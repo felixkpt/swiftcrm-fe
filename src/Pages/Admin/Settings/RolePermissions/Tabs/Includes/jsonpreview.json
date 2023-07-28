@@ -1,0 +1,196 @@
+{
+    "admin": {
+        "routes": [],
+        "children": {
+            "routes": [
+                {
+                    "uri": "admin",
+                    "uri_methods": "admin@GET|@HEAD",
+                    "slug": "admin",
+                    "title": "Dashboard",
+                    "folder": "admin",
+                    "hidden": false
+                },
+                {
+                    "uri": "admin\/tickets",
+                    "uri_methods": "admin\/tickets@GET|@HEAD",
+                    "slug": "admin.tickets",
+                    "title": "Tickets Dashboard",
+                    "folder": "admin",
+                    "hidden": false
+                }
+            ]
+        }
+    },
+    "posts": {
+        "routes": [],
+        "children": {
+            "post": {
+                "routes": [],
+                "children": {
+                    "routes": [
+                        {
+                            "uri": "posts\/post\/{id}",
+                            "uri_methods": "posts\/post\/{id}@GET|@HEAD",
+                            "slug": "posts.post.id",
+                            "title": "Show Post",
+                            "folder": "posts\/post",
+                            "hidden": false
+                        },
+                        {
+                            "uri": "posts\/post\/{id}\/update",
+                            "uri_methods": "posts\/post\/{id}\/update@DELETE",
+                            "slug": "posts.post.id.update",
+                            "title": "Update Post",
+                            "folder": "posts\/post",
+                            "hidden": false
+                        }
+                    ]
+                }
+            },
+            "routes": [
+                {
+                    "uri": "posts",
+                    "uri_methods": "posts@GET|@HEAD",
+                    "slug": "posts",
+                    "title": "Index",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts\/list",
+                    "uri_methods": "posts\/list@GET|@HEAD",
+                    "slug": "posts.list",
+                    "title": "List",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts\/create",
+                    "uri_methods": "posts\/create@GET|@HEAD",
+                    "slug": "posts.create",
+                    "title": "Create",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts",
+                    "uri_methods": "posts@POST",
+                    "slug": "posts",
+                    "title": "Store",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts",
+                    "uri_methods": "posts@PUT",
+                    "slug": "posts",
+                    "title": "Update",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts\/{id}",
+                    "uri_methods": "posts\/{id}@GET|@HEAD",
+                    "slug": "posts.id",
+                    "title": "Show",
+                    "folder": "posts",
+                    "hidden": false
+                },
+                {
+                    "uri": "posts\/{id}",
+                    "uri_methods": "posts\/{id}@DELETE",
+                    "slug": "posts.id",
+                    "title": "Destroy",
+                    "folder": "posts",
+                    "hidden": false
+                }
+            ]
+        }
+    },
+    "settings": {
+        "routes": [],
+        "children": {
+            "role-permissions": {
+                "routes": [],
+                "children": {
+                    "permissions": {
+                        "routes": [],
+                        "children": {
+                            "routes": [
+                                {
+                                    "uri": "settings\/role-permissions\/permissions\/routes",
+                                    "uri_methods": "settings\/role-permissions\/permissions\/routes@GET|@HEAD",
+                                    "slug": "settings.role.permissions.permissions.routes",
+                                    "title": "Index",
+                                    "folder": "settings\/role-permissions\/permissions",
+                                    "hidden": true
+                                }
+                            ]
+                        }
+                    },
+                    "roles": {
+                        "routes": [],
+                        "children": {
+                            "routes": [
+                                {
+                                    "uri": "settings\/role-permissions\/roles",
+                                    "uri_methods": "settings\/role-permissions\/roles@GET|@HEAD",
+                                    "slug": "settings.role.permissions.roles",
+                                    "title": "Index",
+                                    "folder": "settings\/role-permissions\/roles",
+                                    "hidden": true
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tickets": {
+        "routes": [],
+        "children": {
+            "routes": [
+                {
+                    "uri": "tickets\/list",
+                    "uri_methods": "tickets\/list@GET|@HEAD",
+                    "slug": "tickets.list",
+                    "title": "All Tickets",
+                    "folder": "tickets",
+                    "hidden": false
+                }
+            ],
+            "ticket": {
+                "routes": [],
+                "children": {
+                    "routes": [
+                        {
+                            "uri": "tickets\/ticket\/{id}",
+                            "uri_methods": "tickets\/ticket\/{id}@GET|@HEAD",
+                            "slug": "tickets.ticket.id",
+                            "title": "Single Ticket",
+                            "folder": "tickets\/ticket",
+                            "hidden": false
+                        }
+                    ],
+                    "sla": {
+                        "routes": [],
+                        "children": {
+                            "routes": [
+                                {
+                                    "uri": "tickets\/ticket\/sla\/{id}",
+                                    "uri_methods": "tickets\/ticket\/sla\/{id}@GET|@HEAD",
+                                    "slug": "tickets.ticket.sla.id",
+                                    "title": "Sla Ticket",
+                                    "folder": "tickets\/ticket\/sla",
+                                    "hidden": false
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
