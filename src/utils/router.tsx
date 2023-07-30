@@ -1,5 +1,4 @@
-import { createBrowserRouter, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 import Login from '@/Pages/Auth/Login';
 import Profile from '@/Pages/User/Profile';
 import Register from '@/Pages/Auth/Register';
@@ -53,7 +52,7 @@ const router = createBrowserRouter([
 				element: <Profile />,
 			},
 			{
-				path: '/admin/settings/role-permissions/:tab',
+				path: '/admin/settings/role-permissions/:tab?',
 				element: <RolePermissions />,
 			},
 			{

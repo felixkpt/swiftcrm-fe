@@ -17,7 +17,7 @@ const Menu = () => {
       get('/admin/settings/role-permissions/permissions/user/' + user.id)
     }
 
-  }, [user])
+  }, [])
 
   useEffect(() => {
 
@@ -34,10 +34,16 @@ const Menu = () => {
         userMenu !== null ?
           <MenuRoutesTree routes={userMenu} handleSubmit={(checkboxStates) => console.log(checkboxStates)} />
           :
-          <div className="d-flex align-items-center gap-3">
-            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Loading...
-          </div>
+          <>
+            {loading ?
+              <div className="d-flex align-items-center gap-3">
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Loading...
+              </div>
+              :
+              `No menus associated with your role.`
+            }
+          </>
       }
     </div>
   );

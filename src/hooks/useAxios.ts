@@ -40,7 +40,7 @@ const useAxios = () => {
             setLoading(true);
             const response = await axiosInstance(config);
             setData(response.data);
-            
+
             setErrors(null);
             return response.data
         } catch (error) {
@@ -67,7 +67,7 @@ const useAxios = () => {
                     if (axiosError.response?.data.errors) {
                         showErrors(axiosError.response.data);
                     }
-                    
+
 
                 } else {
                     const msg = 'We are experiencing server connection issues.'
@@ -85,7 +85,7 @@ const useAxios = () => {
         }
     };
 
-    const get = (url, config = {}) => fetchData({ method: 'GET', url, ...config });
+    const get = (url, params = {}, config = {}) => fetchData({ method: 'GET', url, ...config, params });
     const post = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config });
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const patch = (url, data = {}, config = {}) => fetchData({ method: 'PATCH', url, data, ...config });

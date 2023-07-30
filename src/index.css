@@ -83,7 +83,7 @@ a:focus {
 }
 
 #navbar-wrapper .navbar a:hover {
-  color: #d4cfbc;
+  color: #2980b9;
 }
 
 #content-wrapper {
@@ -321,11 +321,11 @@ a:focus {
 }
 
 .cursor-default {
-  cursor: default;
+  cursor: default!important;
 }
 
 .cursor-pointer {
-  cursor: pointer;
+  cursor: pointer!important;
 }
 
 .z-50 
@@ -351,4 +351,13 @@ a:focus {
 
 .h-100vh {
   min-height: 100vh;
+}
+
+
+.w-80 {
+  width: 80%!important;
+}
+
+.w-90 {
+  width: 90%!important;
 }

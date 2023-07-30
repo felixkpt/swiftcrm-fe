@@ -100,6 +100,14 @@ export const emitError = (errorMsg: string, status?: number) => {
     window.dispatchEvent(event);
 };
 
+// Event emitter to emit error to the parent component
+export const emitNotification = (messsage: string, type?: 'success' | 'info' | 'light' | 'warning' | 'error') => {
+    const event = new CustomEvent('notification', {
+        detail: { message: messsage, type: type },
+    });
+    window.dispatchEvent(event);
+};
+
 // Event emitter to emit PrepareEdit to the parent component
 export const emitPrepareEdit = (row: any, action: any, data: any) => {
     const event = new CustomEvent('prepareEdit', {

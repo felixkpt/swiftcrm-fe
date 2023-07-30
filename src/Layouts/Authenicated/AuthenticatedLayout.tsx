@@ -11,7 +11,7 @@ const AuthenticatedLayout = () => {
     const navigate = useNavigate();
 
     // Initialize useAxios with the desired endpoint for fetching user data
-    const { data, loading, error, get } = useAxios();
+    const { data, loading, get } = useAxios();
 
     useEffect(() => {
         const fetchData = () => {

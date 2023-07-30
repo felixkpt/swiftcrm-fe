@@ -1,3 +1,4 @@
+import Str from '@/utils/Str';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
@@ -50,6 +51,8 @@ const renderRoutes = (
     let { children } = routes[key];
     const routeList = children?.routes || [];
 
+    if (routeList.length < 1 && children?.children?.routes?.length < 1) return null
+
     let others;
     if (children) {
       const { routes: unwanted, ...rest } = children;
@@ -58,7 +61,7 @@ const renderRoutes = (
 
     children = others;
 
-    const currentId = key + '_nav';
+    const currentId = Str.slug((prevFolderName + '/' + key).replace(/^\//, '')) + '_nav';
 
     const isResolvableURI = (uri_methods: string) => {
       const urisWithParams = uri_methods.split('|').filter(uri => uri.includes('{'));
@@ -66,14 +69,18 @@ const renderRoutes = (
       return urisWithParams.length === 0 && hasGetOrHead;
     };
 
-    const filteredRouteList = routeList?.filter((route) => isResolvableURI(route.uri_methods) && !route.hidden);
+    const filteredRouteList = (routeTest) => {
+      if (routeTest?.length > 0)
+        return routeTest?.filter((route) => isResolvableURI(route.uri_methods) && !route.hidden)
+      else return []
+    }
 
     return (
       <li key={currentId} className='mt-1'>
-        <div className='toggler-section mb-2 px-1 border border-secondary bg-gradient rounded d-flex rounded-lg'>
+        <div className='toggler-section mb-2 px-1 bg-gradient rounded d-flex rounded-lg'>
           <label className='toggler p-2 text-base d-flex align-items-center gap-1 justify-content-between flex-grow-1' onClick={() => handleToggle(currentId)}>
             <span className='d-flex align-items-center gap-1'>
-              <Icon icon={`${'prime:bookmark'}`} />
+              <Icon icon={`${ routes[key].icon || 'prime:bookmark'}`} />
               <span>{key}</span>
             </span>
             <Icon icon="bi-chevron-down" />
@@ -81,9 +88,9 @@ const renderRoutes = (
         </div>
 
         <ul id={currentId} className={`list-unstyled ms-${indent} d-none my-1`}>
-          {filteredRouteList.length > 0 && (
+          {filteredRouteList(routeList).length > 0 && (
             <>
-              {filteredRouteList.map((route, i) => (
+              {filteredRouteList(routeList).map((route, i) => (
                 <li className='link' key={`${i}+${key}_${route.slug}`}>
                   <NavLink
                     to={`${route.uri.startsWith('admin') ? '' : 'admin/'}${route.uri}`}
