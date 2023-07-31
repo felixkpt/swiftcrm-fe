@@ -52,7 +52,7 @@ function handleToggleCheck(key: string) {
 
   if (target) {
     inputs.forEach((input) => (input.checked = target.checked));
-    debouncedHandleCheckedSingle(key, false, true); // Call debouncedHandleCheckedSingle to handle bubbling up
+    debouncedHandleCheckedSingle(key, false); // Call debouncedHandleCheckedSingle to handle bubbling up
   }
 }
 
@@ -70,7 +70,6 @@ function handleCheckedSingle(key: string, indeterminate = true, hideEmptyFolders
 
       if (hiddenCheckbox && hiddenCheckbox.checked) {
         // Mark the folder as hidden if the hidden checkbox is checked
-        // Do any additional handling for hidden folders if needed
       }
 
       // Uncheck parent checkboxes recursively up the tree
@@ -92,7 +91,7 @@ function handleCheckedSingle(key: string, indeterminate = true, hideEmptyFolders
         // Should HideEmptyRoutes Folder
 
         if (hideEmptyFolders) {
-          shouldHideEmptyFolders(parentCheckbox, key)
+          // shouldHideEmptyFolders(parentCheckbox, key)
         }
       }
 
@@ -187,7 +186,7 @@ function getAllFoldersIcons() {
 
   for (const input of inputs) {
     const folder = (input.id).replace(/-icon$/, '')
-    
+
     items.push([folder, input.value]);
   }
 
@@ -256,7 +255,7 @@ const renderRoutes = (
       <li key={currentId} className={`mt-1`} id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
         <div className='folder-section toggler-section mb-2 px-1 border bg-white d-flex align-items-center justify-content-between rounded gap-2'>
           <div className='col-8 d-flex'>
-            <label className='form-check-label px-0.5 d-flex align-items-center cursor-pointer'>
+            <label className='bg-body-secondary form-check-label px-2 d-flex align-items-center cursor-pointer'>
               <input
                 type='checkbox'
                 id={`${currentId}-checkbox`}
@@ -267,16 +266,16 @@ const renderRoutes = (
             </label>
             <label className='toggler text-base flex-grow-1 border flex-grow-1 py-2 ps-1 pe-0 rounded' onClick={() => handleToggle(currentId)}>{key}</label>
           </div>
-          <div className='bg-light col-4 d-flex justify-content-between rounded'>
-            <label>Icon
+          <div className='col-4 d-flex justify-content-between rounded'>
+            <label className='col-6'>Icon
               <input style={{ width: '100px' }} type="text" id={`${parentFolder}-icon`} className='folder-icon ms-1 border border-secondary rounded' />
             </label>
-            <label className='form-check-label d-flex align-items-center cursor-pointer'>
+            <label className='col-6 justify-content-end gap-2 pe-4 form-check-label d-flex align-items-center cursor-pointer'>
               <input
                 type='checkbox'
                 id={`${currentId}-hidden-folder-toggler`}
                 value={[parentFolder, key]}
-                className='form-check-input me-2 hidden-folder-toggler'
+                className='form-check-input hidden-folder-toggler'
               />
               Hidden
             </label>
@@ -309,7 +308,12 @@ const renderRoutes = (
                       : false;
                     setIsChecked(c)
 
-                  }, [isInitialRender, parentChecked])
+                  }, [isInitialRender])
+
+                  useEffect(() => {
+                    setIsChecked(!isChecked)
+
+                  }, [route, parentChecked])
 
                   return (
                     <tr className='link routes-parent' key={`${i}+${key}_${route.slug}`}>
@@ -322,7 +326,7 @@ const renderRoutes = (
                             className={`${ROUTE_CHECKBOX_CLASS} form-check-input me-2`}
                             checked={isChecked}
                             onClick={() => setIsChecked(!isChecked)}
-                            onChange={() => debouncedHandleCheckedSingle(currentId, true, true)}
+                            onChange={() => debouncedHandleCheckedSingle(currentId)}
                           />
                         </label>
                       </td>

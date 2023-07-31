@@ -3,14 +3,17 @@ import Login from '@/Pages/Auth/Login';
 import Profile from '@/Pages/User/Profile';
 import Register from '@/Pages/Auth/Register';
 import Admin from '@/Pages/Admin/Index';
-import RolePermissions from '@/Pages/Admin/Settings/RolePermissions/Index';
 import TestErrorBoundary from '@/Pages/TestErrorBoundary';
 import Test from '@/Pages/Admin/Test';
 import GuestLayout from '@/Layouts/Guest/GuestLayout';
 import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
 import ViewRole from '@/Pages/Admin/Settings/RolePermissions/ViewRole';
 import Users from '../Pages/Admin/Settings/Users/Index';
+import Roles from '@/Pages/Admin/Settings/RolePermissions/Roles/Roles';
+import Permissions from '@/Pages/Admin/Settings/RolePermissions/Permissions/Permissions';
+import CreateOrUpdatePermission from '@/Pages/Admin/Settings/RolePermissions/Permissions/CreateOrUpdatePermission';
 import CreateOrUpdateUser from '@/Pages/Admin/Settings/Users/CreateOrUpdateUser';
+import Index from '@/Pages/Admin/Settings/Users/User/Index';
 
 const router = createBrowserRouter([
 	{
@@ -52,8 +55,20 @@ const router = createBrowserRouter([
 				element: <Profile />,
 			},
 			{
-				path: '/admin/settings/role-permissions/:tab?',
-				element: <RolePermissions />,
+				path: '/admin/settings/role-permissions/roles',
+				element: <Roles />,
+			},
+			{
+				path: '/admin/settings/role-permissions/permissions',
+				element: <Permissions />,
+			},
+			{
+				path: '/admin/settings/role-permissions/permissions/create',
+				element: <CreateOrUpdatePermission />,
+			},
+			{
+				path: '/admin/settings/role-permissions/permissions/permission/:id/edit',
+				element: <CreateOrUpdatePermission />,
 			},
 			{
 				path: '/admin/settings/role-permissions/roles/:id',
@@ -71,8 +86,13 @@ const router = createBrowserRouter([
 				path: '/admin/settings/users/user/:id/edit',
 				element: <CreateOrUpdateUser />,
 			},
+			{
+				path: '/admin/settings/users/user/:id',
+				element: <Index />,
+			},
 		],
 	},
 ]);
+
 
 export default router;

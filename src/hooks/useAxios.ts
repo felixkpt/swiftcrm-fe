@@ -85,7 +85,7 @@ const useAxios = () => {
         }
     };
 
-    const get = (url, params = {}, config = {}) => fetchData({ method: 'GET', url, ...config, params });
+    const get = (url, config = {}) => fetchData({ method: 'GET', url, ...config});
     const post = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config });
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const patch = (url, data = {}, config = {}) => fetchData({ method: 'PATCH', url, data, ...config });

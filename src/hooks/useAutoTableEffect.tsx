@@ -33,9 +33,26 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
     useEffect(() => {
 
         // Update the tableData state with the fetched data
-        setTableData(data);
+        setTableData(data?.data);
 
     }, [data])
+
+    useEffect(() => {
+        // Add event listener for the custom ajaxPost event
+        const eventListener = (event: CustomEvent<{ [key: string]: any }>) => {
+            const { detail } = event
+
+            if (detail !== null)
+                fetchData()
+        };
+
+        window.addEventListener('ajaxPostDone', eventListener as EventListener);
+
+        // Cleanup the event listener when the component unmounts
+        return () => {
+            window.removeEventListener('ajaxPostDone', eventListener as EventListener);
+        };
+    }, []);
 
 
     function handleOrderBy(key: string) {

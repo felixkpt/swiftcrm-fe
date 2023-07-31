@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar/Index';
 import Footer from './Footer/Index';
 import useAxios from '@/hooks/useAxios';
 import Sidebar from './SideNav/Index';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const AuthenticatedLayout = () => {
+
     const { user, updateUser, deleteUser } = useAuth();
     const navigate = useNavigate();
 
@@ -54,16 +56,19 @@ const AuthenticatedLayout = () => {
 
     return (
         <>
+        <ScrollToTop />
             {user ? (
                 <div id="wrapper">
                     <Sidebar />
                     <div id="navbar-wrapper">
                         <Navbar />
                     </div>
-                    <main id="content-wrapper" className='h-100vh'>
-                        <div className="row">
-                            <div className="col-lg-12">
-                                <Outlet />
+                    <main id="content-wrapper" className='w-100 min-h-100vh'>
+                        <div className='containter bg-body-secondary p-2 min-h-100vh'>
+                            <div className="row">
+                                <div className="col-lg-12">
+                                    <Outlet />
+                                </div>
                             </div>
                         </div>
                     </main>

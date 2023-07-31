@@ -6,7 +6,7 @@ const AjaxPost = () => {
 
     const { data, post, put, destroy } = useAxios();
 
-    const [ form, setForm ] = useState();
+    const [form, setForm] = useState();
 
     const ajaxPost = async (event: CustomEvent<{ [key: string]: any }>) => {
 
@@ -38,6 +38,8 @@ const AjaxPost = () => {
         } else if (method == 'delete') {
             response = await destroy(url, formData);
         }
+
+        emitAjaxPostDone(response)
     };
 
     useEffect(() => {

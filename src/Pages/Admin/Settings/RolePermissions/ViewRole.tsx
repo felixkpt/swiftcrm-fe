@@ -69,7 +69,7 @@ const ViewRole = () => {
             )}
 
             <div className="row">
-                <div className='col-12 col-lg-7 col-xl-7'>
+                <div className='col-sm-12 col-md-10 col-lg-8'>
                     <div className='card mt-2'>
                         <div className='card-body'>
                             <div className="card-header">
