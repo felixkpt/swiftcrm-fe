@@ -59,8 +59,8 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
 
     useEffect(() => {
         if (loading === false && data) {
-            setUser(data?.data?.user);
-            setRoles(data?.data?.roles);
+            setUser(data?.user);
+            setRoles(data?.roles);
         }
     }, [data, loading]);
 
@@ -125,7 +125,6 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
                             name="password"
                             id="password"
                             className="form-input block w-full"
-                            required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />

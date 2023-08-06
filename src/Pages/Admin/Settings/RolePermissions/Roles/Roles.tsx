@@ -27,6 +27,10 @@ const Roles = () => {
               key: 'name',
             },
             {
+              label: 'Guard Name',
+              key: 'guard_name',
+            },
+            {
               label: 'Created At',
               key: 'created_at',
             },

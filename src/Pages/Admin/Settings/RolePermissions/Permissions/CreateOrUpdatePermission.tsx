@@ -28,7 +28,7 @@ const CreateOrUpdatePermission: React.FC<Props> = () => {
 
     useEffect(() => {
         if (loading === false && data) {
-            setPermission(data?.data?.permission);
+            setPermission(data?.permission);
         }
     }, [data, loading]);
 

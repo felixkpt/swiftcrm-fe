@@ -92,6 +92,11 @@ const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
         return 'text';
     };
 
+    useEffect(() => {
+
+
+    }, [])
+
     return (
         <div ref={rootRef || null}>
             <div ref={rootRef.current ?? undefined} className={`modal fade`} id="createModel" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>

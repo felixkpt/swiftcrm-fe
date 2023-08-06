@@ -28,7 +28,7 @@ const AuthenticatedLayout = () => {
         if (tried === false && loading === true) setTried(true);
 
         if (loading === false && tried === true) {
-            const user = data?.data;
+            const user = data;
             if (user) {
                 updateUser(user);
             } else {

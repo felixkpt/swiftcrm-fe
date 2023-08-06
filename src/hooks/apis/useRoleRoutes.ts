@@ -1,14 +1,14 @@
 import useAxios from '@/hooks/useAxios';
 import { useEffect } from 'react';
 
-const useRoleRoutes = (roleUri, routesUri) => {
-  const { data: role, get: getRole } = useAxios();
-  const { data: routes, get: getRoutes } = useAxios();
+const useRoleRoutes = (roleUri: string, routesUri: string) => {
+  const { data: role, get: getRole } = useAxios<RoleData>();
+  const { data: routes, get: getRoutes } = useAxios<Route[]>();
 
   useEffect(() => {
     if (roleUri) {
       getRole(roleUri);
-     
+
     }
   }, [roleUri]);
 

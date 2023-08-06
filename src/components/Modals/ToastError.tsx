@@ -58,7 +58,7 @@ const ToastError: React.FC = () => {
   }, [showModal, toastNotificationRef]);
 
   return (
-    <div ref={toastNotificationRef} aria-live="polite" aria-atomic="true" className="position-absolute z-1060 right-0 top-0 d-flex justify-content-end align-items-center w-100">
+    <div ref={toastNotificationRef} aria-live="polite" aria-atomic="true" className="position-fixed z-1060 right-0 top-0 d-flex justify-content-end align-items-center w-100">
 
       <div className="toast m-2 bg-danger-subtle" role="alert" aria-live="assertive" aria-atomic="true">
         <div className="toast-header">{title || 'Toast title'}

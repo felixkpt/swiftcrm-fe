@@ -21,24 +21,24 @@ export default function Register() {
 		try {
 			const resp = await axios.post('/register', body);
 			if (resp.status === 200) {
-				setUser(resp.data.user);
+				setUser(resp.user);
 				return <Navigate to="/profile" />;
 			}
 		} catch (error) {
 			if (error.response.status === 422) {
-				console.log(error.response.data.errors);
-				if (error.response.data.errors.name) {
-					setNameError(error.response.data.errors.name[0]);
+				console.log(error.response.errors);
+				if (error.response.errors.name) {
+					setNameError(error.response.errors.name[0]);
 				} else {
 					setNameError('');
 				}
-				if (error.response.data.errors.email) {
-					setEmailError(error.response.data.errors.email[0]);
+				if (error.response.errors.email) {
+					setEmailError(error.response.errors.email[0]);
 				} else {
 					setEmailError('');
 				}
-				if (error.response.data.errors.password) {
-					setPasswordError(error.response.data.errors.password[0]);
+				if (error.response.errors.password) {
+					setPasswordError(error.response.errors.password[0]);
 				} else {
 					setPasswordError('');
 				}

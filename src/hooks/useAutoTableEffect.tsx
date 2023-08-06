@@ -33,7 +33,7 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
     useEffect(() => {
 
         // Update the tableData state with the fetched data
-        setTableData(data?.data);
+        setTableData(data);
 
     }, [data])
 

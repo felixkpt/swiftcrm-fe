@@ -41,8 +41,8 @@ const Create: React.FC<Props> = () => {
 
     useEffect(() => {
         if (loading === false && data) {
-            setUser(data?.data?.user);
-            setRoles(data?.data?.roles);
+            setUser(data?.user);
+            setRoles(data?.roles);
         }
     }, [data, loading]);
 

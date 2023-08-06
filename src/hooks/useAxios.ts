@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { clearErrors, showErrors } from '@/utils/validation-errors';
 import { useAuth } from '@/contexts/AuthContext';
 import { emitError } from '@/utils/helpers';
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_API;
 
-const useAxios = () => {
-    const [data, setData] = useState(null);
+
+interface AxiosResponseWithData<T> extends AxiosResponse {
+    data: T;
+}
+
+const useAxios = <T = any>() => {
+    const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
 
@@ -39,10 +44,10 @@ const useAxios = () => {
         try {
             setLoading(true);
             const response = await axiosInstance(config);
-            setData(response.data);
+            setData(response.data?.results);
 
             setErrors(null);
-            return response.data
+            return response.data?.results
         } catch (error) {
 
             const axiosError = error as AxiosErrorWithResponse;
@@ -56,6 +61,7 @@ const useAxios = () => {
                     setErrors(msg);
 
                     if (status && status !== 200 && status !== 201 && status !== 401) {
+
                         emitError(msg, status)
                     }
 
@@ -85,7 +91,7 @@ const useAxios = () => {
         }
     };
 
-    const get = (url, config = {}) => fetchData({ method: 'GET', url, ...config});
+    const get = (url, config = {}) => fetchData({ method: 'GET', url, ...config });
     const post = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config });
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const patch = (url, data = {}, config = {}) => fetchData({ method: 'PATCH', url, data, ...config });

@@ -14,7 +14,7 @@ const Menu = () => {
   useEffect(() => {
 
     if (user && userMenu === null) {
-      get('/admin/settings/role-permissions/permissions/user/' + user.id)
+      get('/admin/settings/role-permissions/roles/get-menu/' + user?.roles[0].id + '?get-menu=1')
     }
 
   }, [])
@@ -22,17 +22,24 @@ const Menu = () => {
   useEffect(() => {
 
     if (!loading && data) {
-      setUserMenu(data?.data)
+      setUserMenu(data?.menu)
     }
 
   }, [loading])
 
   return (
     <div>
-      <h4>Menu</h4>
       {
-        userMenu !== null ?
-          <MenuRoutesTree routes={userMenu} handleSubmit={(checkboxStates) => console.log(checkboxStates)} />
+        user && userMenu !== null ?
+          <div className='bg-gray-50 shadow sm:w-full px-2'>
+            <select className='w-100 mb-2'>
+              {
+                user.roles?.map((role) => <option>{role.name}</option>)
+              }
+            </select>
+            <h4>Menu</h4>
+            <MenuRoutesTree routes={userMenu} />
+          </div>
           :
           <>
             {loading ?
