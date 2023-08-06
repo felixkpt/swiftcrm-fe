@@ -9,15 +9,21 @@ const Menu = () => {
   const { data, get, loading } = useAxios()
   const { user } = useAuth()
 
+  const [selectedRoleId, setSelectedRoleId] = useState<string>()
+
   const [userMenu, setUserMenu] = useState(null)
 
   useEffect(() => {
+    if (user) setSelectedRoleId(user.roles[0]?.id)
+  }, [user]);
 
-    if (user && userMenu === null) {
-      get('/admin/settings/role-permissions/roles/get-menu/' + user?.roles[0].id + '?get-menu=1')
+  useEffect(() => {
+
+    if (selectedRoleId) {
+      get('/admin/settings/role-permissions/roles/get-menu/' + selectedRoleId + '?get-menu=1')
     }
 
-  }, [])
+  }, [selectedRoleId])
 
   useEffect(() => {
 
@@ -32,10 +38,10 @@ const Menu = () => {
       {
         user && userMenu !== null ?
           <div className='bg-gray-50 shadow sm:w-full px-2'>
-            <select className='w-100 mb-2'>
+            <select className='w-100 mb-2' onChange={(e) => setSelectedRoleId(e.target.value)}>
               {
-                user.roles?.map((role) => <option>{role.name}</option>)
-              }
+                user.roles?.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)
+              } 
             </select>
             <h4>Menu</h4>
             <MenuRoutesTree routes={userMenu} />
