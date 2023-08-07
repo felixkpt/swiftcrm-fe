@@ -1,6 +1,6 @@
 import useAxios from '@/hooks/useAxios';
 import { emitAjaxPost } from '@/utils/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 type Role = {
@@ -17,167 +17,152 @@ type User = {
 
 type Props = {};
 
+
+import Select from 'react-select';
+
+const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' },
+];
+
 const CreateOrUpdateUser: React.FC<Props> = () => {
     const { id } = useParams<{ id: string }>();
-    const { data, loading, get } = useAxios();
+    const { data: user, loading: loadingUser, get: getUser } = useAxios();
+    const { data: roles, loading: loadingRoles, get: getRoles } = useAxios();
 
-    const [user, setUser] = useState<User | undefined>(undefined);
-    const [roles, setRoles] = useState<Role[]>([]);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
-    const handleRoleChange = (roleId: number) => {
-        if (!user) return [];
-        const selectedRoles = user.roles.map((role) => role.id);
-        if (selectedRoles.includes(roleId)) {
-            return selectedRoles.filter((id) => id !== roleId);
-        }
-        return [...selectedRoles, roleId];
-    };
+    const [selectedOptions, setselectedOptions] = useState<any[]>()
 
-    useEffect(() => {
-        get('admin/settings/users/create');
-    }, []);
+    const rolesRef = useRef()
 
 
     useEffect(() => {
         // Fetch the user data if the 'id' parameter is present
+
         if (id) {
-            get(`admin/settings/users/${id}/edit`);
-        } else {
-            // Initialize the form with default values for new user creation
-            setName('');
-            setEmail('');
-            setPassword('');
-            setPasswordConfirmation('');
-            setUser(undefined);
-            setRoles([]);
+            getUser(`admin/settings/users/${id}/edit`);
         }
+
     }, [id]);
 
     useEffect(() => {
-        if (loading === false && data) {
-            setUser(data?.user);
-            setRoles(data?.roles);
+        if (!roles) {
+            getRoles(`admin/settings/role-permissions/roles?all=1`);
         }
-    }, [data, loading]);
+    }, [roles]);
 
     useEffect(() => {
         if (user) {
-            setName(user.name);
-            setEmail(user.email);
+
+            setName(user.name)
+            setEmail(user.email)
+
+            const currentUserRoles = user.roles.map((role) => role);
+            setselectedOptions(currentUserRoles)
+            console.log(currentUserRoles)
+
         }
-    }, [user]);
+
+    }, [user])
+
+    const handleRoleChange = (roles: any) => {
+
+        if (!user) return [];
+
+        const selectedRoles = roles.map((role) => role.id);
+
+        if (rolesRef.current) {
+            rolesRef.current.value = JSON.stringify(selectedRoles)
+        }
+
+        return [...selectedRoles];
+
+    };
 
     return (
         <div>
-            <div className="container mx-auto card shadow p-3">
-                <h1 className="text-2xl font-bold mb-4">{user ? 'Edit User' : 'Create User'}</h1>
-                <form
-                    method="post"
-                    action={
-                        user
-                            ? import.meta.env.VITE_APP_BASE_API + `/admin/settings/users/${user.id}`
-                            : import.meta.env.VITE_APP_BASE_API + '/admin/settings/users'
-                    }
-                    onSubmit={(e: any) => emitAjaxPost(e)}
-                    className="flex justify-center"
-                >
-                    {user && <input type="hidden" value="put" name="_method" />}
+            {
+                user && Object.keys(user).length > 0
 
-                    <div className="mb-4">
-                        <label htmlFor="name" className="block text-gray-800 font-medium">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            className="form-input block w-full"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block text-gray-800 font-medium">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            className="form-input block w-full"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label htmlFor="password" className="block text-gray-800 font-medium">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            className="form-input block w-full"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <>
-                        <div className="mb-4">
-                            <label htmlFor="password_confirmation" className="block text-gray-800 font-medium">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                name="password_confirmation"
-                                id="password_confirmation"
-                                className="form-input block w-full"
-                                value={passwordConfirmation}
-                                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            />
-                        </div>
-                    </>
-
-                    <div className="mb-4">
-                        <label htmlFor="roles" className="block text-gray-800 font-medium">
-                            Roles
-                        </label>
-                        <select
-                            name="roles[]"
-                            id="roles"
-                            className="form-multiselect block w-full"
-                            multiple
-                            onChange={(e) => handleRoleChange(Number(e.target.value))}
+                    ? <div className="container mx-auto card shadow p-3">
+                        <h1 className="text-2xl font-bold mb-4">{'Edit User'}</h1>
+                        <form
+                            method="post"
+                            action={
+                                user
+                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/settings/users/${user.id}`
+                                    : import.meta.env.VITE_APP_BASE_API + '/admin/settings/users'
+                            }
+                            onSubmit={(e: any) => emitAjaxPost(e)}
+                            className="flex justify-center"
                         >
-                            {roles.map((role) => (
-                                <option
-                                    key={role.id}
-                                    value={role.id}
-                                    selected={user && user.roles.some((r) => r.id === role.id)}
+                            {user && <input type="hidden" value="put" name="_method" />}
+
+                            <div className="mb-4 form-group">
+                                <label htmlFor="name" className="block text-gray-800 font-medium">
+                                    Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    className='form-control'
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                            </div>
+                            <div className="mb-4 form-group">
+                                <label htmlFor="email" className="block text-gray-800 font-medium">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    className="form-control"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="roles" className="block text-gray-800 font-medium">
+                                    Roles
+                                </label>
+                                {
+                                    roles && selectedOptions &&
+                                    <Select
+                                        defaultValue={selectedOptions}
+                                        onChange={handleRoleChange}
+                                        options={roles}
+                                        getOptionValue={(option) => `${option['id']}`}
+                                        getOptionLabel={(option) => `${option['name']}`}
+                                        isMulti
+                                    />
+                                }
+
+                                <input type="hidden" name="roles" defaultValue={JSON.stringify(selectedOptions?.map(role => role.id))} ref={rolesRef} />
+                            </div>
+
+                            <div className='d-flex justify-content-end'>
+                                <button
+                                    type="submit"
+                                    className="px-3 btn btn-outline-primary rounded hover:bg-indigo-600"
                                 >
-                                    {role.name}
-                                </option>
-                            ))}
-                        </select>
+                                    {user ? 'Update User' : 'Create User'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
+                    :
+                    <div>Getting user info</div>
+            }
 
-                    <div className='d-flex justify-content-end'>
-                        <button
-                            type="submit"
-                            className="px-3 btn btn-outline-primary rounded hover:bg-indigo-600"
-                        >
-                            {user ? 'Update User' : 'Create User'}
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     );
 };

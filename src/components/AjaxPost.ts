@@ -22,6 +22,12 @@ const AjaxPost = () => {
         if (url.startsWith('/')) url += import.meta.env.VITE_APP_BASE_API;
 
         const method = (rawForm?.querySelector('input[name="_method"]')?.value || 'post').toLowerCase(); // Get the form's HTTP method
+        const button = rawForm?.querySelector('button[type="submit"]')
+
+        if (button) {
+            button.disabled = true
+            button.classList.add('disabled')
+        }
 
         // Dynamically append data to the FormData based on event details
         Object.entries(event.detail).forEach(([key, value]) => {
@@ -29,6 +35,7 @@ const AjaxPost = () => {
         });
 
         let response
+
 
         // Make the request
         if (method == 'post') {
@@ -40,6 +47,12 @@ const AjaxPost = () => {
         }
 
         emitAjaxPostDone(response)
+
+        if (button) {
+            button.disabled = false
+            button.classList.remove('disabled')
+        }
+
     };
 
     useEffect(() => {

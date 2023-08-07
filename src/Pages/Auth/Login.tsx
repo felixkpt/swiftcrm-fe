@@ -44,33 +44,29 @@ export default function Login() {
     }, [loading, tried]);
 
     return (
-        <div className="container h-100vh">
-            <div className="row justify-content-center mt-5 h-100vh align-items-center">
-                <div className="col-lg-4 col-md-6 col-sm-6">
-                    <div className="card shadow">
-                        <div className="card-title text-center border-bottom">
-                            <h2 className="p-3">Login</h2>
+        <div className="col-lg-4 col-md-6 col-sm-6">
+            <div className="card shadow">
+                <div className="card-title text-center border-bottom">
+                    <h2 className="p-3">Login</h2>
+                </div>
+                <div className="card-body">
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group mb-4">
+                            <label htmlFor="email" className="form-label">Username/Email</label>
+                            <input type="email" className="form-control" name='email' id="email" />
                         </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-group mb-4">
-                                    <label htmlFor="email" className="form-label">Username/Email</label>
-                                    <input type="email" className="form-control" name='email' id="email" />
-                                </div>
-                                <div className="form-group mb-4">
-                                    <label htmlFor="password" className="form-label">Password</label>
-                                    <input type="password" className="form-control" name='password' id="password" />
-                                </div>
-                                <div className="form-group mb-4">
-                                    <input type="checkbox" className="form-check-input" name="remember" id="remember" />
-                                    <label htmlFor="remember" className="form-label">Remember Me</label>
-                                </div>
-                                <div className="d-grid">
-                                    <button type="submit" className="btn btn-primary main-bg">Login</button>
-                                </div>
-                            </form>
+                        <div className="form-group mb-4">
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <input type="password" className="form-control" name='password' id="password" />
                         </div>
-                    </div>
+                        <div className="form-group mb-4">
+                            <input type="checkbox" className="form-check-input" name="remember" id="remember" />
+                            <label htmlFor="remember" className="form-label">Remember Me</label>
+                        </div>
+                        <div className="d-grid">
+                            <button type="submit" className="btn btn-primary main-bg">Login</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

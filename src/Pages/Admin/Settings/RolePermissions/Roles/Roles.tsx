@@ -5,9 +5,6 @@ import React, { useEffect, useState } from 'react';
 const Roles = () => {
   const [data, setData] = useState({})
 
-  useEffect(() => {
-  }, [data])
-
   return (
     <div>
       <h3>Roles List</h3>

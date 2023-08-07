@@ -23,6 +23,10 @@ class Str {
         return subject.split(search)[0];
     }
 
+    static afterLast(subject: string, search: string): string {
+        return subject.split(search).slice(-1)[0];
+    }
+
     static title(subject: string): string {
         let strVal = '';
         let str = subject.split(' ');

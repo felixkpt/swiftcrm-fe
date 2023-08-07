@@ -14,6 +14,7 @@ import Permissions from '@/Pages/Admin/Settings/RolePermissions/Permissions/Perm
 import CreateOrUpdatePermission from '@/Pages/Admin/Settings/RolePermissions/Permissions/CreateOrUpdatePermission';
 import CreateOrUpdateUser from '@/Pages/Admin/Settings/Users/CreateOrUpdateUser';
 import Index from '@/Pages/Admin/Settings/Users/User/Index';
+import Error404 from '@/Pages/ErrorPages/Error404';
 
 const router = createBrowserRouter([
 	{
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
 			{
 				path: '/test',
 				element: <Test />,
+			},
+			{
+				path: '*',
+				element: <Error404 />,
 			},
 		],
 	},
@@ -90,6 +95,7 @@ const router = createBrowserRouter([
 				path: '/admin/settings/users/user/:id',
 				element: <Index />,
 			},
+			
 		],
 	},
 ]);
