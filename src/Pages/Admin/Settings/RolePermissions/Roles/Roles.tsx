@@ -1,16 +1,32 @@
 import AutoTable from '@/components/AutoTable';
-import CreateModel from '@/components/CreateModel';
-import React, { useEffect, useState } from 'react';
+import CreateOrEditModel from '@/components/CreateOrEditModel';
+import { useState } from 'react';
 
 const Roles = () => {
   const [data, setData] = useState({})
+
+  const list_sources = {
+
+    async guardName() {
+      return [
+        {
+          id: 'web',
+          name: 'web',
+        },
+        {
+          id: 'api',
+          name: 'api',
+        }
+      ]
+    },
+  }
 
   return (
     <div>
       <h3>Roles List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#createModel">Create role</button>
+          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#createOrEditModel">Create role</button>
         </div>
         <AutoTable
           baseUri='/admin/settings/role-permissions/roles'
@@ -41,7 +57,7 @@ const Roles = () => {
         />
       </div>
       {
-        data && <><CreateModel data={data} actionUrl='/admin/settings/role-permissions/roles' /></>
+        data && <><CreateOrEditModel data={data} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
       }
     </div>
   );

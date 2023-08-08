@@ -13,7 +13,7 @@ const isResolvableURI = (uri: string) => {
 
 function cleanUri(uri) {
 
-    uri = `${uri.startsWith('admin') ? '' : 'admin/'}${uri}`
+    uri = `/${uri.startsWith('admin') ? '' : 'admin/'}${uri}`
 
     uri = Str.before(uri, '@')
 

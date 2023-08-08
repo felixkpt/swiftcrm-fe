@@ -11,7 +11,11 @@ const showErrors = data => {
             if (key == 'start_date') input = 's'
             if (key == 'end_date') input = 't'
 
-            const element = document.getElementsByName(input)[0] || document.getElementsByName(key)[0]
+            let element = document.getElementsByName(input)[0] || document.getElementsByName(key)[0]
+            if (!element) {
+                element = document.getElementById(input) || document.getElementById(key)
+            }
+
             if (!element) continue
 
             element.classList.add('is-invalid')
@@ -19,14 +23,20 @@ const showErrors = data => {
             const invalidFeedback = document.createElement('div')
             invalidFeedback.classList.add('invalid-feedback')
             invalidFeedback.innerHTML = errors[key]
-            const el = element.closest('.form-group')
-            el.classList.add('has-error')
-            el.append(invalidFeedback)
+            const formGroup = element.closest('.form-group')
+            formGroup.classList.add('has-error')
+            formGroup.append(invalidFeedback)
 
             element.addEventListener('focus', function () {
                 element.classList.remove('is-invalid')
                 invalidFeedback.remove()
             })
+            
+            element.addEventListener('click', function () {
+                element.classList.remove('is-invalid')
+                invalidFeedback.remove()
+            })
+
         }
     }
 }

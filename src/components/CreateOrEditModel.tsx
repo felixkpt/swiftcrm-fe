@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { convertToTitleCase, emitAjaxPost } from '@/utils/helpers';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import useAxios from '@/hooks/useAxios';
+import Str from '@/utils/Str';
 
 interface ModalProps {
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
     data: any;
     actionUrl: string;
+    list_sources: any
 }
 
-const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
+const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources }) => {
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [hasFillable, setHasFillable] = useState(false);
@@ -47,15 +52,19 @@ const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
             setInputData(transformedObject);
         }
 
-        if (fillable) {
-            for (const key in fillable) {
-                const { input, type } = fillable[key];
-                transformedObject[key] = '';
+        if (fillable && data?.data) {
+            let row = data.data
+            console.log(row)
 
+            for (const key in row) {
+                transformedObject[key] = row[key];
+                setMethod('put')
             }
+
             setInputData(transformedObject);
         }
-    }, [fillable]);
+
+    }, [fillable, data]);
 
     const errors = {};
 
@@ -92,20 +101,55 @@ const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
         return 'text';
     };
 
-    useEffect(() => {
+    async function getOptions(key: string) {
+
+        try {
+            const fn = Str.camel(key)
+            console.log(fn)
+            const options = await list_sources[fn]();
+            return options;
+        } catch (e) { console.log(e) }
+
+        return []
+
+    }
+
+    interface RenderAsyncSelectProps {
+        key: string;
+        inputData: { [key: string]: string };
+        isMulti?: boolean;
+    }
 
 
-    }, [])
+    function renderAsyncSelect({ key, inputData, isMulti = false }: RenderAsyncSelectProps) {
+        const defaultValue = inputData[key.replace(/_list/, '')] || (isMulti ? [] : '');
+
+        return (
+            <AsyncSelect
+                id={key}
+                className="form-control"
+                name={isMulti ? `${key}[]` : key}
+                key={key}
+                defaultValue={defaultValue}
+                isMulti={isMulti}
+                cacheOptions
+                defaultOptions
+                loadOptions={() => getOptions(key)}
+                getOptionValue={(option) => `${option['id']}`}
+                getOptionLabel={(option) => `${option['name']}`}
+            />
+        );
+    }
 
     return (
         <div ref={rootRef || null}>
-            <div ref={rootRef.current ?? undefined} className={`modal fade`} id="createModel" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+            <div ref={rootRef.current ?? undefined} className={`modal fade`} id="createOrEditModel" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
                 <div className="modal-dialog">
                     <div className="modal-content">
                         {data && isModalOpen ?
                             <div>
                                 <div className="modal-header">
-                                    <h5 className="modal-title" id="staticBackdropLabel">{`Create ${modelName}`}</h5>
+                                    <h5 className="modal-title" id="staticBackdropLabel">{`${data?.data?.id ? 'Edit' : 'Create'} ${modelName}`}</h5>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
@@ -145,18 +189,11 @@ const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
                                                                     key={key}
                                                                 />
                                                             )}
-                                                            {input === 'select' && (
-                                                                <select
-                                                                    id={key}
-                                                                    className="form-control"
-                                                                    name={key}
-                                                                    value={inputData[key] || ''}
-                                                                    onChange={(e) => handleInputChange(key, e.target.value)}
-                                                                    key={key}
-                                                                >
-                                                                    <option value="">--Please select--</option>
-                                                                </select>
-                                                            )}
+
+                                                            {input === 'select' && renderAsyncSelect({ key, inputData })}
+
+                                                            {input === 'multiselect' && renderAsyncSelect({ key, inputData, isMulti: true })}
+
                                                             {input === 'textarea' && (
                                                                 <textarea
                                                                     id={key}
@@ -192,4 +229,4 @@ const CreateModel: React.FC<ModalProps> = ({ data, actionUrl }) => {
     );
 };
 
-export default CreateModel;
+export default CreateOrEditModel;

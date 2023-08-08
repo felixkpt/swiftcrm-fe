@@ -119,7 +119,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     _setUser(null);
   };
 
-
   // Provide the authentication data and functions to the children components
   return (
     <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser }}>

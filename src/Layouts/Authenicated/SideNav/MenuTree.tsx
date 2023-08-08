@@ -6,6 +6,9 @@ import RoutesList from './RoutesList';
 
 type Props = {}
 
+// Constants used for managing the component behavior
+const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
+
 // The main RoutesTree component
 const MenuTree: React.FC<Props> = ({ child, indent, handleToggle }) => {
 
@@ -19,8 +22,8 @@ const MenuTree: React.FC<Props> = ({ child, indent, handleToggle }) => {
 
     return (
         <ul className='list-unstyled nested-routes main'>
-            <li key={currentId} className='draggable' id={`0${folder}`}>
-                <div className='toggler-section mb-2 px-1 bg-gradient rounded d-flex rounded-lg'>
+            <li key={currentId} id={`${PARENT_FOLDER_ID_PREFIX}${folder}`}>
+                <div className='toggler-section mb-1 px-1 rounded d-flex rounded-lg'>
                     <label className='toggler p-2 text-base d-flex align-items-center gap-1 justify-content-between flex-grow-1' onClick={() => handleToggle(currentId)}>
                         <span className='d-flex align-items-center gap-1'>
                             <Icon icon={`${icon || 'prime:bookmark'}`} />

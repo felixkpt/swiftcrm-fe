@@ -1,11 +1,28 @@
-import React from 'react'
+// src/App.tsx
 
-type Props = {}
+import { Link } from 'react-router-dom';
+import { RouterElement } from '@/routes/router';
+import './App.css';
+import AuthenticatedLayout from './Layouts/Authenicated/AuthenticatedLayout';
+import GuestLayout from './Layouts/Guest/GuestLayout';
 
-const App = (props: Props) => {
+
+function App() {
+  const isAuthenticated = true; // Replace with your actual authentication logic
+
   return (
-    <div>App</div>
-  )
+    <div className="App">
+      {isAuthenticated ? (
+        <AuthenticatedLayout>
+          <RouterElement />
+        </AuthenticatedLayout>
+      ) : (
+        <GuestLayout>
+          <RouterElement />
+        </GuestLayout>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;

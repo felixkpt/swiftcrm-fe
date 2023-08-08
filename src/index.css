@@ -23,8 +23,17 @@ a:focus {
   height: 100%;
   margin-left: -280px;
   overflow: hidden;
-  background: #222;
+  background: #1a4d85;
+  color: #fff !important;
   transition: all 0.5s ease;
+}
+
+#sidebar-wrapper li .toggler-section {
+  background:#235791;
+}
+
+#sidebar-wrapper li.active>.toggler-section {
+  background:#0373BD;
 }
 
 #wrapper.toggled #sidebar-wrapper {

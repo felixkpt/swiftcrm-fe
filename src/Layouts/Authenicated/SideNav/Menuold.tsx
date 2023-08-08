@@ -1,28 +1,36 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useAxios from '@/hooks/useAxios';
 import { useAuth } from '@/contexts/AuthContext';
 import Str from '@/utils/Str';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import MenuTree from './MenuTree';
 import RoutesList from './RoutesList';
-import Select from 'react-select';
 
 // Constants used for managing the component behavior
-const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
+const MAIN_CONTAINER_CLASS = 'nested-routes';
+const PARENT_FOLDER_ID_PREFIX = 'parent-folder-menu-';
 
 function handleToggle(key: string) {
   const target = document.getElementById(key);
-
   if (target) {
 
-    const isHidden = target.classList.contains('d-none')
+    const isHidden = target.classList.contains('nav-item-hidden')
 
-    if (isHidden) {
+    if (isHidden === true) {
       target.classList.remove('d-none');
+      setTimeout(() => {
+        target.classList.add('nav-item-shown');
+        target.classList.remove('nav-item-hidden');
 
+      }, 200);
     } else {
+      target.classList.remove('nav-item-shown');
+      target.classList.add('nav-item-hidden');
 
-      target.classList.add('d-none');
+      setTimeout(() => {
+        target.classList.add('d-none');
+
+      }, 800);
     }
 
 
@@ -32,11 +40,13 @@ function handleToggle(key: string) {
     }
 
   }
+
+
 }
 
 const Menu = () => {
 
-  const { data, get, loading, errors } = useAxios()
+  const { data, get, loading } = useAxios()
   const { user } = useAuth()
 
   const [selectedRoleId, setSelectedRoleId] = useState<string>()
@@ -50,29 +60,31 @@ const Menu = () => {
   useEffect(() => {
 
     if (selectedRoleId) {
-      get('/admin/settings/role-permissions/roles/get-menu/' + selectedRoleId + '?get-menu=1').then((resp) => {
-        if (resp === undefined) {
-          setUserMenu(null)
-        }
-      })
+      get('/admin/settings/role-permissions/roles/get-menu/' + selectedRoleId + '?get-menu=1')
     }
 
   }, [selectedRoleId])
 
   useEffect(() => {
 
-    if (!loading && !errors && data) {
+    if (!loading && data) {
       setUserMenu(data?.menu)
     }
 
   }, [loading])
 
-  const memoizeMenu = useMemo(() => {
-
-    return <>
+  return (
+    <div>
       {
         user && userMenu !== null ?
-          <div className='bg-gray-50 shadow sm:w-full'>
+          <div className='bg-gray-50 shadow sm:w-full px-2'>
+            <select className='w-100 mb-2' onChange={(e) => setSelectedRoleId(e.target.value)}>
+              {
+                user.roles?.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)
+              }
+            </select>
+            <h4>Menu</h4>
+
             <ul className='list-unstyled nested-routes main'>
               {
                 userMenu.map((child, i) => {
@@ -89,10 +101,10 @@ const Menu = () => {
 
                   return (
 
-                    <div key={currentId}>
+                    <>
                       {
                         shouldShowFolder &&
-                        <li className='pb-1' id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
+                        <li key={currentId} className='pb-1' id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
                           <div className='toggler-section px-1 rounded d-flex rounded-lg'>
                             <label className='toggler p-2 text-base d-flex align-items-center gap-1 justify-content-between flex-grow-1' onClick={() => handleToggle(currentId)}>
                               <span className='d-flex align-items-center gap-1'>
@@ -103,25 +115,27 @@ const Menu = () => {
                             </label>
                           </div>
 
-                          <ul id={currentId} className={`list-unstyled ps-${indent} ${shouldShowFirstLevelRoutes ? '' : 'd-none'} my-1`}>
-                            <RoutesList routes={routes} />
-                            <>
-                              {
-                                children.length > 0 &&
-                                <li className={`ps-${indent}`}>
-                                  <ul className={`list-unstyled`}>
-                                    {
-                                      children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} />)
-                                    }
-                                  </ul>
-                                </li>
-                              }
-                            </>
-                          </ul>
+                          <div className='overflow-hidden'>
+                            <ul id={currentId} className={`list-unstyled ps-${indent} ${shouldShowFirstLevelRoutes ? '' : ' nav-item-hidden'} my-1`}>
+                              <RoutesList routes={routes} />
+                              <>
+                                {
+                                  children.length > 0 &&
+                                  <li className={`ps-${indent}`}>
+                                    <ul className={`list-unstyled`}>
+                                      {
+                                        children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} />)
+                                      }
+                                    </ul>
+                                  </li>
+                                }
+                              </>
+                            </ul>
+                          </div>
 
                         </li>
                       }
-                    </div>
+                    </>
 
                   )
                 })
@@ -140,26 +154,8 @@ const Menu = () => {
             }
           </>
       }
-    </>
-
-  }, [user, userMenu])
-
-  return <div className='px-1'>
-    <Select
-      className="basic-single text-dark mb-2"
-      classNamePrefix="select"
-      defaultValue={user?.roles[0]}
-      isSearchable={true}
-      name="roles"
-      options={user?.roles}
-      getOptionValue={(option) => `${option['id']}`}
-      getOptionLabel={(option) => `${option['name']}`}
-      onChange={(item) => setSelectedRoleId(item.id)}
-
-    />
-    {memoizeMenu}
-  </div>
-
+    </div>
+  );
 };
 
 export default Menu;

@@ -33,7 +33,8 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: Aut
     useEffect(() => {
         if (tableData?.data?.length >= 0) {
             setModelDataLength(tableData.data.length);
-            setData(tableData)
+            const {data, ...others} = tableData
+            setData(others)
         } else setModelDataLength(-1);
     }, [tableData]);
 

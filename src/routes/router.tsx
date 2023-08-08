@@ -34,14 +34,6 @@ const router = createBrowserRouter([
 				element: <Register />,
 			},
 			{
-				path: '/testerrorboundary',
-				element: <TestErrorBoundary />,
-			},
-			{
-				path: '/test',
-				element: <Test />,
-			},
-			{
 				path: '*',
 				element: <Error404 />,
 			},

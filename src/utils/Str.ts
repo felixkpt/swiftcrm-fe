@@ -28,6 +28,8 @@ class Str {
     }
 
     static title(subject: string): string {
+        if (!subject) return subject
+
         let strVal = '';
         let str = subject.split(' ');
         for (var chr = 0; chr < str.length; chr++) {
@@ -35,6 +37,27 @@ class Str {
         }
         return strVal
     }
+
+    static studly(subject: string): string {
+        return subject
+            .split(/[_\s]+/)
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('');
+    }
+
+    static camel(subject: string): string {
+        const words = subject.split(/[_\s]+/);
+        const firstWord = words[0].toLowerCase();
+
+        const camelCaseWords = words.slice(1).map((word) => {
+            const capitalizedWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            return capitalizedWord;
+        });
+
+        return firstWord + camelCaseWords.join('');
+    }
+
+
 }
 
 

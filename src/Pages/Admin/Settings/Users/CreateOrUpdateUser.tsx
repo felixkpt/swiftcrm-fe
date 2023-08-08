@@ -2,6 +2,7 @@ import useAxios from '@/hooks/useAxios';
 import { emitAjaxPost } from '@/utils/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Select from 'react-select';
 
 type Role = {
     id: number;
@@ -17,8 +18,6 @@ type User = {
 
 type Props = {};
 
-
-import Select from 'react-select';
 
 const options = [
     { value: 'chocolate', label: 'Chocolate' },
@@ -43,7 +42,7 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
         // Fetch the user data if the 'id' parameter is present
 
         if (id) {
-            getUser(`admin/settings/users/${id}/edit`);
+            getUser(`admin/settings/users/user/${id}/edit`);
         }
 
     }, [id]);
@@ -93,7 +92,7 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
                             method="post"
                             action={
                                 user
-                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/settings/users/${user.id}`
+                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/settings/users/user/${user.id}`
                                     : import.meta.env.VITE_APP_BASE_API + '/admin/settings/users'
                             }
                             onSubmit={(e: any) => emitAjaxPost(e)}
