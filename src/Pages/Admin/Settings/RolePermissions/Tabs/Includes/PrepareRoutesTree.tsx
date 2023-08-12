@@ -1,6 +1,6 @@
 import Str from "@/utils/Str"
 import { useEffect, useState } from "react";
-import RoutesTree2 from "./RoutesTree2";
+import RoutesTree from "./RoutesTree";
 
 // Define the Props interface for the RoutesTree component
 interface Props {
@@ -86,7 +86,7 @@ function getRoutes(container: any) {
       const hidden = route.querySelector('input.folder-hidden').checked
 
       if (hidden === false)
-        items.push({ uri: input.value, title, icon })
+        items.push({ uri: input.value, title, icon, hidden })
     }
   }
 
@@ -142,7 +142,7 @@ const PrepareRoutesTree: React.FC<Props> = ({ routes, permissions, allPermission
                 const currentId = Str.slug((folder).replace(/^\//, ''));
 
                 return <div key={`${currentId}`} className={`tab-pane fade ${j === 0 ? 'show active' : ''} ${MAIN_CONTAINER_CLASS} main-tree COUNTER0`} id={`v-pills-${currentId}`} role="tabpanel" aria-labelledby={`v-pills-${currentId}-tab`}>
-                  <RoutesTree2 child={child} permissions={permissions} allPermissions={allPermissions} indent={0} counter={0} isInitialRender={isInitialRender} />
+                  <RoutesTree child={child} permissions={permissions} allPermissions={allPermissions} indent={0} counter={0} isInitialRender={isInitialRender} />
                 </div>
               }
               )

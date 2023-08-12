@@ -8,7 +8,7 @@ const Index = (props: Props) => {
   const { can, testAbilities } = usePermissions();
 
   useEffect(() => {
-    testAbilities('ticket_create')
+    testAbilities(['ticket_create', 'lead_create'])
   }, [])
 
   return (

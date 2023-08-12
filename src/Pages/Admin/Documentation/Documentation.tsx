@@ -2,50 +2,45 @@ import AutoTable from '@/components/AutoTable';
 import AutoModel from '@/components/AutoModel';
 import { useState } from 'react';
 
-const Roles = () => {
+const Documentation = () => {
   const [data, setData] = useState({})
 
   const list_sources = {
-
-    async guardName() {
-      return [
-        {
-          id: 'web',
-          name: 'web',
-        },
-        {
-          id: 'api',
-          name: 'api',
-        }
-      ]
-    },
   }
 
   return (
     <div>
-      <h3>Roles List</h3>
+      <h3>Documentation List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create role</button>
+          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create Documentation</button>
         </div>
+
         <AutoTable
-          baseUri='/admin/settings/role-permissions/roles'
+          baseUri='/admin/documentation'
           columns={[
             {
               label: 'ID',
               key: 'id',
             },
             {
-              label: 'Role Name',
-              key: 'name',
+              label: 'Title',
+              key: 'title',
             },
             {
-              label: 'Guard Name',
-              key: 'guard_name',
+              label: 'slug',
+              key: 'slug',
+            },{
+              label: 'Content Short',
+              key: 'content_short',
             },
             {
               label: 'Created At',
               key: 'created_at',
+            },
+            {
+              label: 'Status',
+              key: 'status',
             },
             {
               label: 'Action',
@@ -57,11 +52,11 @@ const Roles = () => {
         />
       </div>
       {
-        data && <><AutoModel data={data} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
+        data && <><AutoModel data={data} actionUrl='/admin/documentation' list_sources={list_sources} /></>
       }
     </div>
   );
 };
 
-export default Roles;
+export default Documentation;
 

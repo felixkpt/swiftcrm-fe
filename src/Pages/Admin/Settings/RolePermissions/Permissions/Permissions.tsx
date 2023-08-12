@@ -1,5 +1,5 @@
 import AutoTable from '@/components/AutoTable';
-import CreateModel from '@/components/CreateOrEditModel';
+import CreateModel from '@/components/AutoModel';
 import React, { useEffect, useState } from 'react';
 
 const Permissions = () => {
@@ -26,7 +26,7 @@ const Permissions = () => {
       <h3>Permissions List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#createOrEditModel">Create permission</button>
+          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create permission</button>
         </div>
         <AutoTable
           baseUri='/admin/settings/role-permissions/permissions'

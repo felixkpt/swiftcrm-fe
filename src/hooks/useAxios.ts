@@ -96,8 +96,28 @@ const useAxios = <T = any>() => {
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const patch = (url, data = {}, config = {}) => fetchData({ method: 'PATCH', url, data, ...config });
     const destroy = (url, config = {}) => fetchData({ method: 'DELETE', url, ...config });
+    const getFile = async (url, config = {}) => {
 
-    return { data, loading, errors, get, post, put, patch, destroy };
+        try {
+            setLoading(true);
+            const response = await axiosInstance({
+                method: 'GET',
+                url: `/admin/file-repo/${url}`,
+                responseType: 'blob', // This tells Axios to handle the response as a binary blob
+                ...config,
+            });
+
+            const file = new Blob([response.data], { type: response.headers['content-type'] });
+            return file;
+        } catch (error) {
+            // Error handling code...
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    return { data, loading, errors, get, post, put, patch, destroy, getFile };
 };
 
 export default useAxios;

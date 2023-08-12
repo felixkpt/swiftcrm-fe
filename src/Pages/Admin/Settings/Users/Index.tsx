@@ -1,6 +1,6 @@
 import AutoTable from '@/components/AutoTable'
 import { useState } from 'react'
-import CreateOrEditModel from '@/components/CreateOrEditModel'
+import AutoModel from '@/components/AutoModel'
 
 type Props = {}
 
@@ -13,7 +13,7 @@ const Index = (props: Props) => {
         <div className="container mx-auto">
             <h1 className="text-2xl font-bold mb-4">Users</h1>
             <div className='d-flex justify-content-end'>
-                <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#createOrEditModel">Create User</button>
+                <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create User</button>
             </div>
 
             <AutoTable
@@ -45,7 +45,7 @@ const Index = (props: Props) => {
             />
 
             {
-                data && <><CreateOrEditModel data={data} actionUrl='/admin/settings/users' /></>
+                data && <><AutoModel data={data} actionUrl='/admin/settings/users' /></>
             }
 
         </div>

@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { convertToTitleCase, emitAjaxPost } from '@/utils/helpers';
-import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
-import useAxios from '@/hooks/useAxios';
 import Str from '@/utils/Str';
 
 interface ModalProps {
@@ -10,16 +8,62 @@ interface ModalProps {
     fillable?: { [key: string]: { input: string; type: string } };
     data: any;
     actionUrl: string;
-    list_sources: any
+    ListSources: any;
+    list_depends_on: any;
+    id?: string
 }
 
-const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources }) => {
+const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, list_depends_on, ListSources, id }) => {
+
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [hasFillable, setHasFillable] = useState(false);
     const [fillable, setFillable] = useState([]);
     const [modelName, setModelName] = useState([]);
     const [method, setMethod] = useState("POST");
+
+
+    const [dependentData, setDependentData] = useState({});
+
+    async function fetchDependentData(dependentKey, dependencyKey) {
+        console.log('deep;;')
+        const instance = new ListSources();
+        await instance[dependentKey]();
+        const dependencyOptions = instance.get(dependentKey);
+console.log(dependentKey, dependencyOptions)
+
+        setDependentData(prevData => ({
+            ...prevData,
+            [dependencyKey]: dependencyOptions,
+        }));
+    }
+
+    async function getOptions(key: string) {
+        console.log('getting options....')
+        
+        try {
+            const methodName = Str.camel(key);
+            const instance = new ListSources();
+            console.log('key:', methodName)
+
+            await instance[methodName]();
+
+            const dependencyKeys = instance.getDependencies(methodName);
+            for (const depKey of dependencyKeys) {
+                if (!dependentData[depKey]) {
+                    await fetchDependentData(depKey, methodName);
+                }
+            }
+
+            const options = instance.get(methodName);
+            return options;
+
+        } catch (e) {
+            console.error('error:', e);
+        }
+        return [];
+    }
+
 
     function getActionUrl() {
         const baseURL = import.meta.env.VITE_APP_BASE_API;
@@ -54,7 +98,6 @@ const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources
 
         if (fillable && data?.data) {
             let row = data.data
-            console.log(row)
 
             for (const key in row) {
                 transformedObject[key] = row[key];
@@ -101,40 +144,30 @@ const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources
         return 'text';
     };
 
-    async function getOptions(key: string) {
-
-        try {
-            const fn = Str.camel(key)
-            console.log(fn)
-            const options = await list_sources[fn]();
-            return options;
-        } catch (e) { console.log(e) }
-
-        return []
-
-    }
-
     interface RenderAsyncSelectProps {
         key: string;
         inputData: { [key: string]: string };
         isMulti?: boolean;
     }
 
-
     function renderAsyncSelect({ key, inputData, isMulti = false }: RenderAsyncSelectProps) {
         const defaultValue = inputData[key.replace(/_list/, '')] || (isMulti ? [] : '');
+
+        const cameledKey = Str.camel(key);
+        const hasDependants = !!(list_depends_on && list_depends_on.find(dep => dep[cameledKey]));
+
 
         return (
             <AsyncSelect
                 id={key}
                 className="form-control"
                 name={isMulti ? `${key}[]` : key}
-                key={key}
                 defaultValue={defaultValue}
                 isMulti={isMulti}
                 cacheOptions
                 defaultOptions
                 loadOptions={() => getOptions(key)}
+                options={dependentData[key] || []}
                 getOptionValue={(option) => `${option['id']}`}
                 getOptionLabel={(option) => `${option['name']}`}
             />
@@ -143,7 +176,7 @@ const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources
 
     return (
         <div ref={rootRef || null}>
-            <div ref={rootRef.current ?? undefined} className={`modal fade`} id="createOrEditModel" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+            <div ref={rootRef.current ?? undefined} className={`modal fade`} id={`${id || 'AutoModel'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
                 <div className="modal-dialog">
                     <div className="modal-content">
                         {data && isModalOpen ?
@@ -159,6 +192,7 @@ const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources
                                             {hasFillable ? (
                                                 Object.keys(fillable).map((key) => {
                                                     const { input, type } = fillable[key];
+                                                    key = key.replace(/_multilist$/, '_list')
                                                     return (
                                                         <div key={key} className="form-group mb-2" id={`form-group-section-${key}`}>
                                                             <div className="mb-2 block">
@@ -229,4 +263,4 @@ const CreateOrEditModel: React.FC<ModalProps> = ({ data, actionUrl, list_sources
     );
 };
 
-export default CreateOrEditModel;
+export default AutoModel;
