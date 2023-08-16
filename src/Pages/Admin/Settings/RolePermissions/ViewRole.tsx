@@ -4,6 +4,7 @@ import useRoleRoutes from '@/hooks/apis/useRoleRoutes';
 import useAxios from '@/hooks/useAxios';
 import { emitNotification } from '@/utils/helpers';
 import PrepareRoutesTree from './Tabs/Includes/PrepareRoutesTree';
+import PrepareRoutesTreeDraggable from './Tabs/Includes/PrepareRoutesTreeDraggable';
 
 const ViewRole: React.FC = () => {
     console.log('Render ViewRole');
@@ -86,7 +87,10 @@ const ViewRole: React.FC = () => {
                             </div>
                             {/* let us wait 4 roles, routes & permissions */}
                             {role && routes && permissions && allPermissions ?
-                                <PrepareRoutesTree routes={routes} permissions={permissions} allPermissions={allPermissions} handleSubmit={handleSubmit} saving={savingPermissions} />
+                                <>
+                                {/* <PrepareRoutesTree routes={routes} permissions={permissions} allPermissions={allPermissions} handleSubmit={handleSubmit} saving={savingPermissions} /> */}
+                                <PrepareRoutesTreeDraggable routes={routes} permissions={permissions} allPermissions={allPermissions} handleSubmit={handleSubmit} saving={savingPermissions} />
+                                </>
                                 :
                                 <div className='mt-2 p-2'>
                                     {true ?

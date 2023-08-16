@@ -26,23 +26,12 @@ interface Routes {
     [key: string]: RouteWithChildren;
 }
 
-// Define the PermissionsProps interface for handling permissions
-interface PermissionsProps {
-    folders: string[];
-    permissions: any[];
-    allPermissions: any[];
-}
-
 // Define the Props interface for the RoutesTree component
 // Define the Props interface for the RoutesTree component
 interface Props {
-    folderRoutes: {
-        routes: Routes,
-        children: any
-    };
-    permissions: string[];
-    handleSubmit: ({ folders, permissions }: PermissionsProps) => void;
-    saving: boolean;
+    child: RoutesSection
+    permissions: PermissionData[];
+    allPermissions: PermissionData[];
     indent: number
     counter: number
     isInitialRender: boolean
@@ -118,17 +107,23 @@ function handleToggleCheck(parentId: string, action: boolean | null = null) {
     }
 }
 
-function handleCheckedSingle(e = null) {
+function handleCheckedSingle(e: Event | null = null) {
+    if (!e) return;
 
-    const action = e?.target.checked
+    const target = e.target as HTMLInputElement;
 
-    const parentElement = e.target.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`)
+    const action = target.checked;
+
+    const parentElement = target.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
+
+    if (!parentElement) return;
 
     const parentCheckbox = parentElement.querySelector<HTMLInputElement>(`input[id$="-parent-checkbox"]`);
 
+    if (!parentCheckbox) return;
+
     const checked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:checked.${ROUTE_CHECKBOX_CLASS}`).length;
     const unchecked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`).length;
-
 
     if (unchecked === 0) {
         parentCheckbox.indeterminate = false;
@@ -141,13 +136,11 @@ function handleCheckedSingle(e = null) {
             parentCheckbox.indeterminate = false;
             parentCheckbox.checked = false;
         }
-
     }
 
-    const key = parentElement.id
+    const key = parentElement.id;
 
-    handleToggleCheck(key, action)
-
+    handleToggleCheck(key, action);
 }
 
 // Use the debounce function for checkbox checking logic
@@ -155,7 +148,7 @@ const debouncedHandleCheckedSingle = debounce(handleCheckedSingle, 100);
 
 // Function to find a permission based on uriMethods
 function found(uriMethods: string, permissions: any) {
-    return !!permissions?.find((permission) => permission.uri === uriMethods);
+    return !!permissions?.find((permission: Route) => permission.uri === uriMethods);
 }
 
 // Function to determine whether a checkbox should be checked or not
@@ -166,7 +159,7 @@ function shouldCheckCheckbox(inputId: string, uriMethods: string, permissions: s
         const exists = found(uriMethods, permissions)
 
         if (exists) {
-            const checkbox = document.getElementById(inputId)
+            const checkbox = document.getElementById(inputId) as HTMLInputElement
 
             if (checkbox) {
                 checkbox.checked = true
@@ -215,7 +208,7 @@ function getRouteIcon(allPermissions: any[], uri: string) {
 }
 
 // The main RoutesTree component
-const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, handleSubmit, saving, indent, counter, isInitialRender }) => {
+const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, indent, counter, isInitialRender }) => {
 
     const { routes, children } = child
 
@@ -231,7 +224,7 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, handl
 
     return (
         <div key={currentId} className={`mt-1 parent-folder ps-${indent} border-start border-primary-subtle p-1`} id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
-            <div className='folder-section toggler-section mb-2 ms-1 px-1 border bg-white row align-items-center justify-content-between rounded'>
+            <div className='col-12 folder-section toggler-section mb-2 ms-1 px-1 border bg-white row align-items-center justify-content-between rounded'>
                 <div className='col-7 d-flex'>
                     <label className='form-check-label px-0.5 d-flex align-items-center cursor-pointer'>
                         <input
@@ -305,7 +298,7 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, handl
                                                     <input
                                                         type='hidden'
                                                         className='folder-hidden'
-                                                        value={route.hidden}
+                                                        value={route.hidden.toString()}
                                                     />
                                                 </label>
                                             </td>

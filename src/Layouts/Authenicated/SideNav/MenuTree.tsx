@@ -1,13 +1,12 @@
 import Str from '@/utils/Str';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import React from 'react'
-import { NavLink } from 'react-router-dom';
 import RoutesList from './RoutesList';
 
 type Props = {}
 
 // Constants used for managing the component behavior
-const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
+const PARENT_FOLDER_ID_PREFIX = 'menu-parent-folder-';
 
 // The main RoutesTree component
 const MenuTree: React.FC<Props> = ({ child, indent, handleToggle }) => {

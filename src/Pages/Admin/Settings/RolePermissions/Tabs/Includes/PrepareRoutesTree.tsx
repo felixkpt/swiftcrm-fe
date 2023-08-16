@@ -20,7 +20,7 @@ function constructMenus() {
 
   const topLevelFolders = document.querySelectorAll(`div.${MAIN_CONTAINER_CLASS}.main-tree.tab-pane>div`);
 
-  return {current_folder: constructMenu(currentFolder, true), all_folders: constructMenu(topLevelFolders)}
+  return { current_folder: constructMenu(currentFolder, true), all_folders: constructMenu(topLevelFolders) }
 
 }
 
@@ -38,7 +38,7 @@ function constructMenu(topLevelFolders, isCurrent = false) {
       const icon = container.querySelector('input.folder-icon').value
       const hidden = container.querySelector('input.folder-hidden').checked
 
-      nestedRoutes.push({ folder: input.value, title, icon, hidden, children, routes: getRoutes(container) });
+      nestedRoutes.push({ folder: input.value, title, icon, hidden, children, routes: getRoutes(container, isCurrent) });
     }
   }
 
@@ -71,7 +71,7 @@ function constructMenuRecursively(folderElement: HTMLElement, counter: number) {
 }
 
 // Function to get the selected routes for a given parent container
-function getRoutes(container: any) {
+function getRoutes(container: any, isCurrent = false) {
   const id = container.id
   const routes = container.querySelectorAll(`#chld-${id}-parent-children>.routes-table .route-section`)
 
@@ -81,16 +81,24 @@ function getRoutes(container: any) {
     const input = route.querySelector('input[type="checkbox"]')
 
     if (input.checked) {
+      const uri = input.value
       const title = route.querySelector('input.route-title').value
       const icon = route.querySelector('input.folder-icon').value
       const hidden = route.querySelector('input.folder-hidden').checked
 
-      if (hidden === false)
-        items.push({ uri: input.value, title, icon, hidden })
+      if (isCurrent === true || hidden === false && isResolvableURI(uri))
+        items.push({ uri, title, icon, hidden })
     }
   }
 
   return items
+}
+
+
+const isResolvableURI = (uri: string) => {
+  const urisWithParams = uri.split('|').filter(uri => uri.includes('{'));
+  const hasGetOrHead = uri.includes('@GET') || uri.includes('@HEAD');
+  return urisWithParams.length === 0 && hasGetOrHead;
 }
 
 // The main RoutesTree component
@@ -133,7 +141,7 @@ const PrepareRoutesTree: React.FC<Props> = ({ routes, permissions, allPermission
           <div className='d-flex justify-content-end'>
             <button type="submit" className="btn btn-primary text-white" disabled={saving}>{saving ? 'Saving checked...' : 'Save checked'}</button>
           </div>
-         
+
           <div className={`tab-content overflow-auto`} id="v-pills-tabContent">
             {
               routes.map((child, j) => {

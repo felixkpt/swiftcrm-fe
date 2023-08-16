@@ -8,7 +8,7 @@ import RoutesList from './RoutesList';
 import Select from 'react-select';
 
 // Constants used for managing the component behavior
-const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
+const PARENT_FOLDER_ID_PREFIX = 'menu-parent-folder-';
 
 function handleToggle(key: string) {
   const target = document.getElementById(key);

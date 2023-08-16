@@ -119,32 +119,3 @@ export interface AutoTableInterface {
     reload?: number;
     hideCreate?: boolean
 }
-
-
-export interface Route {
-    uri: string;
-    uri_methods: string;
-    slug: string;
-    title: string;
-    folder: string;
-    hidden: boolean;
-    children?: {
-        routes: Route[];
-        children?: {
-            [key: string]: {
-                routes: Route[];
-                children?: {
-                    routes: Route[];
-                    children?: {
-                        [key: string]: {
-                            routes: Route[];
-                            children?: {
-                                routes: Route[];
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-}
