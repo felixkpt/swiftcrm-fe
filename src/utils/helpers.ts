@@ -5,19 +5,18 @@ export function convertToTitleCase(str: string) {
     });
 }
 
+// // Event emitter to emit error to the parent component
+// export const emitNotification = (errorMsg: string, status?: number) => {
+//     const event = new CustomEvent('axiosError', {
+//         detail: { message: errorMsg, statusCode: status },
+//     });
+//     window.dispatchEvent(event);
+// };
 
 // Event emitter to emit error to the parent component
-export const emitError = (errorMsg: string, status?: number) => {
-    const event = new CustomEvent('axiosError', {
-        detail: { message: errorMsg, statusCode: status },
-    });
-    window.dispatchEvent(event);
-};
-
-// Event emitter to emit error to the parent component
-export const emitNotification = (messsage: string, type?: 'success' | 'info' | 'light' | 'warning' | 'error') => {
+export const emitNotification = (message: string, type?: 'success' | 'info' | 'light' | 'warning' | 'error', status?: number) => {
     const event = new CustomEvent('notification', {
-        detail: { message: messsage, type: type },
+        detail: { message, type, status },
     });
     window.dispatchEvent(event);
 };
@@ -55,3 +54,13 @@ export const emitAjaxPostDone = (response: any) => {
     });
     window.dispatchEvent(event);
 };
+
+export const baseURL = (uri: string) => import.meta.env.VITE_APP_BASE_API + ('/' + uri).replace(/\/+/, '/')
+
+export const userCanView = (view: string) => {
+
+    if (view == 'admin')
+    return true
+    return false
+}
+

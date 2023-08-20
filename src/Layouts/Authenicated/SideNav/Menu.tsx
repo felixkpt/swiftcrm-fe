@@ -6,12 +6,15 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 import MenuTree from './MenuTree';
 import RoutesList from './RoutesList';
 import Select from 'react-select';
+import MetisMenu from 'metismenujs';
 
 // Constants used for managing the component behavior
 const PARENT_FOLDER_ID_PREFIX = 'menu-parent-folder-';
 
 function handleToggle(key: string) {
   const target = document.getElementById(key);
+
+  return
 
   if (target) {
 
@@ -37,20 +40,20 @@ function handleToggle(key: string) {
 const Menu = () => {
 
   const { data, get, loading, errors } = useAxios()
-  const { user } = useAuth()
+  const { user, roles } = useAuth()
 
   const [selectedRoleId, setSelectedRoleId] = useState<string>()
 
   const [userMenu, setUserMenu] = useState(null)
 
   useEffect(() => {
-    if (user) setSelectedRoleId(user.roles[0]?.id)
+    if (user && roles.length > 0) setSelectedRoleId(roles[0]?.id)
   }, [user]);
 
   useEffect(() => {
 
     if (selectedRoleId) {
-      get('/admin/settings/role-permissions/roles/get-menu/' + selectedRoleId + '?get-menu=1').then((resp) => {
+      get('/admin/settings/role-permissions/roles/get-role-menu/' + selectedRoleId + '?get-menu=1').then((resp) => {
         if (resp === undefined) {
           setUserMenu(null)
         }
@@ -67,13 +70,23 @@ const Menu = () => {
 
   }, [loading])
 
+  useEffect(() => {
+    if (userMenu) {
+      // create new instance
+      new MetisMenu('#menu', {});
+
+    }
+
+  }, [userMenu])
+
   const memoizeMenu = useMemo(() => {
 
     return <>
       {
         user && userMenu !== null ?
           <div className='bg-gray-50 shadow sm:w-full'>
-            <ul className='list-unstyled nested-routes main'>
+            <ul className="metismenu list-unstyled nested-routessmain" id="menu">
+
               {
                 userMenu.map((child, i) => {
 
@@ -81,47 +94,45 @@ const Menu = () => {
 
                   const shouldShowFirstLevelRoutes = true
 
-                  const shouldShowFolder = routes.length > 0 || children.length > 0 && !hidden
+                  const shouldShowFolder = routes.length > 0 || children.length > 0
 
                   const currentId = Str.slug((folder).replace(/^\//, ''));
 
-                  const indent = 1
+                  const indent = 2
 
                   return (
 
-                    <div key={currentId}>
+                    <>
                       {
                         shouldShowFolder &&
-                        <li className='pb-1' id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
-                          <div className='toggler-section px-1 rounded d-flex rounded-lg'>
-                            <label className='toggler p-2 text-base d-flex align-items-center gap-1 justify-content-between flex-grow-1' onClick={() => handleToggle(currentId)}>
-                              <span className='d-flex align-items-center gap-1'>
-                                <Icon icon={`${icon || 'prime:bookmark'}`} />
-                                <span>{Str.title(Str.afterLast(folder, '/'))}</span>
-                              </span>
-                              <Icon className='arrow-section' icon={`bi-chevron-down`} />
-                            </label>
-                          </div>
 
-                          <ul id={currentId} className={`list-unstyled ps-${indent} ${shouldShowFirstLevelRoutes ? '' : 'd-none'} my-1`}>
-                            <RoutesList routes={routes} />
-                            <>
+                        <div>
+                          <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target={`#${currentId}`} aria-expanded="false" aria-controls="collapsePages">
+                            <span className='d-flex align-items-center gap-1'>
+                              <Icon icon={`${icon || 'prime:bookmark'}`} />
+                              <span>{Str.title(Str.afterLast(folder, '/'))}</span>
+                            </span>
+                            <div className="sb-sidenav-collapse-arrow"><Icon className='arrow-section' icon={`bi-chevron-down`} /></div>
+                          </a>
+                          <div className="collapse" id={`${currentId}`} aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                            <nav className="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+
+                              <RoutesList routes={routes} />
+
                               {
                                 children.length > 0 &&
-                                <li className={`ps-${indent}`}>
-                                  <ul className={`list-unstyled`}>
-                                    {
-                                      children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} />)
-                                    }
-                                  </ul>
-                                </li>
+                                <>
+                                  {
+                                    children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} prevId={currentId} />)
+                                  }
+                                </>
                               }
-                            </>
-                          </ul>
 
-                        </li>
+                            </nav>
+                          </div>
+                        </div>
                       }
-                    </div>
+                    </>
 
                   )
                 })
@@ -148,18 +159,16 @@ const Menu = () => {
     <Select
       className="basic-single text-dark mb-2"
       classNamePrefix="select"
-      defaultValue={user?.roles[0]}
+      defaultValue={roles[0]}
       isSearchable={true}
       name="roles"
-      options={user?.roles}
+      options={roles}
       getOptionValue={(option) => `${option['id']}`}
       getOptionLabel={(option) => `${option['name']}`}
       onChange={(item) => setSelectedRoleId(item.id)}
-
     />
     {memoizeMenu}
   </div>
-
 };
 
 export default Menu;

@@ -7,10 +7,16 @@ export default function Footer() {
 
     return (
         <>
-            <footer className="mt-4 bg-body-secondary text-center dark:bg-neutral-700 lg:text-left">
-                <div className="p-4 text-center text-neutral-700 dark:text-neutral-200">
-                    <span>© 2023 Copyright: </span>
-                    <a className="text-neutral-800 dark:text-neutral-400" href="/">CRM BASE</a>
+            <footer className="py-4 bg-light mt-auto">
+                <div className="container-fluid px-4">
+                    <div className="d-flex align-items-center justify-content-between small">
+                        <div className="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
                 </div>
             </footer>
             <div>

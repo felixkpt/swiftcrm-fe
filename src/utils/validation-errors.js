@@ -23,7 +23,8 @@ const showErrors = data => {
             const invalidFeedback = document.createElement('div')
             invalidFeedback.classList.add('invalid-feedback')
             invalidFeedback.innerHTML = errors[key]
-            const formGroup = element.closest('.form-group')
+            const formGroup = element.closest('.form-group') || element.closest('.form-floating')
+
             formGroup.classList.add('has-error')
             formGroup.append(invalidFeedback)
 
@@ -44,7 +45,7 @@ const showErrors = data => {
 const clearErrors = () => {
     document.querySelectorAll('.is-invalid').forEach(element => {
         element.classList.remove('is-invalid');
-        const el = element.closest('.form-group');
+        const el = element.closest('.form-group') || element.closest('.form-floating');
         el.classList.remove('has-error');
         const invalidFeedback = el.querySelector('.invalid-feedback');
         if (invalidFeedback) {

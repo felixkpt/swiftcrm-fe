@@ -4,7 +4,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar/Index';
 import Footer from './Footer/Index';
 import useAxios from '@/hooks/useAxios';
-import Sidebar from './SideNav/Index';
+import SideNav from './SideNav/Index';
 import ScrollToTop from '@/components/ScrollToTop';
 
 const AuthenticatedLayout = () => {
@@ -56,28 +56,35 @@ const AuthenticatedLayout = () => {
 
     return (
         <>
-        <ScrollToTop />
+            <ScrollToTop />
             {user ? (
-                <div id="wrapper">
-                    <Sidebar />
-                    <div id="navbar-wrapper">
-                        <Navbar />
-                    </div>
-                    <main id="content-wrapper" className='w-100 min-h-100vh'>
-                        <div className='containter bg-body-secondary p-2 min-h-100vh'>
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <Outlet />
-                                </div>
-                            </div>
+                <>
+                    <Navbar />
+                    <div id="layoutSidenav">
+                        <div id="layoutSidenav_nav">
+                            <SideNav />
                         </div>
-                    </main>
-                    <Footer />
-
+                        <div id="layoutSidenav_content">
+                            <main className='containter bg-body-secondary p-2'>
+                                <Outlet />
+                            </main>
+                            <Footer />
+                        </div>
+                    </div>
+                </>
+            ) :
+                <div>
+                    {
+                        loading ?
+                            <div className="d-flex align-items-center gap-3">
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Please wait, logging you in...
+                            </div>
+                            :
+                            <div className='alert alert-danger'>Server error</div>
+                    }
                 </div>
-            ) : (
-                <div className="loading-message">Please wait, logging you in...</div>
-            )}
+            }
         </>
     );
 };

@@ -3,6 +3,7 @@ import useAxios from "@/hooks/useAxios";
 import React, { useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import defaultAvatar from '@/images/defaultavatar.png'
+import { Icon } from "@iconify/react/dist/iconify.js";
 const NavBar = () => {
     const [open, setOpen] = React.useState(false);
     const [flyer, setFlyer] = React.useState(false);
@@ -44,42 +45,42 @@ const NavBar = () => {
         };
     }, []);
 
+    useEffect(() => {
+
+        // Toggle the side navigation
+        const sidebarToggle = document.body.querySelector('#sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', event => {
+                event.preventDefault();
+                document.body.classList.toggle('sb-sidenav-toggled');
+                localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+            });
+        }
+
+    })
 
     return (
-        <div>
-            <nav className="navbar navbar-expand-lg bg-body-secondary bg-dark">
-                <div className="container-fluid">
-                    <a href="#" className="navbar-brand" id="sidebar-toggle">X<i className="fa fa-bars"></i></a>
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="#">Home</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">Link</a>
-                            </li>
-                        </ul>
-                        <ul className="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu">
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img className="useravatar" src={defaultAvatar} alt="" />
-                                </a>
-                                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <li><a className="dropdown-item" href="#"><i className="fas fa-sliders-h fa-fw"></i> Account</a></li>
-                                    <li><a className="dropdown-item" href="#"><i className="fas fa-cog fa-fw"></i> Settings</a></li>
-                                    <li><hr className="dropdown-divider" /></li>
-                                    <li><span className="dropdown-item" onClick={handleLogout}><i className="fas fa-sign-out-alt fa-fw"></i> Log Out</span></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
+        <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+            <a className="navbar-brand ps-3" href="index.html">Start Bootstrap</a>
+            <button className="btn btn-link btn-sm me-4 me-lg-0" id="sidebarToggle"><Icon icon={`fa6-solid:bars`}/></button>
+            <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+                <div className="input-group">
+                    <input className="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                    <button className="btn btn-primary" id="btnNavbarSearch" type="button"><i className="fas fa-search"></i></button>
                 </div>
-            </nav>
-
-        </div>
+            </form>
+            <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+                <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><Icon icon={`uiw:user`}/></a>
+                    <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><NavLink className="dropdown-item" to="/profile">Profile</NavLink></li>
+                        <li><a className="dropdown-item" href="#!">Activity Log</a></li>
+                        <li><hr className="dropdown-divider" /></li>
+                        <li><a className="dropdown-item" href="#!" onClick={handleLogout}>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
     );
 };
 export default NavBar

@@ -9,7 +9,7 @@ const ToastNotification: React.FC = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Function to handle the emitted error event
-  const handleNotification = useCallback((message: string, type: string) => {
+  const handleNotification = useCallback((message: string, type: string, status: number) => {
 
     // Define the CSS classes based on the type of the notification
     let toastCls = 'toast m-2';
@@ -18,13 +18,13 @@ const ToastNotification: React.FC = () => {
     if (type == 'success') {
       toastCls += ' bg-success-subtle'; // Add the appropriate class for an error notification
       titleText = `Success notification`;
-    }else if (type == 'warning') {
+    } else if (type == 'warning') {
       toastCls += ' bg-warning-subtle'; // Add the appropriate class for an error notification
       titleText = `Warning notification`;
-    }else if (type == 'error') {
+    } else if (type == 'error') {
       toastCls += ' bg-danger-subtle'; // Add the appropriate class for an error notification
-      titleText = `Error notification`;
-    }else if (type == 'info') {
+      titleText = `Error notification ${typeof status === 'number' ? ` (status ${status})` : ''}`;
+    } else if (type == 'info') {
       toastCls += ' bg-info-subtle'; // Add the appropriate class for an error notification
       titleText = `Info notification`;
     } else {
@@ -46,7 +46,7 @@ const ToastNotification: React.FC = () => {
     if (timeoutRef.current !== null) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       setShowModal(false);
     }, 4000);
@@ -54,9 +54,9 @@ const ToastNotification: React.FC = () => {
 
   useEffect(() => {
     // Add event listener for the custom notification event
-    const eventListener = (event: CustomEvent<{ message: string; type: number }>) => {
-      const { message, type } = event.detail;
-      handleNotification(message, type);
+    const eventListener = (event: CustomEvent<{ message: string; type: string, status: number }>) => {
+      const { message, type, status } = event.detail;
+      handleNotification(message, type, status);
     };
 
     window.addEventListener('notification', eventListener as EventListener);

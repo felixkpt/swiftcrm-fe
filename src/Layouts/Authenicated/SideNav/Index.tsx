@@ -4,26 +4,23 @@ import { useRef } from "react";
 import Header from "./Header";
 import Menu from "./Menu";
 import SidebarMenu from "./SidebarMenu";
+import Menuv2 from "./Menuv2";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
     sidebarOpen: boolean;
     setSidebarOpen: (arg: boolean) => void;
 }
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-
-    const sidebar = useRef<any>(null);
-
+const Sidebar = () => {
     return (
-        <aside
-            ref={sidebar}
-            className={`text-light text-opacity-75`} id="sidebar-wrapper">
-
-            <Header sidebar={sidebar} setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} />
-            <div className="ps-2 sidebar w-100">
-                <Menu />
+        <nav className="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+            <div className="sb-sidenav-menu">
+                <div className="nav pt-2">
+                    <Menu />
+                </div>
             </div>
-        </aside>
+        </nav>
     )
 }
 

@@ -8,12 +8,13 @@ interface ModalProps {
     fillable?: { [key: string]: { input: string; type: string } };
     data: any;
     actionUrl: string;
-    ListSources: any;
+    list_sources: any;
     list_depends_on: any;
     id?: string
+    size?: 'modal-sm' | 'modal-lg' | 'modal-xl'
 }
 
-const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, list_depends_on, ListSources, id }) => {
+const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, list_sources }) => {
 
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -22,59 +23,19 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, list_depends_on, Lis
     const [modelName, setModelName] = useState([]);
     const [method, setMethod] = useState("POST");
 
-
-    const [dependentData, setDependentData] = useState({});
-
-    async function fetchDependentData(dependentKey, dependencyKey) {
-        console.log('deep;;')
-        const instance = new ListSources();
-        await instance[dependentKey]();
-        const dependencyOptions = instance.get(dependentKey);
-console.log(dependentKey, dependencyOptions)
-
-        setDependentData(prevData => ({
-            ...prevData,
-            [dependencyKey]: dependencyOptions,
-        }));
-    }
+    const [computedSize, setComputedSize] = useState<string>('')
 
     async function getOptions(key: string) {
-        console.log('getting options....')
-        
+
         try {
-            const methodName = Str.camel(key);
-            const instance = new ListSources();
-            console.log('key:', methodName)
-
-            await instance[methodName]();
-
-            const dependencyKeys = instance.getDependencies(methodName);
-            for (const depKey of dependencyKeys) {
-                if (!dependentData[depKey]) {
-                    await fetchDependentData(depKey, methodName);
-                }
-            }
-
-            const options = instance.get(methodName);
+            const fn = Str.camel(key)
+            console.log(fn)
+            const options = await list_sources[fn]();
             return options;
+        } catch (e) { console.log(e) }
 
-        } catch (e) {
-            console.error('error:', e);
-        }
-        return [];
-    }
+        return []
 
-
-    function getActionUrl() {
-        const baseURL = import.meta.env.VITE_APP_BASE_API;
-
-        // Check if the actionUrl starts with "http" or "https"
-        if (!actionUrl.startsWith('http') && baseURL) {
-            // Prepend the baseURL if actionUrl does not start with "http"
-            actionUrl = baseURL + actionUrl;
-        }
-
-        return actionUrl;
     }
 
     useEffect(() => {
@@ -91,9 +52,19 @@ console.log(dependentKey, dependencyOptions)
             transformedObject[key] = '';
         });
 
-        if (keys.length > 0) {
+        let length = keys.length
+        if (length > 0) {
             setHasFillable(true);
             setInputData(transformedObject);
+
+            if (size)
+                setComputedSize(size)
+            else if (length < 8)
+                setComputedSize('modal-sm')
+            else if (length < 16)
+                setComputedSize('modal-lg')
+            else if (length > 16)
+                setComputedSize('modal-xl')
         }
 
         if (fillable && data?.data) {
@@ -153,21 +124,17 @@ console.log(dependentKey, dependencyOptions)
     function renderAsyncSelect({ key, inputData, isMulti = false }: RenderAsyncSelectProps) {
         const defaultValue = inputData[key.replace(/_list/, '')] || (isMulti ? [] : '');
 
-        const cameledKey = Str.camel(key);
-        const hasDependants = !!(list_depends_on && list_depends_on.find(dep => dep[cameledKey]));
-
-
         return (
             <AsyncSelect
                 id={key}
                 className="form-control"
                 name={isMulti ? `${key}[]` : key}
+                key={key}
                 defaultValue={defaultValue}
                 isMulti={isMulti}
                 cacheOptions
                 defaultOptions
                 loadOptions={() => getOptions(key)}
-                options={dependentData[key] || []}
                 getOptionValue={(option) => `${option['id']}`}
                 getOptionLabel={(option) => `${option['name']}`}
             />
@@ -176,8 +143,8 @@ console.log(dependentKey, dependencyOptions)
 
     return (
         <div ref={rootRef || null}>
-            <div ref={rootRef.current ?? undefined} className={`modal fade`} id={`${id || 'AutoModel'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
-                <div className="modal-dialog">
+            <div className={`modal fade`} id={`${id || 'AutoModel'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+                <div className={`modal-dialog ${computedSize}`}>
                     <div className="modal-content">
                         {data && isModalOpen ?
                             <div>
@@ -186,69 +153,73 @@ console.log(dependentKey, dependencyOptions)
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
-                                    <form ref={formRef} method='post' action={getActionUrl()} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
-                                        <input type="hidden" name="_method" value={method} />
-                                        <div className="flex max-w-md flex-col gap-4">
-                                            {hasFillable ? (
-                                                Object.keys(fillable).map((key) => {
-                                                    const { input, type } = fillable[key];
-                                                    key = key.replace(/_multilist$/, '_list')
-                                                    return (
-                                                        <div key={key} className="form-group mb-2" id={`form-group-section-${key}`}>
-                                                            <div className="mb-2 block">
-                                                                <label htmlFor="small">{convertToTitleCase(key)}</label>
+                                    <form ref={formRef} method='post' action-url={actionUrl} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
+                                        <div className="container-fluid">
+                                            <input type="hidden" name="_method" value={method} />
+                                            <div className="row">
+                                                {hasFillable ? (
+                                                    Object.keys(fillable).map((key) => {
+                                                        const { input, type } = fillable[key];
+                                                        key = key.replace(/_multilist$/, '_list')
+                                                        return (
+                                                            <div className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
+                                                                <div key={key} className="form-group mb-2" id={`form-group-section-${key}`}>
+                                                                    <div className="mb-2 block">
+                                                                        <label htmlFor="small">{convertToTitleCase(key)}</label>
+                                                                    </div>
+                                                                    {input === 'input' && type !== 'file' && (
+                                                                        <input
+                                                                            className="form-control"
+                                                                            id={key}
+                                                                            type={guessType(key)}
+                                                                            name={key}
+                                                                            value={inputData[key] || ''}
+                                                                            onChange={(e) => handleInputChange(key, e.target.value)}
+                                                                            key={key}
+                                                                        />
+                                                                    )}
+                                                                    {input === 'input' && type === 'file' && (
+                                                                        <input
+                                                                            className="form-control"
+                                                                            id={key}
+                                                                            type="file"
+                                                                            name={key}
+                                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                                const files = e.target.files;
+                                                                                const fileNames = files ? Array.from(files).map((file) => file.name).join(', ') : '';
+                                                                                handleInputChange(key, fileNames);
+                                                                            }}
+                                                                            key={key}
+                                                                        />
+                                                                    )}
+
+                                                                    {input === 'select' && renderAsyncSelect({ key, inputData })}
+
+                                                                    {input === 'multiselect' && renderAsyncSelect({ key, inputData, isMulti: true })}
+
+                                                                    {input === 'textarea' && (
+                                                                        <textarea
+                                                                            id={key}
+                                                                            className="form-control"
+                                                                            name={key}
+                                                                            value={inputData[key] || ''}
+                                                                            onChange={(e) => handleInputChange(key, e.target.value)}
+                                                                            key={key}
+                                                                            rows={7}
+                                                                        ></textarea>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                            {input === 'input' && type !== 'file' && (
-                                                                <input
-                                                                    className="form-control"
-                                                                    id={key}
-                                                                    type={guessType(key)}
-                                                                    name={key}
-                                                                    value={inputData[key] || ''}
-                                                                    onChange={(e) => handleInputChange(key, e.target.value)}
-                                                                    key={key}
-                                                                />
-                                                            )}
-                                                            {input === 'input' && type === 'file' && (
-                                                                <input
-                                                                    className="form-control"
-                                                                    id={key}
-                                                                    type="file"
-                                                                    name={key}
-                                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                        const files = e.target.files;
-                                                                        const fileNames = files ? Array.from(files).map((file) => file.name).join(', ') : '';
-                                                                        handleInputChange(key, fileNames);
-                                                                    }}
-                                                                    key={key}
-                                                                />
-                                                            )}
-
-                                                            {input === 'select' && renderAsyncSelect({ key, inputData })}
-
-                                                            {input === 'multiselect' && renderAsyncSelect({ key, inputData, isMulti: true })}
-
-                                                            {input === 'textarea' && (
-                                                                <textarea
-                                                                    id={key}
-                                                                    className="form-control"
-                                                                    name={key}
-                                                                    value={inputData[key] || ''}
-                                                                    onChange={(e) => handleInputChange(key, e.target.value)}
-                                                                    key={key}
-                                                                    rows={7}
-                                                                ></textarea>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })
-                                            ) : (
-                                                <p>Model has no fillable fields.</p>
-                                            )}
-                                        </div>
-                                        <div className="modal-footer">
-                                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" className="btn btn-primary">Submit</button>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <p>Model has no fillable fields.</p>
+                                                )}
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" className="btn btn-primary">Submit</button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>

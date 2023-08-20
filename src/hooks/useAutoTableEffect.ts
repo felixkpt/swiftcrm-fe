@@ -23,7 +23,7 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
             // Fetch data from the API using baseUri and listUri
             // You can customize the request based on your API structure
             // For example, using the Axios instance created in useAxios:
-            await get(`${baseUri}/${listUri || ''}`, { params: { page, per_page, q, orderBy, orderDirection } });
+            await get(`${baseUri}/${listUri || ''}`, { params: { page, per_page, q, order_by: orderBy, order_direction: orderDirection } });
 
         } catch (error) {
             // Handle error if needed

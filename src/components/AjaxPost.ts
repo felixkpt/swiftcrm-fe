@@ -1,10 +1,10 @@
 import useAxios from '@/hooks/useAxios';
-import { emitAjaxPostDone } from '@/utils/helpers';
+import { baseURL, emitAjaxPostDone } from '@/utils/helpers';
 import { useEffect, useState } from 'react'
 
 const AjaxPost = () => {
 
-    const { data, post, put, destroy } = useAxios();
+    const { data, post, put, destroy, patch } = useAxios();
 
     const [form, setForm] = useState();
 
@@ -18,8 +18,8 @@ const AjaxPost = () => {
         // console.log('Form Data:', formData); // Log the form data
 
         // Specify the URL where the post request will be sent
-        let url = rawForm?.action || ''; // Get the baseUri from the event detail
-        if (url.startsWith('/')) url += import.meta.env.VITE_APP_BASE_API;
+        let url = rawForm?.getAttribute('action-url') || ''; // Get the baseUri from the event detail
+        url = baseURL(url);
 
         const method = (rawForm?.querySelector('input[name="_method"]')?.value || 'post').toLowerCase(); // Get the form's HTTP method
         const button = rawForm?.querySelector('button[type="submit"]')
@@ -36,17 +36,18 @@ const AjaxPost = () => {
 
         let response
 
-
         // Make the request
         if (method == 'post') {
             response = await post(url, formData);
         } else if (method == 'put') {
             response = await put(url, formData);
+        } else if (method == 'patch') {
+            response = await patch(url, formData);
         } else if (method == 'delete') {
             response = await destroy(url, formData);
         }
 
-        emitAjaxPostDone(response)
+        emitAjaxPostDone({ formId: rawForm.id, response })
 
         if (button) {
             button.disabled = false
@@ -62,7 +63,8 @@ const AjaxPost = () => {
 
             if (modal && !modal.classList.contains('persistent-modal')) {
 
-                const modalToggleBtn = modal.querySelector('button[data-bs-toggle="modal"]');
+                const modalToggleBtn = modal.querySelector('button[data-bs-dismiss="modal"]') || modal.querySelector('button[data-bs-toggle="modal"]');
+
                 if (modalToggleBtn) {
                     modalToggleBtn.click();
                 }

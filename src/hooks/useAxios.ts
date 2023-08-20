@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { clearErrors, showErrors } from '@/utils/validation-errors';
 import { useAuth } from '@/contexts/AuthContext';
-import { emitError } from '@/utils/helpers';
+import { emitNotification } from '@/utils/helpers';
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_API;
 
@@ -44,9 +44,19 @@ const useAxios = <T = any>() => {
         try {
             setLoading(true);
             const response = await axiosInstance(config);
-            setData(response.data?.results);
 
             setErrors(null);
+
+            if (response.data?.message) {
+                emitNotification(response.data.message, 'success')
+
+                if (!response.data?.results) {
+                    setData(response.data.message);
+                    return response.data.message
+                }
+            }
+
+            setData(response.data?.results);
             return response.data?.results
         } catch (error) {
 
@@ -61,8 +71,7 @@ const useAxios = <T = any>() => {
                     setErrors(msg);
 
                     if (status && status !== 200 && status !== 201 && status !== 401) {
-
-                        emitError(msg, status)
+                        emitNotification(msg, 'error', status)
                     }
 
                     if (status === 401 && msg === 'Unauthenticated.') {
@@ -78,12 +87,12 @@ const useAxios = <T = any>() => {
                 } else {
                     const msg = 'We are experiencing server connection issues.'
                     setErrors(msg);
-                    emitError(msg, 0)
+                    emitNotification(msg, 'error', status)
                 }
             } else {
                 const msg = err?.message || 'An unexpected error occurred.'
                 setErrors(msg);
-                emitError(msg, 0)
+                emitNotification(msg, 'error', status)
             }
 
         } finally {
@@ -94,7 +103,7 @@ const useAxios = <T = any>() => {
     const get = (url, config = {}) => fetchData({ method: 'GET', url, ...config });
     const post = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config });
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
-    const patch = (url, data = {}, config = {}) => fetchData({ method: 'PATCH', url, data, ...config });
+    const patch = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const destroy = (url, config = {}) => fetchData({ method: 'DELETE', url, ...config });
     const getFile = async (url, config = {}) => {
 

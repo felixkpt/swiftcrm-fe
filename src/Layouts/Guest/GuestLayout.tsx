@@ -4,14 +4,16 @@ import Footer from '../Authenicated/Footer/Index';
 export default function GuestLayout() {
 	return (
 		<>
-			<main className='main-content h-100vh'>
-				<div className="container h-100vh">
-					<div className="row justify-content-center mt-5 h-100vh align-items-center">
-						<Outlet />
+			<div id="layoutAuthentication" className='bg-secondary-subtle'>
+				<main>
+					<div className="container">
+						<div className="row justify-content-center">
+							<Outlet />
+						</div>
 					</div>
-				</div>
-			</main>
-			<Footer />
+				</main>
+				<Footer />
+			</div>
 		</>
 	);
 }

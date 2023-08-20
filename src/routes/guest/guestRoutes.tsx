@@ -1,6 +1,8 @@
 import Login from '@/Pages/Auth/Login';
 import Register from '@/Pages/Auth/Register';
+import Password from '@/Pages/Auth/Password';
 import Error404 from '@/Pages/ErrorPages/Error404';
+import PasswordSet from '@/Pages/Auth/PasswordSet';
 
 const guestRoutes = [
     {
@@ -14,6 +16,14 @@ const guestRoutes = [
     {
         path: '/register',
         element: <Register />,
+    },
+    {
+        path: '/password',
+        element: <Password />,
+    },
+    {
+        path: '/password-set/:token',
+        element: <PasswordSet />,
     },
     {
         path: '*',

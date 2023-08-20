@@ -1,24 +1,30 @@
 import React, { createContext, useContext, useState } from 'react';
-import { UserInterface } from '@/interfaces';
 import CryptoJS from 'crypto-js';
+import { UserInterface } from '@/interfaces';
 
 // Secret key for encryption/decryption
 const secretKey = import.meta.env.VITE_APP_CRYPO_SECRET_KEY;
 
 // Define a generic interface for the authenticated user object
-interface AuthenticatedUser<User> {
-  user: User | null; // Holds the user object if authenticated, otherwise null
-  updateUser: (updatedUser: Partial<User>) => void; // Function to update the user object
-  csrfToken: () => Promise<boolean>; // Function to generate CSRF token for guest methods
-  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Function to set the user object in the state
-  deleteUser: () => void
+interface AuthenticatedUser {
+  // The authenticated user or null if not authenticated
+  user?: UserInterface | null;
+  // Function to update the user object
+  updateUser: (updatedUser: Partial<UserInterface>) => void;
+  // Function to generate CSRF token for guest methods
+  csrfToken: () => Promise<boolean>;
+  // Function to set the user object in the state
+  setUser: (user: UserInterface) => void;
+  // Function to delete user data and reset state
+  deleteUser: () => void;
+  // Roles associated with the authenticated user
+  roles: RoleData[];
 }
 
 // Function to decrypt the user object
 const decryptUser = (encryptedUser: string) => {
   try {
     if (!encryptedUser) {
-      console.error("Encrypted user data is empty.");
       return null;
     }
 
@@ -26,25 +32,24 @@ const decryptUser = (encryptedUser: string) => {
     const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
 
     if (!decryptedData) {
-      console.error("Decrypted user data is empty.");
       return null;
     }
 
     const decryptedUser = JSON.parse(decryptedData) as UserInterface;
     return decryptedUser;
   } catch (error) {
-    console.error("Error decrypting user:", error);
-    console.log("Encrypted User:", encryptedUser); // Log the encryptedUser for debugging
     return null;
   }
 };
 
 // Create the AuthContent context with the generic interface
-const AuthContent = createContext<AuthenticatedUser<UserInterface>>({
-  user: null, // Set the initial value to null when no user is authenticated
-  updateUser: () => { }, // Initialize the updateUser function (to be updated later)
-  csrfToken: async () => false, // Initialize the csrfToken function (to be updated later)
-  setUser: () => { }, // Initialize the setUser function (to be updated later)
+const AuthContent = createContext<AuthenticatedUser>({
+  user: null,
+  updateUser: () => {},
+  csrfToken: async () => false,
+  setUser: () => {},
+  deleteUser: () => {},
+  roles: [],
 });
 
 // Function to encrypt the user object
@@ -52,7 +57,6 @@ const encryptData = (user: UserInterface) => {
   try {
     return CryptoJS.AES.encrypt(JSON.stringify(user), secretKey).toString();
   } catch (error) {
-    console.error("Error encrypting user:", error);
     return null;
   }
 };
@@ -64,7 +68,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Initialize the 'user' state with the decrypted user data (if available) or null
   const [user, _setUser] = useState<UserInterface | null>(() => {
-
     try {
       if (storedUser) {
         const decryptedUser = decryptUser(storedUser);
@@ -72,23 +75,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return null;
     } catch (error) {
-      console.error("Error parsing user data from localStorage:", error);
       return null;
     }
   });
 
+  // Initialize roles state
+  const [roles, setRoles] = useState<RoleData[]>([]);
 
-  // set encrypted user to local storage
-  const setUser = (user) => {
-    if (user) {
-      const encryptedUser = encryptData(user);
+  // Set encrypted user data to local storage and update roles state
+  const setUser = (newUser: UserInterface) => {
+    if (newUser) {
+      const encryptedUser = encryptData(newUser);
       localStorage.setItem('user', encryptedUser);
+      setRoles(newUser.roles || []);
     } else {
       localStorage.removeItem('user');
+      setRoles([]); // Clear roles when user is removed
     }
-    _setUser(user);
+    _setUser(newUser);
   };
-
 
   // Function to update the user object and store it in localStorage
   const updateUser = (updatedUser: Partial<UserInterface>) => {
@@ -121,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Provide the authentication data and functions to the children components
   return (
-    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser }}>
+    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, roles }}>
       {children}
     </AuthContent.Provider>
   );
