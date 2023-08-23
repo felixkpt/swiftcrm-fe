@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import CryptoJS from 'crypto-js';
-import { UserInterface } from '@/interfaces';
+import { UserInterface } from '@/interfaces/UserInterface';
 
 // Secret key for encryption/decryption
 const secretKey = import.meta.env.VITE_APP_CRYPO_SECRET_KEY;
@@ -17,8 +17,6 @@ interface AuthenticatedUser {
   setUser: (user: UserInterface) => void;
   // Function to delete user data and reset state
   deleteUser: () => void;
-  // Roles associated with the authenticated user
-  roles: RoleData[];
 }
 
 // Function to decrypt the user object
@@ -45,11 +43,10 @@ const decryptUser = (encryptedUser: string) => {
 // Create the AuthContent context with the generic interface
 const AuthContent = createContext<AuthenticatedUser>({
   user: null,
-  updateUser: () => {},
+  updateUser: () => { },
   csrfToken: async () => false,
-  setUser: () => {},
-  deleteUser: () => {},
-  roles: [],
+  setUser: () => { },
+  deleteUser: () => { },
 });
 
 // Function to encrypt the user object
@@ -79,18 +76,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   });
 
-  // Initialize roles state
-  const [roles, setRoles] = useState<RoleData[]>([]);
-
   // Set encrypted user data to local storage and update roles state
   const setUser = (newUser: UserInterface) => {
     if (newUser) {
       const encryptedUser = encryptData(newUser);
       localStorage.setItem('user', encryptedUser);
-      setRoles(newUser.roles || []);
     } else {
       localStorage.removeItem('user');
-      setRoles([]); // Clear roles when user is removed
     }
     _setUser(newUser);
   };
@@ -114,7 +106,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Function to generate CSRF token for guest methods (You may implement actual CSRF token generation logic here)
   const csrfToken = async () => {
-    // await axios.get(import.meta.env.VITE_APP_BASE_API.replace(/api/, '').replace(/\/$/, '') + '/csrf-cookie');
     return false;
   };
 
@@ -126,7 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Provide the authentication data and functions to the children components
   return (
-    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, roles }}>
+    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser }}>
       {children}
     </AuthContent.Provider>
   );
@@ -136,3 +127,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   return useContext(AuthContent);
 };
+

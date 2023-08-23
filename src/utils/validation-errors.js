@@ -18,6 +18,10 @@ const showErrors = data => {
 
             if (!element) continue
 
+            if (element.getAttribute('type') == 'hidden') {
+                element = element.closest('.form-control')
+            }
+
             element.classList.add('is-invalid')
 
             const invalidFeedback = document.createElement('div')
@@ -32,7 +36,7 @@ const showErrors = data => {
                 element.classList.remove('is-invalid')
                 invalidFeedback.remove()
             })
-            
+
             element.addEventListener('click', function () {
                 element.classList.remove('is-invalid')
                 invalidFeedback.remove()

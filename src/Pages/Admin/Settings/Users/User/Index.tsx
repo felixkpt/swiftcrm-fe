@@ -23,7 +23,7 @@ const Index = (props: Props) => {
   const { data: dataLoggedIn, loading: loggingIn, errors: errorsLoggingIn, post: postLogin } = useAxios()
 
   useEffect(() => {
-    get('admin/settings/users/user/' + id)
+    get('admin/users/user/' + id)
   }, [id])
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const Index = (props: Props) => {
   async function loginUser() {
 
     if (user) {
-      await postLogin(`admin/settings/users/user/login/${user.id}`);
+      await postLogin(`admin/users/user/login/${user.id}`);
 
     }
 
@@ -148,44 +148,10 @@ const Index = (props: Props) => {
                 : <div>Loading user info</div>
             }
 
-            <div className={`modal fade`} id="update_password" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`true`}>
-
-              <div className="modal-dialog modal-dialog-top animated zoomIn animated-3x   ">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title title" id="update_password_label">New Password</h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-
-                  <div className="modal-body">
-                    <div className="section">
-                      <form encType="" method="post" action-url={'/admin/settings/users/user/update-password'} onSubmit={(e: any) => emitAjaxPost(e)} >
-                        <input type="hidden" name="id" value="" />
-                        <div className="form-group password"><label className="form-label label_password">Password</label>
-                          <div className="form-control-wrap">
-                            <input type="password" name="password" className="form-control" />
-                          </div>
-                        </div>
-                        <div className="form-group password_confirmation">
-                          <label className="form-label label_password_confirmation">Password Confirmation</label>
-                          <div className="form-control-wrap">
-                            <input type="password" name="password_confirmation" className="form-control" />
-                          </div>
-                        </div>
-                        <input type="hidden" name="user_id" value={id} />
-                        <div className="form-group mt-2">
-                          <button type="submit" className="btn  btn-primary submit-btn ">Save Information</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
+            
 
             {
-              data && <><AutoModel data={data} actionUrl={`/admin/settings/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
+              data && <><AutoModel data={data} actionUrl={`/admin/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
             }
 
           </div>

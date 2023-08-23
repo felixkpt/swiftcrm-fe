@@ -5,14 +5,6 @@ export function convertToTitleCase(str: string) {
     });
 }
 
-// // Event emitter to emit error to the parent component
-// export const emitNotification = (errorMsg: string, status?: number) => {
-//     const event = new CustomEvent('axiosError', {
-//         detail: { message: errorMsg, statusCode: status },
-//     });
-//     window.dispatchEvent(event);
-// };
-
 // Event emitter to emit error to the parent component
 export const emitNotification = (message: string, type?: 'success' | 'info' | 'light' | 'warning' | 'error', status?: number) => {
     const event = new CustomEvent('notification', {
@@ -57,10 +49,8 @@ export const emitAjaxPostDone = (response: any) => {
 
 export const baseURL = (uri: string) => import.meta.env.VITE_APP_BASE_API + ('/' + uri).replace(/\/+/, '/')
 
-export const userCanView = (view: string) => {
-
-    if (view == 'admin')
-    return true
-    return false
-}
-
+export const convertToLaravelPattern = (uri:string) => {
+    // Replace :id with {id}
+    const laravelPattern = uri.replace(/:\w+/g, (match) => `{${match.substring(1)}}`);
+    return laravelPattern;
+  };

@@ -1,11 +1,6 @@
-// src/App.tsx
-
-import { Link } from 'react-router-dom';
-import { RouterElement } from '@/routes/router';
 import './App.css';
 import AuthenticatedLayout from './Layouts/Authenicated/AuthenticatedLayout';
 import GuestLayout from './Layouts/Guest/GuestLayout';
-
 
 function App() {
   const isAuthenticated = true; // Replace with your actual authentication logic
@@ -13,13 +8,9 @@ function App() {
   return (
     <div className="App">
       {isAuthenticated ? (
-        <AuthenticatedLayout>
-          <RouterElement />
-        </AuthenticatedLayout>
+        <AuthenticatedLayout />
       ) : (
-        <GuestLayout>
-          <RouterElement />
-        </GuestLayout>
+        <GuestLayout />
       )}
     </div>
   );

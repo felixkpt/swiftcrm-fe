@@ -7,7 +7,7 @@ import { convertToTitleCase, emitPrepareEdit } from '@/utils/helpers';
 import { Icon } from '@iconify/react';
 
 // Define the __dangerousHtml function
-function __dangerousHtml(html) {
+function __dangerousHtml(html: HTMLElement) {
     // Implement the logic to safely render HTML content here
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
@@ -33,8 +33,9 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: Aut
     useEffect(() => {
         if (tableData?.data?.length >= 0) {
             setModelDataLength(tableData.data.length);
-            const {data, ...others} = tableData
-            setData(others)
+            const { data, ...others } = tableData
+            if (setData)
+                setData(others)
         } else setModelDataLength(-1);
     }, [tableData]);
 

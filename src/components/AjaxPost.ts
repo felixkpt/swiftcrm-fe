@@ -47,7 +47,7 @@ const AjaxPost = () => {
             response = await destroy(url, formData);
         }
 
-        emitAjaxPostDone({ formId: rawForm.id, response })
+        emitAjaxPostDone({ modalId: rawForm?.closest('.modal').id, response })
 
         if (button) {
             button.disabled = false

@@ -10,7 +10,7 @@ const Profile = (props: Props) => {
 
 	useEffect(() => {
 
-		window.addEventListener('ajaxPostDone', function (event: Event) {
+		window.addEventListener('emitAjaxPostDone', function (event: Event) {
 			if (event?.detail) {
 				const { formId, response } = event.detail
 

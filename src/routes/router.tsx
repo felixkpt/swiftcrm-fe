@@ -8,12 +8,11 @@ import Profile from '@/Pages/User/Profile';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <GuestLayout />,
     children: guestRoutes,
   },
   {
     path: 'profile',
-    element: <AuthenticatedLayout />,
+    element: <AuthenticatedLayout permission="access_profile" />,
     children: [
       {
         path: '',
@@ -23,7 +22,6 @@ const router = createBrowserRouter([
   },
   {
     path: 'admin',
-    element: <AuthenticatedLayout />,
     children: adminRoutes,
   },
 ]);

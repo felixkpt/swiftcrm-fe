@@ -1,7 +1,7 @@
 import Documentation from "@/Pages/Admin/Documentation/Documentation"
 import DocumentationView from "@/Pages/Admin/Documentation/DocumentationView"
 
-const documentation = [
+const index = [
 
     {
         path: '',
@@ -14,4 +14,4 @@ const documentation = [
 
 ]
 
-export default documentation
+export default index

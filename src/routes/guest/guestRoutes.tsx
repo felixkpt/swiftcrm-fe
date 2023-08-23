@@ -1,13 +1,15 @@
+import Admin from '@/Pages/Admin/Index';
 import Login from '@/Pages/Auth/Login';
 import Register from '@/Pages/Auth/Register';
 import Password from '@/Pages/Auth/Password';
 import Error404 from '@/Pages/ErrorPages/Error404';
 import PasswordSet from '@/Pages/Auth/PasswordSet';
+import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
 
 const guestRoutes = [
     {
         path: '/',
-        element: <Login />, // Redirect root to /admin
+        element: <AuthenticatedLayout uri='admin' permission={null} Component={Admin} />,
     },
     {
         path: '/login',

@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import AutoTabs from "@/components/AutoTabs";
 import Roles from "./Roles/Roles";
 import Permissions from "./Permissions/Permissions";
-import Routes from "./Tabs/Routes";
+import Routes from "./Roles/Role/Routes";
 
 export default function Index(): JSX.Element {
-  // Define an array of Tab objects
+
   const tabs = [
     {
       name: "Roles",

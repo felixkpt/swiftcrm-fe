@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CollectionItems } from '@/interfaces';
 import useAxios from './useAxios';
+import Str from '@/utils/Str';
 
 const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
     const [tableData, setTableData] = useState<CollectionItems>({});
@@ -23,7 +24,7 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
             // Fetch data from the API using baseUri and listUri
             // You can customize the request based on your API structure
             // For example, using the Axios instance created in useAxios:
-            await get(`${baseUri}/${listUri || ''}`, { params: { page, per_page, q, order_by: orderBy, order_direction: orderDirection } });
+            await get(`${baseUri}${listUri ? '/' + listUri : ''}`.replace(/\/+/, '/'), { params: { page, per_page, q, order_by: orderBy, order_direction: orderDirection } });
 
         } catch (error) {
             // Handle error if needed
@@ -46,11 +47,11 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
                 fetchData()
         };
 
-        window.addEventListener('ajaxPostDone', eventListener as EventListener);
+        window.addEventListener('emitAjaxPostDone', eventListener as EventListener);
 
         // Cleanup the event listener when the component unmounts
         return () => {
-            window.removeEventListener('ajaxPostDone', eventListener as EventListener);
+            window.removeEventListener('emitAjaxPostDone', eventListener as EventListener);
         };
     }, []);
 

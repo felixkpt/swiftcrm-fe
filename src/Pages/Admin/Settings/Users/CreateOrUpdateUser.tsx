@@ -42,14 +42,14 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
         // Fetch the user data if the 'id' parameter is present
 
         if (id) {
-            getUser(`admin/settings/users/user/${id}/edit`);
+            getUser(`admin/users/user/${id}/edit`);
         }
 
     }, [id]);
 
     useEffect(() => {
         if (!roles) {
-            getRoles(`admin/settings/role-permissions/roles?all=1`);
+            getRoles(`admin/role-permissions/roles?all=1`);
         }
     }, [roles]);
 
@@ -92,8 +92,8 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
                             method="post"
                             action={
                                 user
-                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/settings/users/user/${user.id}`
-                                    : import.meta.env.VITE_APP_BASE_API + '/admin/settings/users'
+                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/users/user/${user.id}`
+                                    : import.meta.env.VITE_APP_BASE_API + '/admin/users'
                             }
                             onSubmit={(e: any) => emitAjaxPost(e)}
                             className="flex justify-center"

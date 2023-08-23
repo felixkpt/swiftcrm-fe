@@ -17,7 +17,7 @@ const Index = (props: Props) => {
             </div>
 
             <AutoTable
-                baseUri='/admin/settings/users'
+                baseUri='/admin/users'
                 columns={[
                     {
                         label: 'ID',
@@ -45,7 +45,7 @@ const Index = (props: Props) => {
             />
 
             {
-                data && <><AutoModel data={data} actionUrl='/admin/settings/users' /></>
+                data && <><AutoModel data={data} actionUrl='/admin/users' /></>
             }
 
         </div>

@@ -2,19 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { convertToTitleCase, emitAjaxPost } from '@/utils/helpers';
 import AsyncSelect from 'react-select/async';
 import Str from '@/utils/Str';
-
 interface ModalProps {
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
     data: any;
     actionUrl: string;
     list_sources: any;
-    list_depends_on: any;
     id?: string
+    setKey?: React.Dispatch<React.SetStateAction<number>>; // Use React.Dispatch type for setKey
     size?: 'modal-sm' | 'modal-lg' | 'modal-xl'
 }
 
-const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, list_sources }) => {
+const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, list_sources }) => {
 
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -121,6 +120,28 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, list_sourc
         isMulti?: boolean;
     }
 
+
+    useEffect(() => {
+
+        window.addEventListener('ajaxPostDone', handleAjaxPostDone);
+
+        return () => {
+            window.removeEventListener('ajaxPostDone', handleAjaxPostDone);
+        };
+
+    }, [])
+
+    const handleAjaxPostDone = (resp: any) => {
+        if (resp.detail) {
+            const detail = resp.detail;
+            if (detail.modalId === id && detail.response && setKey) {
+                setTimeout(() => {
+                    setKey((curr) => curr + 1);
+                }, 300);
+            }
+        }
+    };
+
     function renderAsyncSelect({ key, inputData, isMulti = false }: RenderAsyncSelectProps) {
         const defaultValue = inputData[key.replace(/_list/, '')] || (isMulti ? [] : '');
 
@@ -162,8 +183,8 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, list_sourc
                                                         const { input, type } = fillable[key];
                                                         key = key.replace(/_multilist$/, '_list')
                                                         return (
-                                                            <div className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
-                                                                <div key={key} className="form-group mb-2" id={`form-group-section-${key}`}>
+                                                            <div key={key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
+                                                                <div className="form-group mb-2" id={`form-group-section-${key}`}>
                                                                     <div className="mb-2 block">
                                                                         <label htmlFor="small">{convertToTitleCase(key)}</label>
                                                                     </div>
