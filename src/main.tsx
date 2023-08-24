@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import "./index.css";
+import "./index.scss";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RouterProvider } from "react-router-dom";
 import router from "@/routes/router.js";

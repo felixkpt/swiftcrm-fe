@@ -26,7 +26,7 @@ const DocumentationView = (props: Props) => {
 
     useEffect(() => {
 
-        get(`admin/documentation/${slug}`)
+        get(`admin/documentation/documentation/${slug}`)
 
     }, [slug])
 

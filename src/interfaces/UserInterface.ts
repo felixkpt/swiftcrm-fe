@@ -5,6 +5,7 @@ export interface UserInterface {
     id: number;
     name: string;
     email: string;
+    avatar?: string
 }
 
 export interface UsersApiResponse {

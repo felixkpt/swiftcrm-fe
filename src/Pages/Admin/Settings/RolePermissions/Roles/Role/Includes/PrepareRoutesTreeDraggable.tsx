@@ -52,6 +52,7 @@ function constructMenus() {
   // Sort the topLevelFolders based on the orderArray
   topLevelFolders = orderArray.map(id => idToElementMap.get(id));
 
+console.log(topLevelFolders)
 
   return { current_folder: constructMenu(currentFolder, true, currentFolderPosition), all_folders: constructMenu(topLevelFolders) }
 
@@ -64,17 +65,15 @@ function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFol
   const counter = 0
   for (const container of topLevelFolders) {
     const input = container.querySelector(`input[id$="-parent-checkbox"]`) as HTMLInputElement;
+    index++
 
     if (isCurrent || (input && (input.checked || input.indeterminate))) {
-      index++
 
       if (isCurrent === true && currentFolderPosition) index = currentFolderPosition
-
 
       const titleElement = container.querySelector('.folder-title') as HTMLInputElement | null;
       const iconElement = container.querySelector('input.folder-icon') as HTMLInputElement | null;
       const hiddenElement = container.querySelector('input.folder-hidden') as HTMLInputElement | null;
-
 
       if (titleElement && iconElement && hiddenElement) {
         const title = titleElement.value;

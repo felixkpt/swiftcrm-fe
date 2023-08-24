@@ -1,33 +1,63 @@
 import { useAuth } from '@/contexts/AuthContext'
+import useAxios from '@/hooks/useAxios'
 import { emitAjaxPost } from '@/utils/helpers'
-import { useEffect } from 'react'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import { useEffect, useState } from 'react'
+import defaultUserBackDrop from '@/assets/images/default_user_back_drop.png';
 
-type Props = {}
-
-const Profile = (props: Props) => {
+const Profile = () => {
 
 	const { user, setUser } = useAuth()
 
+	const { getFile: getImage } = useAxios();
+
+	const [imageUrl, setImageUrl] = useState('users/default-user.png')
+
 	useEffect(() => {
 
-		window.addEventListener('emitAjaxPostDone', function (event: Event) {
+		window.addEventListener('ajaxPostDone', function (event: Event) {
 			if (event?.detail) {
-				const { formId, response } = event.detail
+				const { elementId, response } = event.detail
 
-				if (formId === 'profile-update') {
-					console.log(formId)
+				if (elementId === 'profile-update') {
 					setUser(response)
 				}
-
 			}
 		})
 
 	}, [])
 
+	useEffect(() => {
+
+		if (user) {
+			handleFetchImage(user.avatar || imageUrl)
+		}
+
+	}, [user])
+
+	const handleFetchImage = async (src: string) => {
+		try {
+			const imageBlob = await getImage(src);
+			const imageSrc = URL.createObjectURL(imageBlob);
+			setImageUrl(imageSrc)
+
+		} catch (error) {
+			console.error('Error fetching image:', error);
+		}
+	};
+
+	const handleImageChange = (event) => {
+		const file = event.target.files[0]; // Get the selected file
+		if (file) {
+			const imageSrc = URL.createObjectURL(file);
+			setImageUrl(imageSrc);
+		}
+	};
+
 	return (
 		<div>
 			<div className="container-xxl">
-				<div className="section-image" data-image="/storage/../img/faces/margot.jpg">
+				<div className="section-image">
 					<div className="row">
 						<div className="card col-md-8 mb-4">
 							<div className="card-header">
@@ -40,7 +70,7 @@ const Profile = (props: Props) => {
 							<div className="card-body">
 								{
 									user ?
-										<form id='profile-update' method='post' action-url={`admin/users/user/profile-update`} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
+										<form id='profile-update' method='post' action-url={`admin/users/user/profile-update`} onSubmit={(e: any) => emitAjaxPost(e)} encType='multipart/form-data' className="flex justify-center">
 											<input type="hidden" name="_method" value="patch" />
 											<h6 className="heading-small text-muted mb-4">User information</h6>
 											<div className="pl-lg-4">
@@ -55,11 +85,19 @@ const Profile = (props: Props) => {
 													<label className="form-label" htmlFor="input-email"><i className="w3-xxlarge fa fa-envelope-o"></i>Email</label>
 												</div>
 												<div className="form-floating mb-3">
-													<div className="pb-2">
-														<img className="resize-image" src="/storage/../img/faces/margot.jpg" alt="profile" />
-													</div>
-													<div className="custom-file">
-														<input type="file" name="photo" className="form-control-file " id="input-picture" accept="image/*" />
+													<div>
+														<div className="avatar-wrapper position-relative">
+															<img className="profile-pic rounded-circle" src={imageUrl} alt="Profile pic" />
+															<div className="upload-button" onClick={() => document.getElementById("avatarUpload")?.click()}>
+																<Icon className='position-absolute top-50 start-50 translate-middle arrow-circle-up' icon={`mdi:arrow-up`} />
+															</div>
+															<input
+																id="avatarUpload"
+																type="file"
+																name="avatar"
+																onChange={handleImageChange}
+																accept="image/*" />
+														</div>
 													</div>
 												</div>
 												<div className="text-center">
@@ -106,13 +144,13 @@ const Profile = (props: Props) => {
 							<div className="card card-user">
 								<div className="card-header no-padding">
 									<div className="card-image">
-										<img src="https://light-bootstrap-dashboard-pro-laravel.creative-tim.com/img/full-screen-image-3.jpg" alt="..." />
+										<img src={defaultUserBackDrop} alt="..." />
 									</div>
 								</div>
 								<div className="card-body ">
 									<div className="author">
 										<a href="#">
-											<img className="avatar border-gray" src="/storage/../img/faces/margot.jpg " alt="..." />
+											<img className="avatar border-gray" src={imageUrl} alt="..." />
 											<h5 className="card-title">Admin</h5>
 										</a>
 										<p className="card-description">

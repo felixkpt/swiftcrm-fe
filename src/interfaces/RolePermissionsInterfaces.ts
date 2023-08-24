@@ -34,8 +34,9 @@ interface Route {
   title: string;
   hidden: boolean;
   icon: string | null;
+  checked: boolean;
+  children?: Route[];
 }
-
 interface RoutesSection {
   folder: string;
   routes: Route[];

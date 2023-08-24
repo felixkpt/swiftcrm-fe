@@ -2,34 +2,8 @@ import Str from '@/utils/Str';
 import React from 'react';
 import debounce from 'lodash/debounce';
 import CheckboxTreeManager from './CheckboxTreeManager';
-
-// Define the Route interface
-interface Route {
-    uri: string;
-    uri_methods: string;
-    slug: string;
-    title: string;
-    folder: string;
-    hidden: boolean;
-    methods: string[];
-    children?: Routes;
-}
-
-// Define the RouteWithChildren interface
-interface RouteWithChildren {
-    routes: Route[];
-    children: Routes;
-}
-
-// Define the Routes interface as a dictionary with string keys and RouteWithChildren values
-interface Routes {
-    [key: string]: RouteWithChildren;
-}
-
-// Define the Props interface for the RoutesTree component
-// Define the Props interface for the RoutesTree component
 interface Props {
-    child: RoutesSection
+    child: Route;
     permissions: PermissionData[];
     allPermissions: PermissionData[];
     indent: number
@@ -68,7 +42,7 @@ function handleToggleCheck(parentId: string, action: boolean | null = null) {
 
             action = targetCheckbox.checked
 
-            const inputs = targetElement.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"], input[id$="-parent-checkbox"]`);
+            const inputs = targetElement.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"]:not([disabled]), input[id$="-parent-checkbox"]`);
             inputs.forEach((input) => {
                 input.indeterminate = false
                 if (action !== null)
@@ -152,11 +126,13 @@ function found(uriMethods: string, permissions: any) {
 }
 
 // Function to determine whether a checkbox should be checked or not
-function shouldCheckCheckbox(inputId: string, uriMethods: string, permissions: string[]): boolean {
+function shouldCheckChildCheckbox(route: Route, permissions: string[], parentChecked: boolean): boolean {
+
+    const inputId: string = `${Str.uriMethods(route.uri_methods)}-child-checkbox`
 
     setTimeout(() => {
 
-        const exists = found(uriMethods, permissions)
+        const exists = parentChecked === false ? route.checked : route.checked || found(route.uri_methods, permissions)
 
         if (exists) {
             const checkbox = document.getElementById(inputId) as HTMLInputElement
@@ -279,7 +255,7 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, inden
                                 {routes.map((route, i) => {
 
                                     return (
-                                        <tr className='link routes-parent route-section' key={`${i}+${folder}_${route.slug}`}>
+                                        <tr className='link routes-parent route-section' key={`${i}+${folder}_${route.slug}`} style={{opacity: route.checked ? 0.5 : 1}}>
                                             <td className='col-1 border border-right cursor-pointer'>
                                                 <label className="form-check-label py-1 px-3 d-flex gap-2 rounded w-100 cursor-pointer" title={route.uri_methods}>
                                                     <input
@@ -288,7 +264,9 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, inden
                                                         id={`${Str.uriMethods(route.uri_methods)}-child-checkbox`}
                                                         className={`${ROUTE_CHECKBOX_CLASS} form-check-input me-2`}
                                                         onChange={(e) => debouncedHandleCheckedSingle(e, currentId, true, true)}
-                                                        data-checked={(isInitialRender && parentChecked && permissions) && shouldCheckCheckbox(`${Str.uriMethods(route.uri_methods)}-child-checkbox`, route.uri_methods, permissions)}
+                                                        defaultChecked=
+                                                        {(isInitialRender && permissions && shouldCheckChildCheckbox(route, permissions, parentChecked))}
+                                                        disabled={route.checked}
                                                     />
                                                     <input
                                                         type='hidden'
