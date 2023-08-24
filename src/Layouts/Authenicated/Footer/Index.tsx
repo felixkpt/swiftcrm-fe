@@ -2,6 +2,8 @@ import AjaxPost from '@/components/AjaxPost';
 import ToastError from '@/components/Modals/ToastError';
 import ToastNotification from '@/components/Modals/ToastNotification';
 import EditModel from '@/components/ModelComponent';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Footer() {
 

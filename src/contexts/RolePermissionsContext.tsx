@@ -16,7 +16,6 @@ const RolePermissionsContext = createContext<RolePermissionsContextType | undefi
 export const RolePermissionsProvider: React.FC = ({ children }) => {
     const rolePermissions = useRolePermissions();
 
-    console.log(rolePermissions)
     return (
         <RolePermissionsContext.Provider value={rolePermissions}>
             {children}

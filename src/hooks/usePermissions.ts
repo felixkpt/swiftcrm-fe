@@ -6,29 +6,25 @@ import { convertToLaravelPattern } from '@/utils/helpers';
 const usePermissions = () => {
     const { routePermissions, directPermissions } = useRolePermissionsContext();
 
-    console.log('Access usePermissions.')
-
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
 
         if (routePermissions.length > 0) {
-            setTimeout(() => {
-                setLoading(false)
-            }, 500);
+            setLoading(false)
         }
 
     }, [routePermissions])
 
     const checkPermission = (permission: string, method: string) => {
 
-        if (method) {
-            permission= convertToLaravelPattern(permission)
+        console.log('Access usePermissions -> checkPermission().')
 
-            console.log('rrrr',permission)
+        if (method) {
+            permission = convertToLaravelPattern(permission)
 
             const permissionCleaned = permission == '/' ? 'admin' : Str.afterLast(permission, 'admin/').replace(/\/$/, '')
-        
+
             const httpMethod = method.toUpperCase()
             let found = !!routePermissions.find((route) => String(route).startsWith(permissionCleaned + '@') && String(route).includes('@' + httpMethod));
             return found

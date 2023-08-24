@@ -11,7 +11,7 @@ import { useRolePermissionsContext } from '@/contexts/RolePermissionsContext';
 const Menu = () => {
 
   const { data, get, loading, errors } = useAxios()
-  const { user} = useAuth()
+  const { user } = useAuth()
   const { roles, setCurrentRole } = useRolePermissionsContext();
 
   const [selectedRole, setSelectedRole] = useState<RoleData>()
@@ -19,8 +19,10 @@ const Menu = () => {
   const [userMenu, setUserMenu] = useState(null)
 
   useEffect(() => {
-    if (roles.length > 0) {
-      setSelectedRole(roles[0])
+    if (user && roles.length > 0) {
+      setSelectedRole(user.default_role_id ? roles.find((role) => {
+        return role.id === user.default_role_id
+      }) : roles[0])
     }
   }, [roles]);
 
@@ -51,8 +53,8 @@ const Menu = () => {
     return <>
       {
         user && userMenu !== null ?
-          <div className='bg-gray-50 shadow sm:w-full'>
-            <ul className="metismenu list-unstyled nested-routessmain" id="menu">
+          <div className='shadow'>
+            <ul className="metismenu list-unstyled nested-routes main" id="menu">
 
               {
                 userMenu.map((child, i) => {
@@ -101,8 +103,8 @@ const Menu = () => {
           </div>
           :
           <>
-            {loading ?
-              <div className="d-flex align-items-center gap-3">
+            {!selectedRole || loading ?
+              <div className="d-flex align-items-center gap-3 ps-3 pt-3">
                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Loading...
               </div>
@@ -115,18 +117,19 @@ const Menu = () => {
 
   }, [user, userMenu])
 
-  if (roles.length > 0)
+  if (selectedRole)
     return (
       <div className='px-1'>
         <Select
           className="basic-single text-dark mb-2"
           classNamePrefix="select"
-          defaultValue={roles[0]}
+          defaultValue={selectedRole}
           isSearchable={true}
           name="roles"
           options={roles}
           getOptionValue={(option) => `${option['id']}`}
           getOptionLabel={(option) => `${option['name']}`}
+          onChange={(item) => setSelectedRole(item)}
           onChange={(item) => setSelectedRole(item)}
         />
         {memoizeMenu}

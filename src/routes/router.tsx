@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 import GuestLayout from '@/Layouts/Guest/GuestLayout';
 import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
-import adminRoutes from '@/routes/admin/adminRoutes';
 import guestRoutes from '@/routes/guest/guestRoutes';
-import Profile from '@/Pages/User/Profile';
+import adminRoutes from '@/routes/admin/adminRoutes';
+import userRoutes from '@/routes/user/index';
 
 const router = createBrowserRouter([
   {
@@ -11,14 +11,8 @@ const router = createBrowserRouter([
     children: guestRoutes,
   },
   {
-    path: 'profile',
-    element: <AuthenticatedLayout permission="access_profile" />,
-    children: [
-      {
-        path: '',
-        element: <Profile />,
-      }
-    ]
+    path: 'user',
+    children: userRoutes
   },
   {
     path: 'admin',

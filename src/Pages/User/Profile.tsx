@@ -73,7 +73,7 @@ const Profile = (props: Props) => {
 
 								<hr className="my-4" />
 
-								<form method='post' action-url={`admin/users/user/update-password`} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
+								<form method='post' action-url={`admin/users/user/update-self-password`} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
 									<input type="hidden" name="_method" value="patch" />
 									<h6 className="heading-small text-muted mb-4">Password</h6>
 									<div className="pl-lg-4">

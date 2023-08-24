@@ -17,6 +17,8 @@ interface AuthenticatedUser {
   setUser: (user: UserInterface) => void;
   // Function to delete user data and reset state
   deleteUser: () => void;
+  // recenty verified user credentials
+  verified: boolean
 }
 
 // Function to decrypt the user object
@@ -47,6 +49,7 @@ const AuthContent = createContext<AuthenticatedUser>({
   csrfToken: async () => false,
   setUser: () => { },
   deleteUser: () => { },
+  verified: false
 });
 
 // Function to encrypt the user object
@@ -76,6 +79,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   });
 
+  const [verified, setVerified] = useState(false)
+
   // Set encrypted user data to local storage and update roles state
   const setUser = (newUser: UserInterface) => {
     if (newUser) {
@@ -97,6 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const encryptedUser = encryptData(updatedUserData);
       if (encryptedUser) {
         localStorage.setItem('user', encryptedUser);
+        setVerified(true)
+
       }
 
       // Update the 'user' state with the updated user object
@@ -117,7 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Provide the authentication data and functions to the children components
   return (
-    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser }}>
+    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, verified }}>
       {children}
     </AuthContent.Provider>
   );

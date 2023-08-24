@@ -5,6 +5,7 @@ import { AutoTableInterface, ResponseData } from '@/interfaces';
 import { useEffect, useRef, useState } from 'react';
 import { convertToTitleCase, emitPrepareEdit } from '@/utils/helpers';
 import { Icon } from '@iconify/react';
+import { useNavigate } from 'react-router-dom';
 
 // Define the __dangerousHtml function
 function __dangerousHtml(html: HTMLElement) {
@@ -139,8 +140,37 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: Aut
 
     }, [modelDataLength])
 
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (modelDataLength) {
+            const ajaxNavigateElements = document.querySelectorAll('.autotable-navigate');
+
+            ajaxNavigateElements.forEach((element) => {
+                element.addEventListener('click', handleNavigation);
+            });
+            return () => {
+                // Clean up event listeners when the component unmounts
+                ajaxNavigateElements.forEach((element) => {
+                    element.removeEventListener('click', handleNavigation);
+                });
+            };
+        }
+
+    }, [navigate, modelDataLength]);
+
+    const handleNavigation = (event: Event) => {
+
+        event.preventDefault()
+
+        const href = event.target.getAttribute('href')
+        if (href) {
+            navigate(href)
+        }
+    };
+
     return (
-        <div ref={autoTableRef} className={`autotable shadow rounded-3 px-1 my-3 relative overflow-x-auto shadow-md sm:rounded-lg ${modelDataLength >= 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
+        <div className={`autotable shadow rounded-3 px-1 my-3 relative overflow-x-auto shadow-md sm:rounded-lg ${modelDataLength >= 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
             <div className="bg-gray-50 dark:bg-gray-800 py-3.5 overflow-auto">
                 <div className={`mt-2 h-6 px-3 pb-1 text-sm font-medium leading-none text-center text-blue-800 dark:text-white${modelDataLength >= 0 && loading ? ' animate-pulse' : ''}`}>{modelDataLength >= 0 && loading ? 'Loading...' : ''}</div>
                 <div className="flex items-center justify-between pb-2 px-1.5 float-right gap-2">

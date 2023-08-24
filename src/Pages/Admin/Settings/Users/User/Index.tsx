@@ -1,10 +1,9 @@
 import AutoModel from '@/components/AutoModel';
-import CreateOrEditModel from '@/components/CreateOrEditModel';
 import useAxios from '@/hooks/useAxios'
-import { UserInterface } from '@/interfaces';
-import { baseURL, emitAjaxPost } from '@/utils/helpers';
+import { UserInterface } from '@/interfaces/UserInterface';
+import { emitAjaxPost } from '@/utils/helpers';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 
 type Props = {}
@@ -47,7 +46,7 @@ const Index = (props: Props) => {
 
     if (loggingIn === false && dataLoggedIn) {
       const user = dataLoggedIn;
-      
+
       if (user) {
 
         setUser(user);
@@ -144,11 +143,45 @@ const Index = (props: Props) => {
                       </button>
                     </div>
                   </div>
+
+                  <div className={`modal fade`} id="update_password" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`true`}>
+
+                    <div className="modal-dialog modal-dialog-top animated zoomIn animated-3x   ">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h5 className="modal-title title" id="update_password_label">New Password</h5>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div className="modal-body">
+                          <div className="section">
+                            <form encType="" method="post" action-url={'/admin/users/user/update-others-password'} onSubmit={(e: any) => emitAjaxPost(e)} >
+                              <input type="hidden" name="user_id" value={id} />
+                              <input type="hidden" name="_method" value="patch" />
+                              <div className="form-group password">
+                                <label className="form-label label_password">Password</label>
+                                <input type="password" name="password" className="form-control" />
+                              </div>
+                              <div className="form-group password_confirmation">
+                                <label className="form-label label_password_confirmation">Password Confirmation</label>
+                                <input type="password" name="password_confirmation" className="form-control" />
+                              </div>
+                              <div className="form-group mt-2">
+                                <button type="submit" className="btn  btn-primary submit-btn ">Save Information</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
                 : <div>Loading user info</div>
             }
 
-            
+
 
             {
               data && <><AutoModel data={data} actionUrl={`/admin/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
