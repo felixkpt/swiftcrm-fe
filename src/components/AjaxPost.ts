@@ -34,20 +34,20 @@ const AjaxPost = () => {
             formData.append(key, value);
         });
 
-        let response
+        let results
 
         // Make the request
         if (method == 'post') {
-            response = await post(url, formData);
+            results = await post(url, formData);
         } else if (method == 'put') {
-            response = await put(url, formData);
+            results = await put(url, formData);
         } else if (method == 'patch') {
-            response = await patch(url, formData);
+            results = await patch(url, formData);
         } else if (method == 'delete') {
-            response = await destroy(url, formData);
+            results = await destroy(url, formData);
         }
 
-        emitAjaxPostDone({ elementId: rawForm.id || rawForm?.closest('.modal')?.id || null, response })
+        emitAjaxPostDone({ elementId: rawForm.id || rawForm?.closest('.modal')?.id || null, results })
 
         if (button) {
             button.disabled = false

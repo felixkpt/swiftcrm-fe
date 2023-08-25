@@ -17,10 +17,10 @@ const Profile = () => {
 
 		window.addEventListener('ajaxPostDone', function (event: Event) {
 			if (event?.detail) {
-				const { elementId, response } = event.detail
+				const { elementId, results } = event.detail
 
-				if (elementId === 'profile-update') {
-					setUser(response)
+				if (elementId === 'profile-update' && results) {
+					setUser(results)
 				}
 			}
 		})

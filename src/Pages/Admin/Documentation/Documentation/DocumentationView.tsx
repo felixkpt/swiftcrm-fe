@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 
 type Props = {}
 
-interface Documentation {
+interface Docs {
     id: string
     title: string
     content: string
@@ -14,7 +14,7 @@ interface Documentation {
 
 const DocumentationView = (props: Props) => {
 
-    const { slug } = useParams()
+    const { id } = useParams()
 
     const { data, loading, errors, get } = useAxios()
 
@@ -22,17 +22,18 @@ const DocumentationView = (props: Props) => {
 
     const [imageUrl, setImageUrl] = useState()
 
-    const [documentation, setDocumentation] = useState<Documentation>()
+    const [docs, setDocs] = useState<Docs>()
 
     useEffect(() => {
 
-        get(`admin/documentation/documentation/${slug}`)
+        if (id)
+            get(`admin/documentation/documentation/${id}`)
 
-    }, [slug])
+    }, [id])
 
     useEffect(() => {
         if (data) {
-            setDocumentation(data?.data)
+            setDocs(data?.data)
 
             if (data?.data?.image) handleFetchImage(data.data.image)
 
@@ -54,18 +55,18 @@ const DocumentationView = (props: Props) => {
     return (
         <div className='p-2'>
             {
-                !loading && documentation &&
+                !loading && docs &&
 
                 <div>
                     <div className='row mb-4'>
-                        <h2 className='col-8'>{documentation.title}</h2>
+                        <h2 className='col-8'>{docs.title}</h2>
                         <div className='col-4 d-flex justify-content-end'>
                             <div className='rounded shadow' style={{ width: 240, height: 240 }}>
                                 <img src={imageUrl} alt="Doc image" className='border w-100 h-100 rounded' />
                             </div>
                         </div>
                     </div>
-                    <div dangerouslySetInnerHTML={{ __html: documentation.content }}></div>
+                    <div dangerouslySetInnerHTML={{ __html: docs.content }}></div>
                 </div>
 
             }

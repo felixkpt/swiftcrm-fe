@@ -90,10 +90,10 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
                         <h1 className="text-2xl font-bold mb-4">{'Edit User'}</h1>
                         <form
                             method="post"
-                            action={
+                            action-url={
                                 user
-                                    ? import.meta.env.VITE_APP_BASE_API + `/admin/users/user/${user.id}`
-                                    : import.meta.env.VITE_APP_BASE_API + '/admin/users'
+                                    ? `/admin/users/user/${user.id}`
+                                    : '/admin/users'
                             }
                             onSubmit={(e: any) => emitAjaxPost(e)}
                             className="flex justify-center"

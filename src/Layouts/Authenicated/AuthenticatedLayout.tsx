@@ -14,7 +14,7 @@ import { useRolePermissionsContext } from '@/contexts/RolePermissionsContext';
 
 interface Props {
     uri: string
-    permission: string
+    permission?: string | null
     Component: React.ComponentType
 }
 const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {

@@ -1,6 +1,7 @@
 import AutoTable from '@/components/AutoTable';
 import AutoModel from '@/components/AutoModel';
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 const Documentation = () => {
   const [data, setData] = useState({})
@@ -10,10 +11,10 @@ const Documentation = () => {
 
   return (
     <div>
-      <h3>Documentation List</h3>
+      <h3>Docs List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create Documentation</button>
+          <NavLink to={`/admin/documentation/create`} className="btn btn-info text-white">Create Doc</NavLink>
         </div>
 
         <AutoTable
@@ -51,10 +52,7 @@ const Documentation = () => {
           search={true}
         />
       </div>
-      {
-        data && <><AutoModel data={data} actionUrl='/admin/documentation' list_sources={list_sources} /></>
-      }
-    </div>
+     </div>
   );
 };
 

@@ -6,12 +6,11 @@ import RoutesList from './RoutesList';
 type Props = {
     child: RoutesSection
     indent: number
-    handleToggle: () => void
     prevId: string
 }
 
 // The main RoutesTree component
-const MenuTree: React.FC<Props> = ({ child, indent, handleToggle, prevId }) => {
+const MenuTree: React.FC<Props> = ({ child, indent, prevId }) => {
 
     indent += 1
 
@@ -42,7 +41,7 @@ const MenuTree: React.FC<Props> = ({ child, indent, handleToggle, prevId }) => {
                                 children.length > 0 &&
                                 <>
                                     {
-                                        children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} prevId={currentId} />)
+                                        children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} prevId={currentId} />)
                                     }
                                 </>
                             }

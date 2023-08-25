@@ -3,14 +3,16 @@ import Str from "@/utils/Str"
 import { useEffect, useState } from "react";
 import RoutesTree from "./RoutesTree";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useParams } from "react-router-dom";
+import useAxios from "@/hooks/useAxios";
+import { emitNotification } from "@/utils/helpers";
 
 // Define the Props interface for the RoutesTree component
 interface Props {
-  routes: RoutesSection[];
+  role: RoleData;
+  routes: RouteCollection[];
   permissions: PermissionData[];
   allPermissions: PermissionData[];
-  handleSubmit: ({ folders, permissions }: any) => void;
-  saving: boolean;
 }
 
 // Constants used for managing the component behavior
@@ -18,9 +20,6 @@ const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
 const MAIN_CONTAINER_CLASS = 'nested-routes';
 
 function constructMenus() {
-  const currentFolder: Element[] = Array.from(document.querySelectorAll(`div.${MAIN_CONTAINER_CLASS}.main-tree.tab-pane.active>div`))
-  let currentFolderPosition = null
-
   let topLevelFolders: Element[] = Array.from(
     document.querySelectorAll(`div.${MAIN_CONTAINER_CLASS}.main-tree.tab-pane > div`)
   );
@@ -34,11 +33,6 @@ function constructMenus() {
     if (id.match(/^v-pills-/) && id.match(/-tab$/)) {
       const extractedValue = id.replace('v-pills-', '').replace('-tab', '');
       orderArray.push(extractedValue);
-
-      if (`${PARENT_FOLDER_ID_PREFIX}${extractedValue}` == currentFolder[0]?.id) {
-        currentFolderPosition = i + 1
-      }
-
     }
   });
 
@@ -52,13 +46,11 @@ function constructMenus() {
   // Sort the topLevelFolders based on the orderArray
   topLevelFolders = orderArray.map(id => idToElementMap.get(id));
 
-console.log(topLevelFolders)
-
-  return { current_folder: constructMenu(currentFolder, true, currentFolderPosition), all_folders: constructMenu(topLevelFolders) }
+  return { folderPermissions: constructMenu(topLevelFolders), menu: constructMenu(topLevelFolders, true) }
 
 }
 
-function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFolderPosition = null) {
+function constructMenu(topLevelFolders: Element[], isMenu = false) {
   const nestedRoutes = [];
 
   let index = 0; // Initialize the index
@@ -67,9 +59,7 @@ function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFol
     const input = container.querySelector(`input[id$="-parent-checkbox"]`) as HTMLInputElement;
     index++
 
-    if (isCurrent || (input && (input.checked || input.indeterminate))) {
-
-      if (isCurrent === true && currentFolderPosition) index = currentFolderPosition
+    if (input && (input.checked || input.indeterminate)) {
 
       const titleElement = container.querySelector('.folder-title') as HTMLInputElement | null;
       const iconElement = container.querySelector('input.folder-icon') as HTMLInputElement | null;
@@ -78,7 +68,7 @@ function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFol
       if (titleElement && iconElement && hiddenElement) {
         const title = titleElement.value;
         const icon = iconElement.value;
-        const children = constructMenuRecursively(container, isCurrent, counter);
+        const children = constructMenuRecursively(container, isMenu, counter);
         const hidden = hiddenElement.checked;
 
         nestedRoutes.push({
@@ -87,7 +77,7 @@ function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFol
           icon,
           hidden,
           children,
-          routes: getRoutes(container, isCurrent),
+          routes: getRoutes(container, isMenu),
           position: index,
         });
       }
@@ -98,7 +88,7 @@ function constructMenu(topLevelFolders: Element[], isCurrent = false, currentFol
   return nestedRoutes;
 }
 
-function constructMenuRecursively(folderElement: Element | null, isCurrent: boolean, counter: number): any[] {
+function constructMenuRecursively(folderElement: Element | null, isMenu: boolean, counter: number): any[] {
   counter += 1;
 
   const childrenContainers = folderElement?.querySelectorAll(`.COUNTER${counter}>div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
@@ -110,7 +100,7 @@ function constructMenuRecursively(folderElement: Element | null, isCurrent: bool
       const input = container.querySelector(`input[id$="-parent-checkbox"]`) as HTMLInputElement | null;
 
       if (input && (input.checked || input.indeterminate)) {
-        const children = constructMenuRecursively(container, isCurrent, counter);
+        const children = constructMenuRecursively(container, isMenu, counter);
 
         const titleElement = container.querySelector('.folder-title') as HTMLInputElement | null;
         const iconElement = container.querySelector('input.folder-icon') as HTMLInputElement | null;
@@ -127,7 +117,7 @@ function constructMenuRecursively(folderElement: Element | null, isCurrent: bool
             icon,
             hidden,
             children,
-            routes: getRoutes(container, isCurrent),
+            routes: getRoutes(container, isMenu),
           });
         }
       }
@@ -139,7 +129,7 @@ function constructMenuRecursively(folderElement: Element | null, isCurrent: bool
 
 
 // Function to get the selected routes for a given parent container
-function getRoutes(container: any, isCurrent = false) {
+function getRoutes(container: any, isMenu = false) {
   const id = container.id
   const routes = container.querySelectorAll(`#chld-${id}-parent-children>.routes-table .route-section`)
 
@@ -154,7 +144,7 @@ function getRoutes(container: any, isCurrent = false) {
       const icon = route.querySelector('input.folder-icon').value
       const hidden = route.querySelector('input.folder-hidden').checked
 
-      if (isCurrent === true || hidden === false && isResolvableURI(uri))
+      if (isMenu === false || hidden === false && isResolvableURI(uri))
         items.push({ uri, title, icon })
     }
   }
@@ -169,7 +159,7 @@ const isResolvableURI = (uri: string) => {
 }
 
 // The main RoutesTree component
-const PrepareRoutesTreeDraggable: React.FC<Props> = ({ routes, permissions, allPermissions, handleSubmit, saving }) => {
+const PrepareRoutesTreeDraggable: React.FC<Props> = ({ role, routes, permissions, allPermissions }) => {
 
   const [isInitialRender, setIsInitialRender] = useState(true);
 
@@ -179,7 +169,6 @@ const PrepareRoutesTreeDraggable: React.FC<Props> = ({ routes, permissions, allP
       setIsInitialRender(false); // Set isInitialRender to false after the initial render
     }
   }, []);
-
 
   const defaultList = routes;
   // React state to track order of items
@@ -197,6 +186,54 @@ const PrepareRoutesTreeDraggable: React.FC<Props> = ({ routes, permissions, allP
     // Update State
     setItemList(updatedList);
   };
+
+  const { id } = useParams<{ id: string }>();
+
+  const [saving, setSaving] = useState<boolean>(false)
+  const [savedFolder, setSavedFolder] = useState<string>('')
+
+  const roleUri = `admin/settings/role-permissions/roles/role/${id}`;
+
+
+  const { post: saveData, loading: savingPermissions } = useAxios();
+
+  async function handleSubmit(checked: any) {
+
+    setSaving(true)
+
+    const { folderPermissions, menu } = checked
+
+    folderPermissions.forEach(async (current_folder: any) => {
+
+      const { folder } = current_folder
+
+      await saveData(`${roleUri}/save-permissions?folder=` + folder, {
+        role_id: role.id,
+        current_folder
+      }).then((response) => {
+        if (response) {
+          console.log('done')
+          setSavedFolder(folder)
+          emitNotification('Successfully saved role permissions', 'success');
+        }
+      });
+
+    })
+
+    await saveData(`${roleUri}/save-menu`, {
+      role_id: role.id,
+      menu
+    }).then((response) => {
+      if (response) {
+        emitNotification('Successfully saved role menu', 'success');
+      }
+    });
+
+
+    setSaving(false)
+    // doGetPermissions();
+
+  }
 
   return (
     <div>
@@ -225,7 +262,7 @@ const PrepareRoutesTreeDraggable: React.FC<Props> = ({ routes, permissions, allP
                             {...provided.draggableProps}
                           >
                             <Icon icon="carbon:drag-vertical"></Icon>
-                            <button className={`nav-link text-start border w-100 ${i === 0 ? 'show active' : ''}`} id={`v-pills-${currentId}-tab`} data-bs-toggle="pill" data-bs-target={`#v-pills-${currentId}`} type="button" role="tab" aria-controls={`v-pills-${currentId}`} aria-selected="true">{Str.title(folder)}</button>
+                            <button className={`nav-link text-start border w-100 ${i === 0 ? 'show active' : ''}`} id={`v-pills-${currentId}-tab`} data-bs-toggle="pill" data-bs-target={`#v-pills-${currentId}`} type="button" role="tab" aria-controls={`v-pills-${currentId}`} aria-selected="true">{Str.title(folder)} {savedFolder == folder ? 'saved!' : ''}</button>
                           </div>
                         )}
                       </Draggable>

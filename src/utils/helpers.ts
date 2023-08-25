@@ -31,7 +31,7 @@ export const emitStatusUpdate = (e: Event) => {
 };
 
 // Event emitter to emit emitAjaxPost to the parent component
-export const emitAjaxPost = (e: Event) => {
+export const emitAjaxPost = (e: any) => {
     e.preventDefault()
     const event = new CustomEvent('ajaxPost', {
         detail: e,

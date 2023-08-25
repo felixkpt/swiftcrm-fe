@@ -18,12 +18,12 @@ const showErrors = data => {
 
             if (!element) continue
 
-            if (element.getAttribute('type') == 'hidden') {
+            if (element.getAttribute('type') == 'hidden' || element.classList.contains('hidden') || element.classList.contains('d-none')) {
                 element = element.closest('.form-control')
             }
 
             element.classList.add('is-invalid')
-
+            
             const invalidFeedback = document.createElement('div')
             invalidFeedback.classList.add('invalid-feedback')
             invalidFeedback.innerHTML = errors[key]

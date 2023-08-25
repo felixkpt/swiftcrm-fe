@@ -37,7 +37,7 @@ interface Route {
   checked: boolean;
   children?: Route[];
 }
-interface RoutesSection {
+interface RouteCollection {
   folder: string;
   routes: Route[];
   slug: string;
@@ -45,5 +45,5 @@ interface RoutesSection {
   hidden: boolean;
   icon: string | null;
 
-  children: RoutesSection[];
+  children: RouteCollection[];
 }

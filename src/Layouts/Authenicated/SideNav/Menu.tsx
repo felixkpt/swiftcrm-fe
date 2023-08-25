@@ -57,7 +57,7 @@ const Menu = () => {
             <ul className="metismenu list-unstyled nested-routes main" id="menu">
 
               {
-                userMenu.map((child, i) => {
+                userMenu.map((child:RouteCollection, i) => {
 
                   const { routes, children, icon, folder } = child
 
@@ -102,20 +102,20 @@ const Menu = () => {
             </ul>
           </div>
           :
-          <>
+          <div className='ps-2 pt-3'>
             {!selectedRole || loading ?
-              <div className="d-flex align-items-center gap-3 ps-3 pt-3">
+              <div className="d-flex align-items-center gap-3">
                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Loading...
               </div>
               :
-              `No menus associated with your role.`
+              `No menus associated with role.`
             }
-          </>
+          </div>
       }
     </>
 
-  }, [user, userMenu])
+  }, [user, userMenu, selectedRole, loading])
 
   if (selectedRole)
     return (
