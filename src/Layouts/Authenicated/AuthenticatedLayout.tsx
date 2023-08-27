@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Navbar from './Navbar/Index';
 import Footer from './Footer/Index';
@@ -11,6 +11,8 @@ import Error403 from '@/Pages/ErrorPages/Error403';
 import usePermissions from '@/hooks/usePermissions';
 import Loader from '@/components/Loader';
 import { useRolePermissionsContext } from '@/contexts/RolePermissionsContext';
+import Error404 from '@/Pages/ErrorPages/Error404';
+import { environment } from '@/utils/helpers';
 
 interface Props {
     uri: string
@@ -18,6 +20,8 @@ interface Props {
     Component: React.ComponentType
 }
 const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
+
+    const [reloadKey, setReloadKey] = useState<number>(0);
 
     const { user, updateUser, deleteUser, verified } = useAuth();
     const navigate = useNavigate();
@@ -29,18 +33,31 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
     const { checkPermission } = usePermissions()
 
+    const allowedRoutes = ['error-404']
+
     const [isAllowed, setIsAllowed] = useState(true)
+    const [checked, setChecked] = useState(false)
 
     useEffect(() => {
         // Prioritize permission is given (this refers to direct permission)
         const testPermission = permission || uri
 
         if (verified === true && testPermission && loadingRoutePermissions === false) {
-            const isAllowed = checkPermission(testPermission, 'get');
-            // setIsAllowed(isAllowed);
+
+            if (!allowedRoutes.includes(testPermission)) {
+                const isAllowed = checkPermission(testPermission, 'get');
+                setIsAllowed(isAllowed);
+            }
+
+            // console.log(testPermission,isAllowed)
+
+            setTimeout(function () {
+                setChecked(true);
+            }, 500);
+
         }
 
-    }, [verified, loadingRoutePermissions])
+    }, [verified, loadingRoutePermissions, Component])
 
     useEffect(() => {
 
@@ -69,8 +86,20 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
         }
     }, [loadingUser, tried]);
 
+    const [previousUrl, setSpreviousUrl] = useState<string|null>(null)
+
+  useEffect(() => {
+    
+    if (previousUrl !== location.pathname)
+    {
+        console.log('chng', previousUrl, location.pathname)
+        setSpreviousUrl(location.pathname)
+    }
+
+  }, [location.pathname]);
+
     return (
-        <>
+        <div key={reloadKey}>
             <ScrollToTop />
             {user ? (
                 <>
@@ -81,17 +110,21 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                         </div>
                         <div id="layoutSidenav_content">
                             <main className='container-fluid p-3 min-h-100vh position-relative'>
-                                <div className={`${isAllowed === false ? 'position-absolute top-50 start-50 translate-middle w-100' : ''} `}>
-                                    {isAllowed === true ? (
+                                {
+                                    isAllowed === true && checked === true ?
                                         <Component />
-                                    ) : loadingRoutePermissions === false ? (
-                                        <Error403 />
-                                    ) : (
-                                        <Loader message='Granting you page access...' />
-                                    )}
-                                </div>
+                                        :
+                                        <>
+                                            {
+                                                loadingRoutePermissions === false && checked === true ? (
+                                                    environment === 'local' ? <Error403 previousUrl={previousUrl} currentUrl={location.pathname} setReloadKey={setReloadKey} /> : <Error404 previousUrl={previousUrl} currentUrl={location.pathname} setReloadKey={setReloadKey} />
+                                                ) : (
+                                                    <Loader message='Granting you page access...' />
+                                                )
+                                            }
+                                        </>
+                                }
                             </main>
-
                             <Footer />
                         </div>
                     </div>
@@ -109,7 +142,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                     }
                 </div>
             }
-        </>
+        </div>
     );
 };
 

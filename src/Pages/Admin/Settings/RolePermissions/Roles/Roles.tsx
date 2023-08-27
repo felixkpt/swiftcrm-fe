@@ -1,5 +1,5 @@
 import AutoTable from '@/components/AutoTable';
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
 
 const Roles = () => {
@@ -26,7 +26,7 @@ const Roles = () => {
       <h3>Roles List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create role</button>
+          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create role</button>
         </div>
         <AutoTable
           baseUri='/admin/settings/role-permissions/roles'
@@ -57,7 +57,7 @@ const Roles = () => {
         />
       </div>
       {
-        data && <><AutoModel data={data} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
+        data && <><AutoModal data={data} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
       }
     </div>
   );

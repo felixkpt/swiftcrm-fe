@@ -48,29 +48,6 @@ const MenuTree: React.FC<Props> = ({ child, indent, prevId }) => {
                         </nav>
                     </div>
                 </div>
-                // <li key={currentId} id={`${PARENT_FOLDER_ID_PREFIX}${folder}`}>
-                //     <a href="#" aria-expanded="true" className='has-arrow mb-1 px-1 rounded d-flex rounded-lg'>
-                //         <label className='toggler p-2 text-base d-flex align-items-center gap-1 justify-content-between flex-grow-1' onClick={() => handleToggle(currentId)}>
-                //             <span className='d-flex align-items-center gap-1'>
-                //                 <Icon icon={`${icon || 'prime:bookmark'}`} />
-                //                 <span>{Str.title(Str.afterLast(folder, '/'))}</span>
-                //             </span>
-                //             {/* <Icon icon="bi-chevron-down" /> */}
-                //         </label>
-                //     </a>
-
-                //     <ul aria-expanded="true" id={currentId} className={`list-unstyled ms-${indent} my-1`}>
-                //         <RoutesList routes={routes} />
-                //         {
-                //             children.length > 0 &&
-                //             <>
-                //                 {
-                //                     children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} handleToggle={handleToggle} />)
-                //                 }
-                //             </>
-                //         }
-                //     </ul>
-                // </li>
             }
         </>
     )

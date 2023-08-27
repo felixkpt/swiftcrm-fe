@@ -3,24 +3,29 @@ import Str from "@/utils/Str"
 import { useEffect, useState } from "react";
 import RoutesTree from "./RoutesTree";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useParams } from "react-router-dom";
-import useAxios from "@/hooks/useAxios";
-import { emitNotification } from "@/utils/helpers";
 
 // Define the Props interface for the RoutesTree component
 interface Props {
-  role: RoleData;
   routes: RouteCollection[];
   permissions: PermissionData[];
   allPermissions: PermissionData[];
+  handleSubmit: ({ folders, permissions }: any) => void;
+  saving: boolean;
+  savedFolders: string[]
+}
+
+interface FolderCheck {
+  parentId: string;
+  state: 'none' | 'checked' | 'indeterminate';
 }
 
 // Constants used for managing the component behavior
 const PARENT_FOLDER_ID_PREFIX = 'parent-folder-';
 const MAIN_CONTAINER_CLASS = 'nested-routes';
+const ROUTE_CHECKBOX_CLASS = 'routecheckbox';
 
 function constructMenus() {
-  let topLevelFolders: Element[] = Array.from(
+  let topLevelFolders: HTMLElement[] = Array.from(
     document.querySelectorAll(`div.${MAIN_CONTAINER_CLASS}.main-tree.tab-pane > div`)
   );
 
@@ -45,12 +50,13 @@ function constructMenus() {
 
   // Sort the topLevelFolders based on the orderArray
   topLevelFolders = orderArray.map(id => idToElementMap.get(id));
+  const allFolders = Array.from(idToElementMap.keys());
 
-  return { folderPermissions: constructMenu(topLevelFolders), menu: constructMenu(topLevelFolders, true) }
+  return { folderPermissions: constructMenu(topLevelFolders), menu: constructMenu(topLevelFolders, true), allFolders }
 
 }
 
-function constructMenu(topLevelFolders: Element[], isMenu = false) {
+function constructMenu(topLevelFolders: HTMLElement[], isMenu = false) {
   const nestedRoutes = [];
 
   let index = 0; // Initialize the index
@@ -71,6 +77,11 @@ function constructMenu(topLevelFolders: Element[], isMenu = false) {
         const children = constructMenuRecursively(container, isMenu, counter);
         const hidden = hiddenElement.checked;
 
+        let unchecked: string[] = []
+        if (isMenu == false) {
+          unchecked = getUncheckedCheckboxValues(container);
+        }
+
         nestedRoutes.push({
           folder: input?.value ?? '',
           title,
@@ -79,6 +90,7 @@ function constructMenu(topLevelFolders: Element[], isMenu = false) {
           children,
           routes: getRoutes(container, isMenu),
           position: index,
+          unchecked
         });
       }
 
@@ -86,6 +98,14 @@ function constructMenu(topLevelFolders: Element[], isMenu = false) {
   }
 
   return nestedRoutes;
+}
+
+function getUncheckedCheckboxValues(container: HTMLElement): string[] {
+  const uncheckedFoldersUnchecked: HTMLInputElement[] = Array.from(container.querySelectorAll(`input[id$="-parent-checkbox"]:not(:checked):not(:indeterminate)`));
+  const uncheckedRoutes: HTMLInputElement[] = Array.from(container.querySelectorAll(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`));
+
+  const unchecked: string[] = uncheckedFoldersUnchecked.concat(uncheckedRoutes).map(checkbox => checkbox.value);
+  return unchecked;
 }
 
 function constructMenuRecursively(folderElement: Element | null, isMenu: boolean, counter: number): any[] {
@@ -142,7 +162,7 @@ function getRoutes(container: any, isMenu = false) {
       const uri = input.value
       const title = route.querySelector('input.route-title').value
       const icon = route.querySelector('input.folder-icon').value
-      const hidden = route.querySelector('input.folder-hidden').checked
+      const hidden = route.querySelector('input.folder-hidden').value === 'true' ? true : false
 
       if (isMenu === false || hidden === false && isResolvableURI(uri))
         items.push({ uri, title, icon })
@@ -159,9 +179,11 @@ const isResolvableURI = (uri: string) => {
 }
 
 // The main RoutesTree component
-const PrepareRoutesTreeDraggable: React.FC<Props> = ({ role, routes, permissions, allPermissions }) => {
+const PrepareRoutesTreeDraggable: React.FC<Props> = ({ routes, permissions, allPermissions, handleSubmit, saving, savedFolders }) => {
 
   const [isInitialRender, setIsInitialRender] = useState(true);
+
+  const [foldersCheckState, setFoldersCheckState] = useState<FolderCheck[]>([]);
 
   // Run checkbox checking logic once on component render
   useEffect(() => {
@@ -187,122 +209,159 @@ const PrepareRoutesTreeDraggable: React.FC<Props> = ({ role, routes, permissions
     setItemList(updatedList);
   };
 
-  const { id } = useParams<{ id: string }>();
+  useEffect(() => {
 
-  const [saving, setSaving] = useState<boolean>(false)
-  const [savedFolder, setSavedFolder] = useState<string>('')
+    if (routes && !isInitialRender) {
 
-  const roleUri = `admin/settings/role-permissions/roles/role/${id}`;
+      setTimeout(() => {
 
+        const topLevelFoldersCheckBoxes = document.querySelectorAll(`div[id^="${PARENT_FOLDER_ID_PREFIX}"] input[id$="-parent-checkbox"][data-counter="1"]`);
 
-  const { post: saveData, loading: savingPermissions } = useAxios();
+        topLevelFoldersCheckBoxes.forEach((checkbox) => {
 
-  async function handleSubmit(checked: any) {
+          const inputCheckbox = checkbox as HTMLInputElement;
+          if (!inputCheckbox) return;
 
-    setSaving(true)
+          if (!checkbox) return
 
-    const { folderPermissions, menu } = checked
+          const parentDiv = inputCheckbox.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
 
-    folderPermissions.forEach(async (current_folder: any) => {
+          if (!parentDiv) return
 
-      const { folder } = current_folder
+          const parentId = parentDiv.id;
 
-      await saveData(`${roleUri}/save-permissions?folder=` + folder, {
-        role_id: role.id,
-        current_folder
-      }).then((response) => {
-        if (response) {
-          console.log('done')
-          setSavedFolder(folder)
-          emitNotification('Successfully saved role permissions', 'success');
-        }
-      });
+          let checkedState: 'none' | 'checked' | 'indeterminate' = 'none';
 
-    })
+          if (inputCheckbox.checked) {
+            checkedState = 'checked';
+          } else if (inputCheckbox.indeterminate) {
+            checkedState = 'indeterminate';
+          }
 
-    await saveData(`${roleUri}/save-menu`, {
-      role_id: role.id,
-      menu
-    }).then((response) => {
-      if (response) {
-        emitNotification('Successfully saved role menu', 'success');
-      }
-    });
+          const curr: FolderCheck = {
+            parentId: Str.afterFirst(parentId, PARENT_FOLDER_ID_PREFIX),
+            state: checkedState,
+          };
 
+          setFoldersCheckState((items) => {
+            const updatedItems = items.map((item) =>
+              item.parentId === curr.parentId ? curr : item
+            );
 
-    setSaving(false)
-    // doGetPermissions();
+            // If the current item doesn't exist, add it to the array
+            if (!updatedItems.some((item) => item.parentId === curr.parentId)) {
+              updatedItems.push(curr);
+            }
 
-  }
+            return updatedItems;
+          });
+        })
+
+      }, 250)
+
+    }
+
+  }, [isInitialRender, routes, saving])
 
   return (
     <div>
-      <div className="d-flex align-items-start mt-1">
-        <div className="nav flex-column nav-pills me-3 position-relative" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <DragDropContext onDragEnd={handleDrop}>
-            <Droppable droppableId="list-container">
-              {(provided: any) => (
-                <div
-                  className="list-container"
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {
-                    itemList.map((child, i) => {
-
-                      const folder = child.folder
-                      const currentId = Str.slug((folder).replace(/^\//, ''));
-
-                      return <Draggable key={currentId} draggableId={currentId} index={i}>
-                        {(provided: any) => (
-                          <div
-                            className="item-container ps-1 my-1 rounded text-dark d-flex gap-2 align-items-center border draggable"
-                            ref={provided.innerRef}
-                            {...provided.dragHandleProps}
-                            {...provided.draggableProps}
-                          >
-                            <Icon icon="carbon:drag-vertical"></Icon>
-                            <button className={`nav-link text-start border w-100 ${i === 0 ? 'show active' : ''}`} id={`v-pills-${currentId}-tab`} data-bs-toggle="pill" data-bs-target={`#v-pills-${currentId}`} type="button" role="tab" aria-controls={`v-pills-${currentId}`} aria-selected="true">{Str.title(folder)} {savedFolder == folder ? 'saved!' : ''}</button>
-                          </div>
-                        )}
-                      </Draggable>
-
-                    })
-                  }
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+      <form
+        action=''
+        onSubmit={(e: React.FormEvent) => {
+          e.preventDefault();
+          handleSubmit(constructMenus());
+        }}
+        className="w-100"
+      >
+        <div className='d-flex justify-content-end mt-2'>
+          <button type="submit" className="btn btn-primary text-white" disabled={saving}>{saving ? 'Saving checked...' : 'Save checked'}</button>
         </div>
+        <div className="d-flex align-items-start mt-1">
+          <div className="nav flex-column nav-pills me-3 position-relative" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <DragDropContext onDragEnd={handleDrop}>
+              <Droppable droppableId="list-container">
+                {(provided: any) => (
+                  <div
+                    className="list-container"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {
+                      itemList.map((child, i) => {
 
-        <form
-          action=''
-          onSubmit={(e: React.FormEvent) => {
-            e.preventDefault();
-            handleSubmit(constructMenus());
-          }}
-          className="w-100"
-        >
-          <div className='d-flex justify-content-end'>
-            <button type="submit" className="btn btn-primary text-white" disabled={saving}>{saving ? 'Saving checked...' : 'Save checked'}</button>
+                        const folder = child.folder
+                        const currentId = Str.slug((folder).replace(/^\//, ''));
+
+                        const folderCheckState = foldersCheckState.find(item => item.parentId === currentId)
+
+                        // console.log(foldersCheckState)
+
+                        return <Draggable key={currentId} draggableId={currentId} index={i}>
+                          {(provided: any) => (
+                            <div
+                              className="item-container ps-1 my-1 rounded text-dark d-flex gap-2 align-items-center border draggable"
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                              {...provided.draggableProps}
+                            >
+                              <Icon icon="carbon:drag-vertical"></Icon>
+                              <button className={`nav-link text-start border w-100 d-flex gap-1 align-items-center justify-content-between ${i === 0 ? 'show active' : ''}`} id={`v-pills-${currentId}-tab`} data-bs-toggle="pill" data-bs-target={`#v-pills-${currentId}`} type="button" role="tab" aria-controls={`v-pills-${currentId}`} aria-selected="true">
+                                <div className="d-flex align-items-center gap-1">
+                                  <span className={`text-primary bg-white rounded-circle d-flex align-items-center justify-content-center`} style={{ width: 20, height: 20 }}>
+                                    {
+                                      <Icon
+                                        icon={
+                                          !!folderCheckState && folderCheckState.state === 'checked'
+                                            ? 'gg:check-o'
+                                            : !!folderCheckState && folderCheckState.state === 'indeterminate'
+                                              ? 'ri:indeterminate-circle-line'
+                                              : 'ci:radio-unchecked'
+                                        }
+                                      />
+                                    }
+                                  </span>
+                                  <span>{Str.title(folder)}</span>
+                                </div>
+                                {
+                                  savedFolders.includes(folder)
+                                    ?
+                                    <span title="Saved!" className={`text-success bg-white rounded-circle d-flex align-items-center justify-content-center`} style={{ width: 20, height: 20 }}>
+                                      {savedFolders.includes(folder) ? <><Icon icon="gg:check-o" /> </> : <> </>}
+                                    </span>
+                                    :
+                                    ''
+                                }
+                              </button>
+                            </div>
+                          )}
+                        </Draggable>
+
+                      })
+                    }
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
 
-          <div className={`tab-content overflow-auto`} id="v-pills-tabContent">
-            {
-              routes.map((child, j) => {
+          <div className="w-100">
+            <div className={`tab-content overflow-auto`} id="v-pills-tabContent">
+              {
+                routes.map((child, j) => {
 
-                const folder = child.folder
-                const currentId = Str.slug((folder).replace(/^\//, ''));
+                  const folder = child.folder
+                  const currentId = Str.slug((folder).replace(/^\//, ''));
 
-                return <div key={`${currentId}`} className={`tab-pane fade ${j === 0 ? 'show active' : ''} ${MAIN_CONTAINER_CLASS} main-tree COUNTER0`} id={`v-pills-${currentId}`} role="tabpanel" aria-labelledby={`v-pills-${currentId}-tab`}>
-                  <RoutesTree child={child} permissions={permissions} allPermissions={allPermissions} indent={0} counter={0} isInitialRender={isInitialRender} />
-                </div>
+                  return <div key={`${currentId}`} className={`tab-pane fade ${j === 0 ? 'show active' : ''} ${MAIN_CONTAINER_CLASS} main-tree COUNTER0`} id={`v-pills-${currentId}`} role="tabpanel" aria-labelledby={`v-pills-${currentId}-tab`}>
+                    <RoutesTree child={child} permissions={permissions} allPermissions={allPermissions} indent={0} counter={0} isInitialRender={isInitialRender} />
+                  </div>
+                }
+                )
               }
-              )
-            }
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

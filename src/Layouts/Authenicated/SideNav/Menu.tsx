@@ -12,7 +12,7 @@ const Menu = () => {
 
   const { data, get, loading, errors } = useAxios()
   const { user } = useAuth()
-  const { roles, setCurrentRole } = useRolePermissionsContext();
+  const { roles, setCurrentRole, routePermissions } = useRolePermissionsContext();
 
   const [selectedRole, setSelectedRole] = useState<RoleData>()
 
@@ -38,7 +38,7 @@ const Menu = () => {
       setCurrentRole(selectedRole)
     }
 
-  }, [selectedRole])
+  }, [selectedRole, routePermissions])
 
   useEffect(() => {
 

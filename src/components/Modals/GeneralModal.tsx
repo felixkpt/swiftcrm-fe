@@ -1,3 +1,4 @@
+import { subscribe, unsubscribe } from '@/utils/events';
 import { emitAjaxPost } from '@/utils/helpers'
 import React, { ReactNode, useEffect, useState } from 'react'
 
@@ -29,10 +30,10 @@ const GeneralModal: React.FC<GeneralModalProps> = ({ title, children, actionUrl,
 
     useEffect(() => {
 
-        window.addEventListener('ajaxPostDone', handleAjaxPostDone);
+        subscribe('ajaxPostDone', handleAjaxPostDone);
 
         return () => {
-            window.removeEventListener('ajaxPostDone', handleAjaxPostDone);
+            unsubscribe('ajaxPostDone', handleAjaxPostDone);
         };
 
     }, [])

@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { convertToTitleCase, emitAjaxPost } from '@/utils/helpers';
-import AsyncSelect from 'react-select/async';
-import Str from '@/utils/Str';
+import { publish, subscribe, unsubscribe } from '@/utils/events';
+import RenderAsyncSelect from './RenderAsyncSelect';
 interface ModalProps {
+    modelDetails?: any;
+    record?: string[] | null
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
-    data: any;
     actionUrl: string;
-    list_sources: any;
+    list_sources?: any;
     id?: string
     setKey?: React.Dispatch<React.SetStateAction<number>>; // Use React.Dispatch type for setKey
     size?: 'modal-sm' | 'modal-lg' | 'modal-xl'
 }
 
-const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, list_sources }) => {
+const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size, id, setKey, list_sources }) => {
 
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -24,25 +25,12 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
 
     const [computedSize, setComputedSize] = useState<string>('')
 
-    async function getOptions(key: string) {
-
-        try {
-            const fn = Str.camel(key)
-            console.log(fn)
-            const options = await list_sources[fn]();
-            return options;
-        } catch (e) { console.log(e) }
-
-        return []
-
-    }
-
     useEffect(() => {
-        if (data) {
-            setFillable(data?.fillable || []);
-            setModelName(data?.model_name || null);
+        if (modelDetails) {
+            setFillable(modelDetails?.fillable || []);
+            setModelName(modelDetails?.model_name || null);
         }
-    }, [data]);
+    }, [modelDetails]);
 
     useEffect(() => {
         const transformedObject: { [key: string]: string } = {};
@@ -66,18 +54,17 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
                 setComputedSize('modal-xl')
         }
 
-        if (fillable && data?.data) {
-            let row = data.data
+        if (fillable && record) {
 
-            for (const key in row) {
-                transformedObject[key] = row[key];
+            for (const key in record) {
+                transformedObject[key] = record[key];
                 setMethod('put')
             }
 
             setInputData(transformedObject);
         }
 
-    }, [fillable, data]);
+    }, [fillable, record]);
 
     const errors = {};
 
@@ -95,7 +82,7 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
     useEffect(() => {
         setIsModalOpen(true);
 
-    }, [data]);
+    }, [modelDetails]);
 
     useEffect(() => {
         if (errors && Object.keys(errors).length > 0 && !firstErrorRef.current) {
@@ -114,63 +101,42 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
         return 'text';
     };
 
-    interface RenderAsyncSelectProps {
-        key: string;
-        inputData: { [key: string]: string };
-        isMulti?: boolean;
-    }
-
-
     useEffect(() => {
 
-        window.addEventListener('ajaxPostDone', handleAjaxPostDone);
+        subscribe('ajaxPostDone', handleAjaxPostDone as EventListener);
 
-        return () => {
-            window.removeEventListener('ajaxPostDone', handleAjaxPostDone);
-        };
+        return () => unsubscribe('ajaxPostDone', handleAjaxPostDone as EventListener);
 
     }, [])
 
-    const handleAjaxPostDone = (resp: any) => {
-        if (resp.detail) {
-            const detail = resp.detail;
-            if (detail.modalId === id && detail.response && setKey) {
-                setTimeout(() => {
-                    setKey((curr) => curr + 1);
-                }, 300);
+    
+    const handleAjaxPostDone = (event: CustomEvent<{ [key: string]: any }>) => {
+   
+        if (event.detail) {
+            const detail = event.detail;
+
+            if (detail.results) {
+                if (detail.elementId === id && setKey) {
+                    setTimeout(() => {
+                        setKey((curr) => curr + 1);
+                    }, 300);
+                } else {
+                    publish('reloadAutoTable', { tableId: modelDetails.tableId });
+                }
             }
         }
     };
 
-    function renderAsyncSelect({ key, inputData, isMulti = false }: RenderAsyncSelectProps) {
-        const defaultValue = inputData[key.replace(/_list/, '')] || (isMulti ? [] : '');
-
-        return (
-            <AsyncSelect
-                id={key}
-                className="form-control"
-                name={isMulti ? `${key}[]` : key}
-                key={key}
-                defaultValue={defaultValue}
-                isMulti={isMulti}
-                cacheOptions
-                defaultOptions
-                loadOptions={() => getOptions(key)}
-                getOptionValue={(option) => `${option['id']}`}
-                getOptionLabel={(option) => `${option['name']}`}
-            />
-        );
-    }
 
     return (
         <div ref={rootRef || null}>
-            <div className={`modal fade`} id={`${id || 'AutoModel'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+            <div className={`modal fade`} id={`${id || 'AutoModal'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
                 <div className={`modal-dialog ${computedSize}`}>
                     <div className="modal-content">
-                        {data && isModalOpen ?
+                        {modelDetails && isModalOpen ?
                             <div>
                                 <div className="modal-header">
-                                    <h5 className="modal-title" id="staticBackdropLabel">{`${data?.data?.id ? 'Edit' : 'Create'} ${modelName}`}</h5>
+                                    <h5 className="modal-title" id="staticBackdropLabel">{`${record && record.id ? 'Edit' : 'Create'} ${modelName}`}</h5>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
@@ -181,51 +147,52 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
                                                 {hasFillable ? (
                                                     Object.keys(fillable).map((key) => {
                                                         const { input, type } = fillable[key];
-                                                        key = key.replace(/_multilist$/, '_list')
+                                                        const current_key = key.replace(/_multilist$/, '_list')
+
                                                         return (
-                                                            <div key={key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
-                                                                <div className="form-group mb-2" id={`form-group-section-${key}`}>
+                                                            <div key={current_key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
+                                                                <div className="form-group mb-2" id={`form-group-section-${current_key}`}>
                                                                     <div className="mb-2 block">
-                                                                        <label htmlFor="small">{convertToTitleCase(key)}</label>
+                                                                        <label htmlFor="small">{convertToTitleCase(current_key)}</label>
                                                                     </div>
                                                                     {input === 'input' && type !== 'file' && (
                                                                         <input
                                                                             className="form-control"
-                                                                            id={key}
-                                                                            type={guessType(key)}
-                                                                            name={key}
-                                                                            value={inputData[key] || ''}
-                                                                            onChange={(e) => handleInputChange(key, e.target.value)}
-                                                                            key={key}
+                                                                            id={current_key}
+                                                                            type={guessType(current_key)}
+                                                                            name={current_key}
+                                                                            value={inputData[current_key] || ''}
+                                                                            onChange={(e) => handleInputChange(current_key, e.target.value)}
+                                                                            key={current_key}
                                                                         />
                                                                     )}
                                                                     {input === 'input' && type === 'file' && (
                                                                         <input
                                                                             className="form-control"
-                                                                            id={key}
+                                                                            id={current_key}
                                                                             type="file"
-                                                                            name={key}
+                                                                            name={current_key}
                                                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                                                 const files = e.target.files;
                                                                                 const fileNames = files ? Array.from(files).map((file) => file.name).join(', ') : '';
-                                                                                handleInputChange(key, fileNames);
+                                                                                handleInputChange(current_key, fileNames);
                                                                             }}
-                                                                            key={key}
+                                                                            key={current_key}
                                                                         />
                                                                     )}
 
-                                                                    {input === 'select' && renderAsyncSelect({ key, inputData })}
+                                                                    {input === 'select' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} inputData={inputData} isMulti={false} />}
 
-                                                                    {input === 'multiselect' && renderAsyncSelect({ key, inputData, isMulti: true })}
+                                                                    {input === 'multiselect' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} inputData={inputData} isMulti={true} />}
 
                                                                     {input === 'textarea' && (
                                                                         <textarea
-                                                                            id={key}
+                                                                            id={current_key}
                                                                             className="form-control"
-                                                                            name={key}
-                                                                            value={inputData[key] || ''}
-                                                                            onChange={(e) => handleInputChange(key, e.target.value)}
-                                                                            key={key}
+                                                                            name={current_key}
+                                                                            value={inputData[current_key] || ''}
+                                                                            onChange={(e) => handleInputChange(current_key, e.target.value)}
+                                                                            key={current_key}
                                                                             rows={7}
                                                                         ></textarea>
                                                                     )}
@@ -249,10 +216,10 @@ const AutoModel: React.FC<ModalProps> = ({ data, actionUrl, size, id, setKey, li
                         }
                     </div>
                 </div>
-                <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target="#createModel"></button>
+                <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target="#AutoModal"></button>
             </div>
         </div>
     );
 };
 
-export default AutoModel;
+export default AutoModal;

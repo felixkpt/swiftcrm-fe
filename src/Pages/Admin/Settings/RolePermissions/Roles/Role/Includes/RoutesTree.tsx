@@ -1,9 +1,9 @@
 import Str from '@/utils/Str';
-import React from 'react';
 import debounce from 'lodash/debounce';
 import CheckboxTreeManager from './CheckboxTreeManager';
+import { useEffect } from 'react';
 interface Props {
-    child: Route;
+    child: RouteCollection;
     permissions: PermissionData[];
     allPermissions: PermissionData[];
     indent: number
@@ -22,136 +22,6 @@ const checkboxTreeManager = new CheckboxTreeManager(
     ROUTE_CHECKBOX_CLASS,
     MAIN_CONTAINER_CLASS
 );
-
-// Function to handle toggling the display of child routes
-function handleToggle(key: string) {
-    const target = document.getElementById(`chld-${PARENT_FOLDER_ID_PREFIX}${key}-${PARENT_CHILDREN_CLASS}`);
-    target?.classList.toggle('d-none');
-}
-
-// Function to handle toggling checkboxes for parent routes
-function handleToggleCheck(parentId: string, action: boolean | null = null) {
-
-    const targetElement = document.getElementById(parentId) as HTMLInputElement; // Narrow the type to HTMLInputElement
-    const targetCheckbox = targetElement.querySelector(`.parent-checkbox`) as HTMLInputElement;
-
-    if (targetCheckbox) {
-
-        // real user clicking on handleToggleCheck
-        if (typeof action !== 'boolean') {
-
-            action = targetCheckbox.checked
-
-            const inputs = targetElement.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"]:not([disabled]), input[id$="-parent-checkbox"]`);
-            inputs.forEach((input) => {
-                input.indeterminate = false
-                if (action !== null)
-                    input.checked = action
-            });
-
-            targetCheckbox.indeterminate = false
-
-        } else {
-            // assist programmatic click
-
-            const checked = targetElement.querySelectorAll(`input[type="checkbox"]:checked.${ROUTE_CHECKBOX_CLASS}`).length;
-            const unchecked = targetElement.querySelectorAll(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`).length;
-            if (checked === 0) {
-                targetCheckbox.checked = false;
-                targetCheckbox.indeterminate = false;
-
-            } else {
-                if (unchecked === 0) {
-                    targetCheckbox.checked = true;
-                    targetCheckbox.indeterminate = false;
-                } else
-                    targetCheckbox.indeterminate = true;
-            }
-
-        }
-
-        if (action === true) {
-            // should checkup recursivley -:) <<<---recursion
-            checkboxTreeManager.checkUp(targetElement)
-        }
-        else {
-            // should uncheckup recursivley (:- <<<---recursion
-            checkboxTreeManager.uncheckUp(targetElement)
-        }
-    }
-}
-
-function handleCheckedSingle(e: Event | null = null) {
-    if (!e) return;
-
-    const target = e.target as HTMLInputElement;
-
-    const action = target.checked;
-
-    const parentElement = target.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
-
-    if (!parentElement) return;
-
-    const parentCheckbox = parentElement.querySelector<HTMLInputElement>(`input[id$="-parent-checkbox"]`);
-
-    if (!parentCheckbox) return;
-
-    const checked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:checked.${ROUTE_CHECKBOX_CLASS}`).length;
-    const unchecked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`).length;
-
-    if (unchecked === 0) {
-        parentCheckbox.indeterminate = false;
-        parentCheckbox.checked = true;
-    } else {
-        if (checked > 0) {
-            parentCheckbox.indeterminate = true;
-            parentCheckbox.checked = false;
-        } else {
-            parentCheckbox.indeterminate = false;
-            parentCheckbox.checked = false;
-        }
-    }
-
-    const key = parentElement.id;
-
-    handleToggleCheck(key, action);
-}
-
-// Use the debounce function for checkbox checking logic
-const debouncedHandleCheckedSingle = debounce(handleCheckedSingle, 100);
-
-// Function to find a permission based on uriMethods
-function found(uriMethods: string, permissions: any) {
-    return !!permissions?.find((permission: Route) => permission.uri === uriMethods);
-}
-
-// Function to determine whether a checkbox should be checked or not
-function shouldCheckChildCheckbox(route: Route, permissions: string[], parentChecked: boolean): boolean {
-
-    const inputId: string = `${Str.uriMethods(route.uri_methods)}-child-checkbox`
-
-    setTimeout(() => {
-
-        const exists = parentChecked === false ? route.checked : route.checked || found(route.uri_methods, permissions)
-
-        if (exists) {
-            const checkbox = document.getElementById(inputId) as HTMLInputElement
-
-            if (checkbox) {
-                checkbox.checked = true
-                const parentElement = checkbox.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`)
-                if (parentElement) {
-                    const key = parentElement.id
-                    handleToggleCheck(key, true)
-                } else {
-                    console.log('no parent')
-                }
-            }
-        }
-
-    }, 200);
-
-}
 
 // Function to get the hidden for a route based on its permissions
 function getHiddenState(allPermissions: any[], uri: string) {
@@ -184,7 +54,7 @@ function getRouteIcon(allPermissions: any[], uri: string) {
 }
 
 // The main RoutesTree component
-const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, indent, counter, isInitialRender }) => {
+const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, indent, counter, isInitialRender, setFoldersCheckState }) => {
 
     const { routes, children } = child
 
@@ -198,6 +68,147 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, inden
 
     const parentChecked = !!found(parentFolder, permissions)
 
+
+    // Function to handle toggling checkboxes for parent routes
+    function handleToggleCheck(parentId: string, action: boolean | null = null) {
+
+        const targetElement = document.getElementById(parentId) as HTMLElement; // Narrow the type to HTMLInputElement
+        const targetCheckbox = targetElement.querySelector(`.parent-checkbox`) as HTMLInputElement;
+
+        if (targetCheckbox) {
+
+            // real user clicking on handleToggleCheck
+            if (typeof action !== 'boolean') {
+
+                action = targetCheckbox.checked
+
+                const inputs = targetElement.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"]:not([disabled]), input[id$="-parent-checkbox"]`);
+                inputs.forEach((input) => {
+                    input.indeterminate = false
+                    if (action !== null)
+                        input.checked = action
+                });
+
+                const hasDisabled = targetElement.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"]:disabled`).length;
+                targetCheckbox.indeterminate = !!hasDisabled
+
+                // Work on children
+                const children = targetElement.querySelectorAll(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
+                children.forEach((child: Element) => {
+                    const targetCheckbox = child.querySelector(`.parent-checkbox`) as HTMLInputElement;
+                    const hasDisabled = child.querySelectorAll<HTMLInputElement>(`input[id$="-child-checkbox"]:disabled`).length;
+                    targetCheckbox.indeterminate = !!hasDisabled
+                })
+
+            } else {
+                // assist programmatic click
+
+                const checked = targetElement.querySelectorAll(`input[type="checkbox"]:checked.${ROUTE_CHECKBOX_CLASS}`).length;
+                const unchecked = targetElement.querySelectorAll(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`).length;
+
+                if (checked === 0) {
+                    targetCheckbox.checked = false;
+                    targetCheckbox.indeterminate = false;
+                } else {
+                    if (unchecked === 0) {
+                        targetCheckbox.checked = true;
+                        targetCheckbox.indeterminate = false;
+                    } else {
+                        targetCheckbox.indeterminate = true;
+                    }
+                }
+
+            }
+
+            if (action === true) {
+                // should checkup recursivley -:) <<<---recursion
+                checkboxTreeManager.checkUp(targetElement)
+            }
+            else {
+                // should uncheckup recursivley (:- <<<---recursion
+                checkboxTreeManager.uncheckUp(targetElement)
+            }
+        }
+    }
+
+    // Function to handle toggling the display of child routes
+    function handleToggle(key: string) {
+        const target = document.getElementById(`chld-${PARENT_FOLDER_ID_PREFIX}${key}-${PARENT_CHILDREN_CLASS}`);
+        target?.classList.toggle('d-none');
+    }
+
+    function handleCheckedSingle(e: Event | null = null) {
+        if (!e) return;
+
+        const target = e.target as HTMLInputElement;
+
+        const action = target.checked;
+
+        const parentElement = target.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`);
+
+        if (!parentElement) return;
+
+        const parentCheckbox = parentElement.querySelector<HTMLInputElement>(`input[id$="-parent-checkbox"]`);
+
+        if (!parentCheckbox) return;
+
+        const checked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:checked.${ROUTE_CHECKBOX_CLASS}`).length;
+        const unchecked = parentElement.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]:not(:checked).${ROUTE_CHECKBOX_CLASS}`).length;
+
+        if (unchecked === 0) {
+            parentCheckbox.indeterminate = false;
+            parentCheckbox.checked = true;
+        } else {
+            if (checked > 0) {
+                parentCheckbox.indeterminate = true;
+                parentCheckbox.checked = false;
+            } else {
+                parentCheckbox.indeterminate = false;
+                parentCheckbox.checked = false;
+            }
+        }
+
+        const key = parentElement.id;
+
+        handleToggleCheck(key, action);
+    }
+
+    // Use the debounce function for checkbox checking logic
+    const debouncedHandleCheckedSingle = debounce(handleCheckedSingle, 100);
+
+    // Function to find a permission based on uriMethods
+    function found(uriMethods: string, permissions: any) {
+        return !!permissions?.find((permission: Route) => permission.uri === uriMethods);
+    }
+
+    // Function to determine whether a checkbox should be checked or not
+    function shouldCheckChildCheckbox(route: Route, permissions: string[], parentChecked: boolean): boolean {
+
+        const inputId: string = `${Str.uriMethods(route.uri_methods)}-child-checkbox`
+
+        setTimeout(() => {
+
+            const exists = parentChecked === false ? route.checked : route.checked || found(route.uri_methods, permissions)
+
+            if (exists) {
+                const checkbox = document.getElementById(inputId) as HTMLInputElement
+
+                if (checkbox) {
+                    checkbox.checked = true
+                    const parentElement = checkbox.closest(`div[id^="${PARENT_FOLDER_ID_PREFIX}"]`)
+                    if (parentElement) {
+                        const key = parentElement.id
+                        handleToggleCheck(key, true)
+                    } else {
+                        console.log('no parent')
+                    }
+                }
+            }
+
+        }, 200);
+
+    }
+
     return (
         <div key={currentId} className={`mt-1 parent-folder ps-${indent} border-start border-primary-subtle p-1`} id={`${PARENT_FOLDER_ID_PREFIX}${currentId}`}>
             <div className='col-12 folder-section toggler-section mb-2 ms-1 px-1 border bg-white row align-items-center justify-content-between rounded'>
@@ -209,6 +220,7 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, inden
                             value={parentFolder}
                             className='form-check-input me-2 parent-checkbox'
                             onChange={() => handleToggleCheck(`${PARENT_FOLDER_ID_PREFIX}${currentId}`)}
+                            data-counter={counter}
                         />
                         <input
                             type='hidden'
@@ -255,7 +267,7 @@ const RoutesTree: React.FC<Props> = ({ child, permissions, allPermissions, inden
                                 {routes.map((route, i) => {
 
                                     return (
-                                        <tr className='link routes-parent route-section' key={`${i}+${folder}_${route.slug}`} style={{opacity: route.checked ? 0.5 : 1}}>
+                                        <tr className='link routes-parent route-section' key={`${i}+${folder}_${route.slug}`} style={{ opacity: route.checked ? 0.5 : 1 }}>
                                             <td className='col-1 border border-right cursor-pointer'>
                                                 <label className="form-check-label py-1 px-3 d-flex gap-2 rounded w-100 cursor-pointer" title={route.uri_methods}>
                                                     <input

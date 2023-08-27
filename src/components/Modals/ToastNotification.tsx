@@ -1,3 +1,4 @@
+import { subscribe, unsubscribe } from '@/utils/events';
 import React, { useEffect, useRef, useCallback } from 'react';
 
 const ToastNotification: React.FC = () => {
@@ -10,6 +11,8 @@ const ToastNotification: React.FC = () => {
 
   // Function to handle the emitted error event
   const handleNotification = useCallback((message: string, type: string, status: number) => {
+
+    console.log(message)
 
     // Define the CSS classes based on the type of the notification
     let toastCls = 'toast m-2';
@@ -54,16 +57,19 @@ const ToastNotification: React.FC = () => {
 
   useEffect(() => {
     // Add event listener for the custom notification event
-    const eventListener = (event: CustomEvent<{ message: string; type: string, status: number }>) => {
-      const { message, type, status } = event.detail;
-      handleNotification(message, type, status);
+    const eventListener: EventListener = (event) => {
+      const customEvent = event as CustomEvent<{ message: string; type: 'success' | 'info' | 'light' | 'warning' | 'error', status: number }>;
+      if (customEvent.detail) {
+        const { message, type, status } = customEvent.detail;
+        handleNotification(message, type, status);
+      }
     };
 
-    window.addEventListener('notification', eventListener as EventListener);
+    subscribe("notification", eventListener);
 
     // Cleanup the event listener when the component unmounts
     return () => {
-      window.removeEventListener('notification', eventListener as EventListener);
+      unsubscribe("notification", eventListener);
       // Clear the timeout when the component unmounts to avoid potential memory leaks
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);

@@ -23,6 +23,14 @@ class Str {
         return subject.split(search)[0];
     }
 
+    static afterFirst(subject: string, search: string): string {
+        const index = subject.indexOf(search);
+        if (index === -1) {
+            return ""; // Search string not found, return an empty string
+        }
+        return subject.substring(index + search.length);
+    }
+
     static afterLast(subject: string, search: string): string {
         return subject.split(search).slice(-1)[0];
     }

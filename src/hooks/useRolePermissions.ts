@@ -29,8 +29,12 @@ const useRolePermissions = () => {
         }
     };
 
-    const fetchRoutePermissions = async () => {
+    const fetchRoutePermissions = async (roleId = null) => {
+
         if (!user || !currentRole) return false
+
+        // When roleId is give, let us NOT do refetching routePermissions if following condition fails
+        if (roleId && String(currentRole.id) !== roleId) return false
 
         setLoadingRoutePermissions(true)
 

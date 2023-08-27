@@ -4,12 +4,13 @@ import documentation from './documentation';
 import users from './users';
 import tickets from './tickets/tickets';
 import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
+import Error404 from '@/Pages/ErrorPages/Error404';
 
 
 const adminRoutes = [
   {
     path: '',
-    element: <AuthenticatedLayout uri='admin' permission={null} Component={Admin}/>,
+    element: <AuthenticatedLayout uri='admin' permission={null} Component={Admin} />,
   },
   {
     path: 'settings',
@@ -26,6 +27,10 @@ const adminRoutes = [
   {
     path: 'documentation',
     children: documentation,
+  },
+  {
+    path: '*',
+    element: <AuthenticatedLayout uri='error-404' permission={null} Component={Error404} />,
   },
 ];
 

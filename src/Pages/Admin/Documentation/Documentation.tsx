@@ -1,22 +1,25 @@
 import AutoTable from '@/components/AutoTable';
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import usePermissions from '@/hooks/usePermissions';
 
 const Documentation = () => {
   const [data, setData] = useState({})
 
-  const list_sources = {
-  }
+  const { checkPermission } = usePermissions()
 
   return (
     <div>
       <h3>Docs List</h3>
       <div>
-        <div className='d-flex justify-content-end'>
-          <NavLink to={`/admin/documentation/create`} className="btn btn-info text-white">Create Doc</NavLink>
-        </div>
-
+        {
+          checkPermission('documentation', 'post') &&
+          <div className='d-flex justify-content-end'>
+            <NavLink to={`/admin/documentation/create`} className="btn btn-info text-white">Create Doc</NavLink>
+          </div>
+        }
+        
         <AutoTable
           baseUri='/admin/documentation'
           columns={[
@@ -31,7 +34,7 @@ const Documentation = () => {
             {
               label: 'slug',
               key: 'slug',
-            },{
+            }, {
               label: 'Content Short',
               key: 'content_short',
             },
@@ -52,7 +55,7 @@ const Documentation = () => {
           search={true}
         />
       </div>
-     </div>
+    </div>
   );
 };
 

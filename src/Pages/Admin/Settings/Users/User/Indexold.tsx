@@ -1,4 +1,4 @@
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import useAxios from '@/hooks/useAxios'
 import Str from '@/utils/Str';
 import { Icon } from '@iconify/react/dist/iconify.js';
@@ -195,7 +195,7 @@ const Index = (props: Props) => {
 
     //                 <div className='d-flex gap-1'>
 
-    //                   <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">
+    //                   <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">
     //                     <Icon fontSize={26} icon="streamline:interface-user-edit-actions-close-edit-geometric-human-pencil-person-single-up-user-write" />
     //                     <span className='ms-2'>Edit User</span>
     //                   </button>
@@ -253,7 +253,7 @@ const Index = (props: Props) => {
 
     //         {
     //           data && <>
-    //             <AutoModel
+    //             <AutoModal
     //               data={data}
     //               actionUrl={`/admin/settings/users/user/${data?.data?.id || 0}`}
     //               list_depends_on={list_depends_on}

@@ -1,6 +1,7 @@
 import AutoTable from '@/components/AutoTable'
 import { useState } from 'react'
-import AutoModel from '@/components/AutoModel'
+import AutoModal from '@/components/AutoModal'
+import usePermissions from '@/hooks/usePermissions'
 
 type Props = {}
 
@@ -8,14 +9,18 @@ const Index = (props: Props) => {
 
     const [data, setData] = useState([])
 
+    const { checkPermission } = usePermissions()
+
     return (
 
         <div className="container mx-auto">
             <h1 className="text-2xl font-bold mb-4">Users</h1>
-            <div className='d-flex justify-content-end'>
-                <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create User</button>
-            </div>
-
+            {
+                checkPermission('users', 'post') &&
+                <div className='d-flex justify-content-end'>
+                    <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create User</button>
+                </div>
+            }
             <AutoTable
                 baseUri='/admin/users'
                 columns={[
@@ -45,7 +50,7 @@ const Index = (props: Props) => {
             />
 
             {
-                data && <><AutoModel data={data} actionUrl='/admin/users' /></>
+                data && <><AutoModal data={data} actionUrl='/admin/users' /></>
             }
 
         </div>

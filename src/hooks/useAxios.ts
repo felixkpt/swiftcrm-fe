@@ -2,10 +2,10 @@ import { useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { clearErrors, showErrors } from '@/utils/validation-errors';
 import { useAuth } from '@/contexts/AuthContext';
-import { emitNotification } from '@/utils/helpers';
+import { publish } from '@/utils/events';
+import { baseURL } from '@/utils/helpers';
 
-axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_API;
-
+axios.defaults.baseURL = baseURL('');
 
 interface AxiosResponseWithData<T> extends AxiosResponse {
     data: T;
@@ -48,7 +48,7 @@ const useAxios = <T = any>() => {
             setErrors(null);
 
             if (response.data?.message) {
-                emitNotification(response.data.message, 'success')
+                publish('notification', { message: response.data.message, type: 'success' })
 
                 if (!response.data?.results) {
                     setData(response.data.message);
@@ -71,7 +71,8 @@ const useAxios = <T = any>() => {
                     setErrors(msg);
 
                     if (status && status !== 200 && status !== 201 && status !== 401) {
-                        emitNotification(msg, 'error', status)
+                        publish('notification', { message: msg, type: 'error', status })
+
                     }
 
                     if (status === 401 && msg === 'Unauthenticated.') {
@@ -87,12 +88,14 @@ const useAxios = <T = any>() => {
                 } else {
                     const msg = 'We are experiencing server connection issues.'
                     setErrors(msg);
-                    emitNotification(msg, 'error', status)
+                    publish('notification', { message: msg, type: 'error', status: 0 })
+
                 }
             } else {
-                const msg = err?.message || 'An unexpected error occurred.'
+                const msg = error?.message || 'An unexpected error occurred.'
                 setErrors(msg);
-                emitNotification(msg, 'error', status)
+                publish('notification', { message: msg, type: 'error', status: 0 })
+
             }
 
         } finally {

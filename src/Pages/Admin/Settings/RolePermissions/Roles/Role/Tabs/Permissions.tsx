@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useAxios from '@/hooks/useAxios';
-import { emitNotification } from '@/utils/helpers';
 import PrepareRoutesTreeDraggable from '../Includes/PrepareRoutesTreeDraggable';
 import Header from '../Includes/Header';
+import { useRolePermissionsContext } from '@/contexts/RolePermissionsContext';
+import { publish } from '@/utils/events';
 
 type Props = {
     role: RoleData
@@ -14,16 +15,75 @@ type Props = {
 
 const Permissions: React.FC = ({ role, permissions, loadingPermission, doGetPermissions }: Props) => {
 
-    const allPermissionsUri = `admin/settings/role-permissions/permissions/role/all`;
-    const routesUri = 'admin/settings/role-permissions/permissions/routes';
+    const { id } = useParams<{ id: string }>();
 
-    const { data: routes, get: getRoutes } = useAxios<RouteCollection[]>();
+    const [savedFolders, setSavedFolders] = useState<string[]>([])
+    const [saving, setSaving] = useState<boolean>(false)
+    const { fetchRoutePermissions } = useRolePermissionsContext();
+
+    const { post: saveData } = useAxios();
+    const { data: routes, get: getRoutes } = useAxios<RoleData>();
     const { data: allPermissions, get: getAllPermissions } = useAxios<PermissionData[]>();
+
+    const roleUri = `admin/settings/role-permissions/roles/role/${id}`;
+    const allPermissionsUri = `admin/settings/role-permissions/permissions/get-role-permissions/all`;
+    const routesUri = 'admin/settings/role-permissions/permissions/routes';
 
     useEffect(() => {
         getRoutes(routesUri, { uri: 1 });
         getAllPermissions(allPermissionsUri, { uri: 1 });
     }, []);
+
+    useEffect(() => {
+
+        if (savedFolders.length > 0 && id) {
+            fetchRoutePermissions(id)
+        }
+
+    }, [saving, id]);
+
+    async function handleSubmit(checked: any) {
+        setSavedFolders([]);
+        setSaving(true);
+
+        const { folderPermissions, menu, allFolders } = checked;
+
+        const savePromises = folderPermissions.map(async (current_folder: any) => {
+            const { folder } = current_folder;
+
+            return saveData(`${roleUri}/save-permissions?folder=` + folder, {
+                role_id: role.id,
+                current_folder,
+            });
+        });
+
+        let updatedSavedFolders = []; // Declare the variable here
+
+        try {
+            const responses = await Promise.all(savePromises);
+
+            updatedSavedFolders = folderPermissions
+                .filter((_, index) => responses[index]) // Keep only successful responses
+                .map((current_folder: any) => current_folder.folder); // Extract folders from successful responses
+
+            if (updatedSavedFolders.length === folderPermissions.length) {
+                await saveData(`${roleUri}/save-menu-and-clean-permissions`, {
+                    role_id: role.id,
+                    menu,
+                    saved_folders: updatedSavedFolders,
+                    all_folders: allFolders,
+                });
+
+                publish('notification', { message: 'Successfully saved role menu', type: 'success' });
+                doGetPermissions();
+            }
+        } catch (error) {
+            publish('notification', { message: 'An error occurred: ' + error, type: 'error' });
+        } finally {
+            setSaving(false);
+            setSavedFolders(updatedSavedFolders);
+        }
+    }
 
     // Memoize the component so it doesn't re-render unless `role`, `routes`, or `permissions` changes
     const memoizedComponent = useMemo(() => {
@@ -41,7 +101,7 @@ const Permissions: React.FC = ({ role, permissions, loadingPermission, doGetPerm
                                 {/* let us wait 4 roles, routes & permissions */}
                                 {
                                     routes && permissions && allPermissions ?
-                                        <PrepareRoutesTreeDraggable role={role} routes={routes} permissions={permissions} allPermissions={allPermissions} />
+                                        <PrepareRoutesTreeDraggable routes={routes} permissions={permissions} allPermissions={allPermissions} handleSubmit={handleSubmit} saving={saving} savedFolders={savedFolders} />
                                         :
                                         <div className='mt-2 p-2'>
                                             {true ?
@@ -61,7 +121,7 @@ const Permissions: React.FC = ({ role, permissions, loadingPermission, doGetPerm
             </div>
         )
 
-    }, [permissions, allPermissions, routes]);
+    }, [permissions, allPermissions, routes, saving, savedFolders]);
 
     return memoizedComponent;
 }

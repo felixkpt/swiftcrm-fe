@@ -78,8 +78,17 @@ export interface AutoTableInterface {
     singleUri?: string;
     search?: boolean;
     columns: ColumnInterface[];
-    action: ActionInterface;
+    action?: ActionInterface;
     reload?: number;
     hideCreate?: boolean
-    setData?: (props: Partial<CollectionItems>) => void
+    getModelDetails?: (props: Partial<CollectionItems>) => void
+    list_sources?: { [key: string]: () => Promise<ListSource[]> };
+    id?: string
+
+}
+
+export interface ListSource {
+    id: string;
+    name: string;
+    // You can add more properties here if needed
 }

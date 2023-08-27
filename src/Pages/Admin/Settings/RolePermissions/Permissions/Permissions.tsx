@@ -1,16 +1,16 @@
 import AutoTable from '@/components/AutoTable';
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
+import { ListSource } from '@/interfaces/Uncategorized';
 
 const Permissions = () => {
 
   const [key, setKey] = useState(0)
 
-  const [data, setData] = useState({})
+  const [modelDetails, setModelDetails] = useState({})
 
   const list_sources = {
-
-    async guardName() {
+    guardName: async () => {
       return [
         {
           id: 'web',
@@ -20,9 +20,9 @@ const Permissions = () => {
           id: 'api',
           name: 'api',
         }
-      ]
+      ] as ListSource[];
     },
-  }
+  };
 
   return (
     <div>
@@ -56,12 +56,13 @@ const Permissions = () => {
               key: 'action',
             },
           ]}
-          setData={setData}
+          getModelDetails={setModelDetails}
           search={true}
+          list_sources={list_sources}
         />
       </div>
       {
-        data && <><AutoModel setKey={setKey} id={`CreatePermission`} data={data} actionUrl='/admin/settings/role-permissions/permissions' list_sources={list_sources} /></>
+        modelDetails && <><AutoModal id={`CreatePermission`} modelDetails={modelDetails} actionUrl='/admin/settings/role-permissions/permissions' list_sources={list_sources} /></>
       }
     </div>
   );

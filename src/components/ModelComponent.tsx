@@ -1,54 +1,60 @@
-import React, { useEffect, useState } from 'react'
-import AutoModal from './Modals/AutoModal'
+import { useEffect, useState } from 'react'
+import { subscribe, unsubscribe } from '@/utils/events'
+import AutoModal from './AutoModal'
 
-type Props = {}
-
-const EditModel = (props: Props) => {
+const EditModel = () => {
 
     const [showAutoModal, setShowAutoModal] = useState(false)
-    const [data, setData] = useState<any>(false)
-    const [row, setRow] = useState<any>(false)
+    const [modelDetails, setModelDetails] = useState({})
+    const [record, setRecord] = useState<any>(false)
+    const [list_sources, setListSources] = useState<object[]>([])
+
     const [action, setActionUrl] = useState<string>('')
 
     const prepareEdit = async (event: CustomEvent<{ [key: string]: any }>) => {
 
         const detail = event?.detail
         if (detail) {
-            setData(detail.data)
-            setRow(detail.row)
+            setModelDetails(detail.modelDetails)
+            setRecord(detail.record)
             setActionUrl(detail.action)
+            setListSources(detail.list_sources)
         }
 
         setShowAutoModal(true)
+
+        document.getElementById("showAutoModal")?.click()
+        
     }
 
     useEffect(() => {
 
         // Add event listener for the custom ajaxPost event
-        const prepareEditEventListener = (event: CustomEvent<{ [key: string]: any }>) => {
-            prepareEdit(event);
+        const prepareEditEventListener: EventListener = (event) => {
+
+            const customEvent = event as CustomEvent<{ [key: string]: any }>;
+            if (customEvent.detail) {
+                prepareEdit(customEvent);
+            }
         };
 
-        window.addEventListener('prepareEdit', prepareEditEventListener as EventListener);
+        subscribe('prepareEdit', prepareEditEventListener);
 
         // Cleanup the event listener when the component unmounts
         return () => {
-            window.removeEventListener('prepareEdit', prepareEditEventListener as EventListener);
+            unsubscribe('prepareEdit', prepareEditEventListener);
         };
     }, []);
     return (
         <div>
-            {
-                showAutoModal && <>
-                    <AutoModal
-                        action='Edit'
-                        data={data}
-                        row={row}
-                        actionUrl={action}
-                        response
-                    />
-                </>
-            }
+            <button id='showAutoModal' type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create User</button>
+
+            <AutoModal
+                modelDetails={modelDetails}
+                record={record}
+                actionUrl={action}
+                list_sources={list_sources}
+            />
         </div>
     )
 }

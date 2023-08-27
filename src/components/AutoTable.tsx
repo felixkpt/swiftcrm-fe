@@ -1,11 +1,12 @@
 import useAutoTableEffect from '@/hooks/useAutoTableEffect';
 import { debounce } from 'lodash';
 import Pagination from './Pagination';
-import { AutoTableInterface, ResponseData } from '@/interfaces';
 import { useEffect, useRef, useState } from 'react';
-import { convertToTitleCase, emitPrepareEdit } from '@/utils/helpers';
+import { convertToTitleCase } from '@/utils/helpers';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
+import { publish, subscribe, unsubscribe } from '@/utils/events';
+import { AutoTableInterface } from '@/interfaces/Uncategorized';
 
 // Define the __dangerousHtml function
 function __dangerousHtml(html: HTMLElement) {
@@ -13,8 +14,7 @@ function __dangerousHtml(html: HTMLElement) {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-
-const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: AutoTableInterface) => {
+const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetails, list_sources, id }: AutoTableInterface) => {
     const {
         tableData,
         loading,
@@ -25,18 +25,27 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: Aut
         setReload,
     } = useAutoTableEffect(baseUri, listUri);
 
+    id = id ? id : 'AutoTable'
+
     const [checkedItems, setCheckedItems] = useState<(string | number)[]>([]);
     const [checkedAllItems, setCheckedAllItems] = useState<boolean>(false);
     const [modelDataLength, setModelDataLength] = useState<number>(-1);
 
-    const autoTableRef = useRef()
+    const [modelDetails, setModelDetails] = useState({})
 
     useEffect(() => {
         if (tableData?.data?.length >= 0) {
             setModelDataLength(tableData.data.length);
             const { data, ...others } = tableData
-            if (setData)
-                setData(others)
+            if (setModelDetails) {
+
+                const rest = { ...others, tableId: id }
+
+                setModelDetails(rest)
+                if (getModelDetails) {
+                    getModelDetails(rest)
+                }
+            }
         } else setModelDataLength(-1);
     }, [tableData]);
 
@@ -108,69 +117,76 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, setData }: Aut
         });
     };
 
-
     useEffect(() => {
+        subscribe('reloadAutoTable', reloadAutoTable)
 
-        if (modelDataLength > 0 && autoTableRef?.current) {
+        return () => unsubscribe('reloadAutoTable', reloadAutoTable)
+    }, [])
 
-            // Waiting for the data to be written on the DOM you can adjust the timeout
-            setTimeout(() => {
-
-                // Attach event listener to the "Edit" option
-                autoTableRef?.current?.querySelectorAll('.prepare-edit').forEach((editLink) => {
-
-                    editLink.addEventListener('click', (event) => {
-                        event.preventDefault()
-
-                        const id = event.target.getAttribute('data-id')
-                        const action = event.target.getAttribute('href')
-
-                        const Row = tableData.data.find(item => item.id == id)
-
-                        const { model_name, model_name_plural, fillable } = tableData
-
-                        emitPrepareEdit(Row, action, { model_name, model_name_plural, fillable })
-
-                    });
-                });
-
-            }, 100);
-
-        }
-
-    }, [modelDataLength])
+    const reloadAutoTable: EventListener = (event) => {
+        setReload((curr) => curr + 1)
+    }
 
     const navigate = useNavigate()
 
     useEffect(() => {
         if (modelDataLength) {
-            const ajaxNavigateElements = document.querySelectorAll('.autotable-navigate');
-
-            ajaxNavigateElements.forEach((element) => {
+            const autotableNavigateElements = document.querySelectorAll('.autotable .autotable-navigate');
+            autotableNavigateElements.forEach((element) => {
                 element.addEventListener('click', handleNavigation);
             });
+
+            const autotableEditElements = document.querySelectorAll('.autotable .autotable-edit');
+            autotableEditElements.forEach((element) => {
+                element.addEventListener('click', handleEdit);
+            });
+
             return () => {
                 // Clean up event listeners when the component unmounts
-                ajaxNavigateElements.forEach((element) => {
+                autotableNavigateElements.forEach((element) => {
                     element.removeEventListener('click', handleNavigation);
+                });
+
+                autotableEditElements.forEach((element) => {
+                    element.removeEventListener('click', handleEdit);
                 });
             };
         }
 
-    }, [navigate, modelDataLength]);
+    }, [navigate, modelDataLength, handleOrderBy]);
 
     const handleNavigation = (event: Event) => {
 
         event.preventDefault()
 
-        const href = event.target.getAttribute('href')
+        const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
+
+        const href = target.getAttribute('href')
         if (href) {
             navigate(href)
         }
     };
 
+    const handleEdit = (event: Event) => {
+
+        event.preventDefault()
+
+        const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
+
+        const id = target.getAttribute('data-id');
+        const action = target.getAttribute('href');
+
+        if (!id || !action) return;
+
+        const record = tableData.data.find((item: any) => item.id == id)
+
+        console.log(modelDetails)
+        publish('prepareEdit', { modelDetails, record, action, list_sources })
+
+    };
+
     return (
-        <div className={`autotable shadow rounded-3 px-1 my-3 relative overflow-x-auto shadow-md sm:rounded-lg ${modelDataLength >= 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
+        <div id={id} className={`autotable shadow rounded-3 px-1 my-3 relative overflow-x-auto shadow-md sm:rounded-lg ${modelDataLength >= 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
             <div className="bg-gray-50 dark:bg-gray-800 py-3.5 overflow-auto">
                 <div className={`mt-2 h-6 px-3 pb-1 text-sm font-medium leading-none text-center text-blue-800 dark:text-white${modelDataLength >= 0 && loading ? ' animate-pulse' : ''}`}>{modelDataLength >= 0 && loading ? 'Loading...' : ''}</div>
                 <div className="flex items-center justify-between pb-2 px-1.5 float-right gap-2">

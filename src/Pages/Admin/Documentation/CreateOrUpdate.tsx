@@ -4,6 +4,7 @@ import { emitAjaxPost } from '@/utils/helpers';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import useAxios from '@/hooks/useAxios';
+import { subscribe, unsubscribe } from '@/utils/events';
 
 const CreateOrUpdate = () => {
 
@@ -54,15 +55,19 @@ const CreateOrUpdate = () => {
 
   useEffect(() => {
 
-    window.addEventListener('ajaxPostDone', function (event: Event) {
+    const handleAjaxPostDone = (event: Event) => {
       if (event?.detail) {
-        const { elementId, results } = event.detail
+        const { elementId, results } = event.detail;
 
         if (elementId === 'docs-form' && results) {
-          navigate('/admin/documentation/documentation/' + results.slug + '/edit')
+          navigate('/admin/documentation/documentation/' + results.slug + '/edit');
         }
       }
-    })
+    };
+
+    subscribe('ajaxPostDone', handleAjaxPostDone)
+
+    return () => unsubscribe(handleAjaxPostDone)
 
   }, [])
 

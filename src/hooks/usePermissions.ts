@@ -18,9 +18,10 @@ const usePermissions = () => {
 
     const checkPermission = (permission: string, method: string) => {
 
-        console.log('Access usePermissions -> checkPermission().')
+        // console.log('Access usePermissions -> checkPermission().')
 
         if (method) {
+            permission = permission.replace(/\./, '/')
             permission = convertToLaravelPattern(permission)
 
             const permissionCleaned = permission == '/' ? 'admin' : Str.afterLast(permission, 'admin/').replace(/\/$/, '')

@@ -6,7 +6,7 @@ interface RolePermissionsContextType {
     directPermissions: PermissionData[];
     routePermissions: PermissionData[];
     fetchRolesAndDirectPermissions: () => void;
-    fetchRoutePermissions: (roleId: string) => void;
+    fetchRoutePermissions: (roleId?: string) => void;
     loadingRoutePermissions: boolean
     setCurrentRole: (role: RoleData) => void
 }

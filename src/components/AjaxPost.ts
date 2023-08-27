@@ -1,5 +1,6 @@
 import useAxios from '@/hooks/useAxios';
-import { baseURL, emitAjaxPostDone } from '@/utils/helpers';
+import { publish } from '@/utils/events';
+import { baseURL } from '@/utils/helpers';
 import { useEffect, useState } from 'react'
 
 const AjaxPost = () => {
@@ -47,7 +48,7 @@ const AjaxPost = () => {
             results = await destroy(url, formData);
         }
 
-        emitAjaxPostDone({ elementId: rawForm.id || rawForm?.closest('.modal')?.id || null, results })
+        publish('ajaxPostDone', { elementId: rawForm.id || rawForm?.closest('.modal')?.id || null, results })
 
         if (button) {
             button.disabled = false
@@ -69,8 +70,6 @@ const AjaxPost = () => {
                     modalToggleBtn.click();
                 }
             }
-
-            emitAjaxPostDone(data)
         }
 
     }, [data])

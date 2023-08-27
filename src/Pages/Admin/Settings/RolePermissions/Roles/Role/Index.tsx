@@ -19,7 +19,7 @@ export default function Index(): JSX.Element {
 
     }, [])
 
-    const permissionsUri = `admin/settings/role-permissions/permissions/role/${id}`;
+    const permissionsUri = `admin/settings/role-permissions/permissions/get-role-permissions/${id}`;
 
     const { data: permissions, get: getPermissions, loading: loadingPermission } = useAxios<PermissionData[]>();
 

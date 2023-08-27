@@ -4,6 +4,7 @@ import { emitAjaxPost } from '@/utils/helpers'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { useEffect, useState } from 'react'
 import defaultUserBackDrop from '@/assets/images/default_user_back_drop.png';
+import { subscribe, unsubscribe } from '@/utils/events'
 
 const Profile = () => {
 
@@ -15,7 +16,7 @@ const Profile = () => {
 
 	useEffect(() => {
 
-		window.addEventListener('ajaxPostDone', function (event: Event) {
+		const handleAjaxPostDone = (event: Event) => {
 			if (event?.detail) {
 				const { elementId, results } = event.detail
 
@@ -23,8 +24,11 @@ const Profile = () => {
 					setUser(results)
 				}
 			}
-		})
+		}
 
+		subscribe('ajaxPostDone', handleAjaxPostDone)
+
+		return () => unsubscribe('ajaxPostDone', handleAjaxPostDone)
 	}, [])
 
 	useEffect(() => {
@@ -70,7 +74,7 @@ const Profile = () => {
 							<div className="card-body">
 								{
 									user ?
-										<form id='profile-update' method='post' action-url={`admin/users/user/profile-update`} onSubmit={(e: any) => emitAjaxPost(e)} encType='multipart/form-data' className="flex justify-center">
+										<form id='profile-update' method='post' action-url={`admin/users/user/profile`} onSubmit={(e: any) => emitAjaxPost(e)} encType='multipart/form-data' className="flex justify-center">
 											<input type="hidden" name="_method" value="patch" />
 											<h6 className="heading-small text-muted mb-4">User information</h6>
 											<div className="pl-lg-4">

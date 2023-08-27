@@ -1,5 +1,5 @@
 import AutoTable from '@/components/AutoTable';
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
 import useAxios from '@/hooks/useAxios';
 
@@ -21,7 +21,7 @@ const Tickets = () => {
       <h3>Tickets List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">Create Ticket</button>
+          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create Ticket</button>
         </div>
 
         <AutoTable
@@ -59,7 +59,7 @@ const Tickets = () => {
         />
       </div>
       {
-        data && <><AutoModel data={data} actionUrl='/admin/tickets' list_sources={list_sources} /></>
+        data && <><AutoModal data={data} actionUrl='/admin/tickets' list_sources={list_sources} /></>
       }
     </div>
   );

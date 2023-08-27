@@ -1,4 +1,4 @@
-import AutoModel from '@/components/AutoModel';
+import AutoModal from '@/components/AutoModal';
 import useAxios from '@/hooks/useAxios'
 import { UserInterface } from '@/interfaces/UserInterface';
 import { emitAjaxPost } from '@/utils/helpers';
@@ -21,14 +21,17 @@ const Index = (props: Props) => {
   const { data: roles, loading: loadingRoles, errors: errorsRoles, get: getRoles } = useAxios()
   const { data: dataLoggedIn, loading: loggingIn, errors: errorsLoggingIn, post: postLogin } = useAxios()
 
+  const [modelDetails, setModelDetails] = useState({})
+
   useEffect(() => {
     get('admin/users/user/' + id)
   }, [id])
 
   useEffect(() => {
     if (!loading && userData) {
+      const { data, ...others } = userData
       setUser(userData.data)
-      setData(userData)
+      setModelDetails(others)
     }
 
   }, [user, loading])
@@ -129,7 +132,7 @@ const Index = (props: Props) => {
 
                     <div className='d-flex gap-1'>
 
-                      <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModel">
+                      <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">
                         <Icon fontSize={26} icon="streamline:interface-user-edit-actions-close-edit-geometric-human-pencil-person-single-up-user-write" />
                         <span className='ms-2'>Edit User</span>
                       </button>
@@ -181,10 +184,8 @@ const Index = (props: Props) => {
                 : <div>Loading user info</div>
             }
 
-
-
             {
-              data && <><AutoModel data={data} actionUrl={`/admin/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
+              user && <><AutoModal modelDetails={modelDetails} record={user} actionUrl={`/admin/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
             }
 
           </div>
