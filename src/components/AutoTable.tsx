@@ -131,6 +131,12 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
 
     useEffect(() => {
         if (modelDataLength) {
+
+            const autotableViewElements = document.querySelectorAll('.autotable .autotable-view');
+            autotableViewElements.forEach((element) => {
+                element.addEventListener('click', handleView);
+            });
+
             const autotableNavigateElements = document.querySelectorAll('.autotable .autotable-navigate');
             autotableNavigateElements.forEach((element) => {
                 element.addEventListener('click', handleNavigation);
@@ -141,14 +147,27 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
                 element.addEventListener('click', handleEdit);
             });
 
+            const autotableStatusUpdateElements = document.querySelectorAll('.autotable .autotable-status-update');
+            autotableStatusUpdateElements.forEach((element) => {
+                element.addEventListener('click', handleStatusUpdate);
+            });
+
             return () => {
                 // Clean up event listeners when the component unmounts
+                autotableViewElements.forEach((element) => {
+                    element.removeEventListener('click', handleView);
+                });
+
                 autotableNavigateElements.forEach((element) => {
                     element.removeEventListener('click', handleNavigation);
                 });
 
                 autotableEditElements.forEach((element) => {
                     element.removeEventListener('click', handleEdit);
+                });
+
+                autotableStatusUpdateElements.forEach((element) => {
+                    element.removeEventListener('click', handleStatusUpdate);
                 });
             };
         }
@@ -167,6 +186,23 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
         }
     };
 
+    const handleView = (event: Event) => {
+
+        event.preventDefault()
+
+        const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
+
+        const id = target.getAttribute('data-id');
+        const action = target.getAttribute('href');
+
+        if (!id || !action) return;
+
+        const record = tableData.data.find((item: any) => item.id == id)
+
+        publish('prepareView', { modelDetails, record, action })
+
+    };
+
     const handleEdit = (event: Event) => {
 
         event.preventDefault()
@@ -182,6 +218,25 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
 
         console.log(modelDetails)
         publish('prepareEdit', { modelDetails, record, action, list_sources })
+
+    };
+
+    const handleStatusUpdate = (event: Event) => {
+
+        event.preventDefault()
+        console.log('okkssass    '
+        )
+
+        const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
+
+        const id = target.getAttribute('data-id');
+        const action = target.getAttribute('href');
+
+        if (!id || !action) return;
+
+        const record = tableData.data.find((item: any) => item.id == id)
+
+        publish('prepareStatusUpdate', { modelDetails, record, action, type: 'status-update' })
 
     };
 
@@ -299,6 +354,5 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
         </div>
     )
 }
-
 
 export default AutoTable

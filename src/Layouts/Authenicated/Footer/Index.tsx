@@ -1,9 +1,9 @@
 import AjaxPost from '@/components/AjaxPost';
 import ToastError from '@/components/Modals/ToastError';
 import ToastNotification from '@/components/Modals/ToastNotification';
-import EditModel from '@/components/ModelComponent';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import PrepareEditModal from '@/components/PrepareEditModal';
+import PrepareStatusUpdateModal from '@/components/PrepareStatusUpdateModal';
+import PrepareViewModal from '@/components/PrepareViewModal';
 
 export default function Footer() {
 
@@ -24,7 +24,9 @@ export default function Footer() {
             <div>
                 <ToastNotification />
                 <ToastError />
-                <EditModel />
+                <PrepareViewModal />
+                <PrepareEditModal />
+                <PrepareStatusUpdateModal />
                 <AjaxPost />
             </div>
         </>

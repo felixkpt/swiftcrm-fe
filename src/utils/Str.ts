@@ -39,9 +39,12 @@ class Str {
         if (!subject) return subject
 
         let strVal = '';
-        let str = subject.split(' ');
+        let str = subject.replace(/_/, ' ').split(' ');
         for (var chr = 0; chr < str.length; chr++) {
-            strVal += str[chr].substring(0, 1).toUpperCase() + str[chr].substring(1, str[chr].length) + ' '
+            let sub = str[chr]
+            if (sub === 'id') sub = 'ID'
+            
+            strVal += sub.substring(0, 1).toUpperCase() + sub.substring(1, sub.length) + ' '
         }
         return strVal
     }

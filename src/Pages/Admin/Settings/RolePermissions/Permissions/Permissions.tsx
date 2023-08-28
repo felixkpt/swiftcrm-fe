@@ -5,8 +5,6 @@ import { ListSource } from '@/interfaces/Uncategorized';
 
 const Permissions = () => {
 
-  const [key, setKey] = useState(0)
-
   const [modelDetails, setModelDetails] = useState({})
 
   const list_sources = {
@@ -32,7 +30,6 @@ const Permissions = () => {
           <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#CreatePermission">Create permission</button>
         </div>
         <AutoTable
-          key={key}
           baseUri='/admin/settings/role-permissions/permissions'
           columns={[
             {

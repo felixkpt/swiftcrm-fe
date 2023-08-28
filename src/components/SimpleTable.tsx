@@ -1,34 +1,38 @@
-import { convertToTitleCase } from "@/utils/helpers"
+import Str from "@/utils/Str";
 
 type Props = {
-    row: any
+    record: any
+    exclude?: string[]
 }
 
-function SimpleTable({ row }: Props) {
-    
+function SimpleTable({ record, exclude }: Props) {
     return (
         <div>
-            <table className="border-collapse">
+            <table className="table table-striped table-bordered rounded">
                 <tbody>
-                    <tr>
-                        <td className="p-4">
-                            <div className="flex flex-col space-y-2">
-                                {Object.keys(row).map((key) => {
-                                    return (
-                                        <div className="flex" key={key}>
-                                            <span className="font-semibold mr-2">{convertToTitleCase(key)}:</span>
-                                            <span>{row[key]}</span>
+                    {Object.keys(record).map((key) => {
+                        if (exclude && exclude.length > 0 && exclude.includes(key)) {
+                            return null; // Skip this key if it's in the exclude array
+                        }
+                        return (
+                            <tr key={key}>
+                                <td className="p-2">
+                                    <div className="d-flex flex-column gap-2">
+                                        <div className="d-flex">
+                                            <span className="fw-bold me-2">{Str.title(key)}:</span>
+                                            <span>{record[key]}</span>
                                         </div>
-                                    )
-                                })}
-                            </div>
-                        </td>
-                        <td className="w-1"></td>
-                    </tr>
+                                    </div>
+                                </td>
+                                <td className="w-1"></td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
+
         </div>
-    )
+    );
 }
 
-export default SimpleTable
+export default SimpleTable;

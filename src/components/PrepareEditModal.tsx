@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import { subscribe, unsubscribe } from '@/utils/events'
 import AutoModal from './AutoModal'
 
-const EditModel = () => {
+const PrepareEditModal = () => {
 
-    const [showAutoModal, setShowAutoModal] = useState(false)
     const [modelDetails, setModelDetails] = useState({})
     const [record, setRecord] = useState<any>(false)
     const [list_sources, setListSources] = useState<object[]>([])
@@ -21,8 +20,6 @@ const EditModel = () => {
             setListSources(detail.list_sources)
         }
 
-        setShowAutoModal(true)
-
         document.getElementById("showAutoModal")?.click()
         
     }
@@ -30,7 +27,7 @@ const EditModel = () => {
     useEffect(() => {
 
         // Add event listener for the custom ajaxPost event
-        const prepareEditEventListener: EventListener = (event) => {
+        const prepareEventListener: EventListener = (event) => {
 
             const customEvent = event as CustomEvent<{ [key: string]: any }>;
             if (customEvent.detail) {
@@ -38,17 +35,16 @@ const EditModel = () => {
             }
         };
 
-        subscribe('prepareEdit', prepareEditEventListener);
+        subscribe('prepareEdit', prepareEventListener);
 
         // Cleanup the event listener when the component unmounts
         return () => {
-            unsubscribe('prepareEdit', prepareEditEventListener);
+            unsubscribe('prepareEdit', prepareEventListener);
         };
     }, []);
     return (
         <div>
-            <button id='showAutoModal' type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create User</button>
-
+            <button id='showAutoModal' type="button" className="btn btn-info text-white d-none" data-bs-toggle="modal" data-bs-target="#AutoModal"></button>
             <AutoModal
                 modelDetails={modelDetails}
                 record={record}
@@ -59,4 +55,4 @@ const EditModel = () => {
     )
 }
 
-export default EditModel
+export default PrepareEditModal

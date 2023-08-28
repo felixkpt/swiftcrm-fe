@@ -15,7 +15,10 @@ const Error404 = ({ previousUrl, currentUrl, setReloadKey }: Props) => {
           <div className="col-lg-6">
             <div className="text-center mt-4">
               <div className="contant_box_404 text-center">
-                <h1 className="display-1">404</h1>
+                <div className="four_zero_four_bg rounded mb-2">
+                  <h1 className="display-1">404</h1>
+                </div>
+
                 <p className="lead">Look like you're lost</p>
 
                 <p>the page you are looking for not avaible!</p>
