@@ -9,14 +9,14 @@ export interface UserInterface {
 }
 
 
-interface Data {
+interface DataInterface {
     id: string | number
     name?: string
     status: boolean | number | string
 }
-export interface CollectionItems {
+export interface CollectionItemsInterface {
     current_page: number
-    data: Data[]
+    data: DataInterface[]
     first_page_url: string
     from: number
     last_page: number
@@ -40,19 +40,19 @@ export interface Link {
     active: boolean
 }
 
-export interface GetItem {
-    data: Data
+export interface GetItemInterface {
+    data: DataInterface
     model_name: string,
     model_name_plural: string,
     fillable: {},
     sortable: [],
 }
 
-export interface GetItems {
-    [index: number]: GetItem[];
+export interface GetItemsInterface {
+    [index: number]: GetItemInterface[];
 }
 
-export interface ResponseData {
+export interface ResponseDataInterface {
     type: string;
     message: string;
     data: any;
@@ -81,13 +81,13 @@ export interface AutoTableInterface {
     action?: ActionInterface;
     reload?: number;
     hideCreate?: boolean
-    getModelDetails?: (props: Partial<CollectionItems>) => void
-    list_sources?: { [key: string]: () => Promise<ListSource[]> };
+    getModelDetails?: (props: Partial<CollectionItemsInterface>) => void
+    list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> };
     id?: string
 
 }
 
-export interface ListSource {
+export interface ListSourceInterface {
     id: string;
     name: string;
     // You can add more properties here if needed

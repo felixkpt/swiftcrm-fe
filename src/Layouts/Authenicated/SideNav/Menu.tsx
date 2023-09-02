@@ -12,33 +12,22 @@ const Menu = () => {
 
   const { data, get, loading, errors } = useAxios()
   const { user } = useAuth()
-  const { roles, setCurrentRole, routePermissions } = useRolePermissionsContext();
-
-  const [selectedRole, setSelectedRole] = useState<RoleData>()
+  const { roles, setCurrentRole, currentRole } = useRolePermissionsContext();
 
   const [userMenu, setUserMenu] = useState(null)
 
   useEffect(() => {
-    if (user && roles.length > 0) {
-      setSelectedRole(user.default_role_id ? roles.find((role) => {
-        return role.id === user.default_role_id
-      }) : roles[0])
-    }
-  }, [roles]);
 
-  useEffect(() => {
-
-    if (selectedRole) {
-      get('/admin/settings/role-permissions/roles/role/' + selectedRole.id + '/get-role-menu/?get-menu=1').then((resp) => {
+    if (currentRole) {
+      get('/admin/settings/role-permissions/roles/role/' + currentRole.id + '/get-role-menu/?get-menu=1').then((resp) => {
         if (resp === undefined) {
           setUserMenu(null)
         }
       })
 
-      setCurrentRole(selectedRole)
     }
 
-  }, [selectedRole, routePermissions])
+  }, [currentRole])
 
   useEffect(() => {
 
@@ -57,7 +46,7 @@ const Menu = () => {
             <ul className="metismenu list-unstyled nested-routes main" id="menu">
 
               {
-                userMenu.map((child:RouteCollection, i) => {
+                userMenu.map((child: RouteCollection, i) => {
 
                   const { routes, children, icon, folder } = child
 
@@ -103,7 +92,7 @@ const Menu = () => {
           </div>
           :
           <div className='ps-2 pt-3'>
-            {!selectedRole || loading ?
+            {!currentRole || loading ?
               <div className="d-flex align-items-center gap-3">
                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Loading...
@@ -115,22 +104,21 @@ const Menu = () => {
       }
     </>
 
-  }, [user, userMenu, selectedRole, loading])
+  }, [user, userMenu, currentRole, loading])
 
-  if (selectedRole)
+  if (currentRole)
     return (
       <div className='px-1'>
         <Select
           className="basic-single text-dark mb-2"
           classNamePrefix="select"
-          defaultValue={selectedRole}
+          defaultValue={currentRole}
           isSearchable={true}
           name="roles"
           options={roles}
           getOptionValue={(option) => `${option['id']}`}
           getOptionLabel={(option) => `${option['name']}`}
-          onChange={(item) => setSelectedRole(item)}
-          onChange={(item) => setSelectedRole(item)}
+          onChange={(item) => setCurrentRole(item)}
         />
         {memoizeMenu}
       </div>

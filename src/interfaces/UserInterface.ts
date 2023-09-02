@@ -8,10 +8,10 @@ export interface UserInterface {
     avatar?: string
 }
 
-export interface UsersApiResponse {
+export interface UsersApiResponseInterface {
     users: UserInterface[];
 }
 
-export interface UserApiResponse {
+export interface UserApiResponseInterface {
     user: UserInterface;
 }

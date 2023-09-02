@@ -1,5 +1,5 @@
 import useAxios from '@/hooks/useAxios';
-import { publish } from '@/utils/events';
+import { publish, subscribe, unsubscribe } from '@/utils/events';
 import { baseURL } from '@/utils/helpers';
 import { useEffect, useState } from 'react'
 
@@ -9,14 +9,20 @@ const AjaxPost = () => {
 
     const [form, setForm] = useState();
 
-    const ajaxPost = async (event: CustomEvent<{ [key: string]: any }>) => {
+    const handleEvent = async (event: CustomEvent<{ [key: string]: any }>) => {
+
+        const files = event.detail?.files ?? []
 
         const rawForm = event.detail.target
         setForm(rawForm);
 
         const formElement = event.detail.nativeEvent.target; // Get the form element
         const formData = new FormData(formElement); // Create a FormData object from the form
-        // console.log('Form Data:', formData); // Log the form data
+
+        // Append files to the FormData as an array
+        files.forEach((file) => {
+            formData.append('files_array[]', file);
+        });
 
         // Specify the URL where the post request will be sent
         let url = rawForm?.getAttribute('action-url') || ''; // Get the baseUri from the event detail
@@ -29,11 +35,6 @@ const AjaxPost = () => {
             button.disabled = true
             button.classList.add('disabled')
         }
-
-        // Dynamically append data to the FormData based on event details
-        Object.entries(event.detail).forEach(([key, value]) => {
-            formData.append(key, value);
-        });
 
         let results
 
@@ -74,23 +75,23 @@ const AjaxPost = () => {
 
     }, [data])
 
+    const eventListener = (event: CustomEvent<{ [key: string]: any }>) => {
+        event.preventDefault()
+        handleEvent(event);
+    };
 
     useEffect(() => {
-        // Add event listener for the custom ajaxPost event
-        const eventListener = (event: CustomEvent<{ [key: string]: any }>) => {
-            ajaxPost(event);
-        };
 
-        window.addEventListener('ajaxPost', eventListener as EventListener);
+        subscribe('ajaxPost', eventListener as EventListener);
 
         // Cleanup the event listener when the component unmounts
         return () => {
-            window.removeEventListener('ajaxPost', eventListener as EventListener);
+            unsubscribe('ajaxPost', eventListener as EventListener);
         };
+
     }, []);
 
     return null
-
 }
 
 export default AjaxPost

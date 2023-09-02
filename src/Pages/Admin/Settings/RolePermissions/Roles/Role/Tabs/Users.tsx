@@ -4,12 +4,14 @@ import useAxios from "@/hooks/useAxios"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import AsyncSelect from 'react-select/async';
 import { debounce } from 'lodash';
-import { useState } from "react";
-import { RoleData, PermissionData } from "@/interfaces/RolePermissionsInterfaces";
+import { useEffect, useState } from "react";
+import { useRolePermissionsContext } from "@/contexts/RolePermissionsContext";
+import { subscribe, unsubscribe } from "@/utils/events";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Props = {
-    role: RoleData;
-    permissions: PermissionData[];
+    role: RoleInterface;
+    permissions: PermissionInterface[];
     loadingPermission: boolean;
 }
 
@@ -67,6 +69,9 @@ const Users = ({ role }: Props) => {
 
 const AddUser = ({ role }: Pick<Props, 'role'>) => {
 
+    const { fetchRolesAndDirectPermissions } = useRolePermissionsContext();
+    const { user } = useAuth()
+
     const { get } = useAxios()
 
     const debouncedLoadOptions = (roleId: number) =>
@@ -74,6 +79,29 @@ const AddUser = ({ role }: Pick<Props, 'role'>) => {
             const { data } = await get(`/admin/users?role_id=${roleId}&negate=1&all=1&q=${q}`);
             callback(data || []);
         }, 1000);
+
+    const handleIsCurrentUser = (event: CustomEvent<{ [key: string]: any }>) => {
+   
+        if (user && event.detail) {
+            const detail = event.detail;
+
+            if (detail.results) {
+                if (detail.elementId === 'addUserToRole') {
+                   
+                    if (user.id == detail.results.id) {
+                        // refetch user roles
+                        fetchRolesAndDirectPermissions()
+                    }
+                }
+            }
+        }
+    };
+
+    useEffect(() => {
+        subscribe('ajaxPostDone', handleIsCurrentUser as EventListener);
+
+        return () => unsubscribe('ajaxPostDone', handleIsCurrentUser as EventListener)
+    }, [])
 
     return (
         <div>
@@ -83,8 +111,8 @@ const AddUser = ({ role }: Pick<Props, 'role'>) => {
                     name={`user_id`}
                     defaultOptions
                     loadOptions={debouncedLoadOptions(role.id)}
-                    getOptionValue={(option) => `${option['id']}`}
-                    getOptionLabel={(option) => `${option['name']}`}
+                    getOptionValue={(option:any) => `${option['id']}`}
+                    getOptionLabel={(option:any) => `${option['name']}`}
                 />
             </div>
             <div className="form-group">

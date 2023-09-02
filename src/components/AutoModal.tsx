@@ -127,7 +127,6 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
         }
     };
 
-
     return (
         <div ref={rootRef || null}>
             <div className={`modal fade`} id={`${id || 'AutoModal'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
@@ -140,7 +139,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
-                                    <form ref={formRef} method='post' action-url={actionUrl} onSubmit={(e: any) => emitAjaxPost(e)} className="flex justify-center">
+                                    <form ref={formRef} method='post' action-url={actionUrl} onSubmit={(e: any) => publish('ajaxPost', e)} className="flex justify-center">
                                         <div className="container-fluid">
                                             <input type="hidden" name="_method" value={method} />
                                             <div className="row">

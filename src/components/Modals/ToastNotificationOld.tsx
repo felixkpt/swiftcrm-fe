@@ -1,11 +1,18 @@
 import { subscribe, unsubscribe } from '@/utils/events';
-import React, { useEffect, useCallback } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect, useRef, useCallback } from 'react';
 
 const ToastNotification: React.FC = () => {
+  const [showModal, setShowModal] = React.useState(false);
+  const [title, setTitle] = React.useState<string | React.ReactNode>('');
+  const [body, setBody] = React.useState<React.ReactNode>(null);
+  const [toastClass, setToastClass] = React.useState('toast m-2'); // Declare the toastClass variable here
+  const toastNotificationRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Function to handle the emitted error event
   const handleNotification = useCallback((message: string, type: string, status: number) => {
+
+    console.log(message)
 
     // Define the CSS classes based on the type of the notification
     let toastCls = 'toast m-2';
@@ -14,31 +21,38 @@ const ToastNotification: React.FC = () => {
     if (type == 'success') {
       toastCls += ' bg-success-subtle'; // Add the appropriate class for an error notification
       titleText = `Success notification`;
-      toast.success(<Msg title={titleText} content={message} />)
-
     } else if (type == 'warning') {
       toastCls += ' bg-warning-subtle'; // Add the appropriate class for an error notification
       titleText = `Warning notification`;
-      toast.warning(<Msg title={titleText} content={message} />)
-
     } else if (type == 'error') {
       toastCls += ' bg-danger-subtle'; // Add the appropriate class for an error notification
       titleText = `Error notification ${typeof status === 'number' ? ` (status ${status})` : ''}`;
-      toast.error(<Msg title={titleText} content={message} />)
-
     } else if (type == 'info') {
       toastCls += ' bg-info-subtle'; // Add the appropriate class for an error notification
       titleText = `Info notification`;
-      toast.info(<Msg title={titleText} content={message} />)
-
     } else {
       toastCls += ' bg-light-subtle'; // Add the appropriate class for a connection error notification
       titleText = 'General Notification';
-      toast(<Msg title={titleText} content={message} />)
-
     }
 
+    setToastClass(toastCls)
 
+    setTitle(titleText);
+    setBody(<div className="error-modal" dangerouslySetInnerHTML={{ __html: `${message}` }} />);
+    setShowModal(true);
+
+    const notification = toastNotificationRef.current;
+
+    notification?.querySelector('.toast')?.classList.toggle('show');
+
+    // Clear the previous timeout if it exists
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setShowModal(false);
+    }, 4000);
   }, []);
 
   useEffect(() => {
@@ -56,26 +70,30 @@ const ToastNotification: React.FC = () => {
     // Cleanup the event listener when the component unmounts
     return () => {
       unsubscribe("notification", eventListener);
+      // Clear the timeout when the component unmounts to avoid potential memory leaks
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, [handleNotification]);
 
+  useEffect(() => {
+    const notification = toastNotificationRef.current;
+
+    if (!showModal) {
+      notification?.querySelector('.toast')?.classList.remove('show');
+    }
+
+  }, [showModal, toastNotificationRef]);
+
   return (
-    <>
-      <ToastContainer />
-    </>
+    <div ref={toastNotificationRef} aria-live="polite" aria-atomic="true" className="position-fixed z-1060 right-0 top-0 d-flex justify-content-end align-items-center w-100">
+      <div className={toastClass} role="alert" aria-live="assertive" aria-atomic="true">
+        <div className="toast-header">{title || 'Toast title'}</div>
+        <div className="toast-body">{body || 'This is a toast message.'}</div>
+      </div>
+    </div>
   );
 };
-
-interface MsgProps {
-  title: string
-  content: string
-}
-const Msg = ({ title, content }: MsgProps) => (
-  <div>
-    <h6 className='fw-bold'>{title}</h6>
-    <div className="error-modal text-sm" dangerouslySetInnerHTML={{ __html: `${content}` }} />
-  </div>
-)
-
 
 export default ToastNotification;

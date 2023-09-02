@@ -5,6 +5,7 @@ import Password from '@/Pages/Auth/Password';
 import Error404 from '@/Pages/ErrorPages/Error404';
 import PasswordSet from '@/Pages/Auth/PasswordSet';
 import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
+import GuestLayout from '@/Layouts/Guest/GuestLayout';
 
 const guestRoutes = [
     {
@@ -13,23 +14,24 @@ const guestRoutes = [
     },
     {
         path: '/login',
-        element: <Login />,
+        element: <GuestLayout Component={Login} />,
     },
     {
         path: '/register',
-        element: <Register />,
+        element: <GuestLayout Component={Register} />,
     },
     {
         path: '/password',
-        element: <Password />,
+        element: <GuestLayout Component={Password} />,
     },
     {
         path: '/password-set/:token',
-        element: <PasswordSet />,
+        element: <GuestLayout Component={PasswordSet} />,
+
     },
     {
         path: '*',
-        element: <Error404 />,
+        element: <GuestLayout Component={Error404} />,
     },
 ]
 

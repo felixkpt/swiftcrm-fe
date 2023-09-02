@@ -1,7 +1,7 @@
 import Select, { PropsValue } from 'react-select';
 import Str from '@/utils/Str';
 import { useEffect, useState } from "react";
-import { ListSource } from '@/interfaces/Uncategorized';
+import { ListSource } from '../interfaces/UncategorizedInterfaces';
 
 interface RenderAsyncSelectProps {
     current_key: string;

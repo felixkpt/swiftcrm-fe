@@ -1,13 +1,15 @@
 import AutoTable from '@/components/AutoTable';
 import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
+import usePermissions from '@/hooks/usePermissions';
+import { ListSource } from '../../../../../interfaces/UncategorizedInterfaces';
 
 const Roles = () => {
-  const [data, setData] = useState({})
+  const [modelDetails, setModelDetails] = useState({})
+  const { checkPermission } = usePermissions()
 
   const list_sources = {
-
-    async guardName() {
+    guardName: async () => {
       return [
         {
           id: 'web',
@@ -17,16 +19,22 @@ const Roles = () => {
           id: 'api',
           name: 'api',
         }
-      ]
+      ] as ListSource[];
     },
-  }
+  };
 
   return (
     <div>
       <h3>Roles List</h3>
       <div>
         <div className='d-flex justify-content-end'>
-          <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create role</button>
+          {
+            checkPermission('admin.settings.role-permissions.roles', 'post') &&
+            <div className='d-flex justify-content-end'>
+              <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create role</button>
+            </div>
+          }
+
         </div>
         <AutoTable
           baseUri='/admin/settings/role-permissions/roles'
@@ -52,12 +60,12 @@ const Roles = () => {
               key: 'action',
             },
           ]}
-          setData={setData}
+          getModelDetails={setModelDetails}
           search={true}
         />
       </div>
       {
-        data && <><AutoModal data={data} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
+        modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>
       }
     </div>
   );

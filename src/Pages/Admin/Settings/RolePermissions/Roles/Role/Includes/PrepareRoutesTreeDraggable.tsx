@@ -52,7 +52,8 @@ function constructMenus() {
   topLevelFolders = orderArray.map(id => idToElementMap.get(id));
   const allFolders = Array.from(idToElementMap.keys());
 
-  return { folderPermissions: constructMenu(topLevelFolders), menu: constructMenu(topLevelFolders, true), allFolders }
+  let menu = constructMenu(topLevelFolders, true)
+  return { folderPermissions: constructMenu(topLevelFolders), menu, allFolders }
 
 }
 
@@ -82,22 +83,36 @@ function constructMenu(topLevelFolders: HTMLElement[], isMenu = false) {
           unchecked = getUncheckedCheckboxValues(container);
         }
 
-        nestedRoutes.push({
-          folder: input?.value ?? '',
-          title,
-          icon,
-          hidden,
-          children,
-          routes: getRoutes(container, isMenu),
-          position: index,
-          unchecked
-        });
+        // Check if there's at least one route
+        const routes = getRoutes(container, isMenu);
+        if (routes.length > 0 || hasRouteInChildren(children)) {
+          nestedRoutes.push({
+            folder: input?.value ?? '',
+            title,
+            icon,
+            hidden,
+            children,
+            position: nestedRoutes.length + 1,
+            unchecked,
+            routes,
+          });
+        }
+
       }
 
     }
   }
 
   return nestedRoutes;
+}
+
+function hasRouteInChildren(children: RouteCollection[]) {
+  for (const child of children) {
+    if (child.routes.length > 0 || hasRouteInChildren(child.children)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function getUncheckedCheckboxValues(container: HTMLElement): string[] {

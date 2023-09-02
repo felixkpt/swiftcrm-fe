@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { CollectionItems } from '@/interfaces';
 import useAxios from './useAxios';
-import Str from '@/utils/Str';
+import { CollectionItemsInterface } from '@/interfaces/UncategorizedInterfaces';
+import { subscribe, unsubscribe } from '@/utils/events';
 
 const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
-    const [tableData, setTableData] = useState<CollectionItems>({});
+    const [tableData, setTableData] = useState<CollectionItemsInterface>({});
     const [page, setPage] = useState<number | string>(1);
     const [per_page, setPerPage] = useState<number | string>(10);
     const [orderBy, setOrderBy] = useState<string | undefined>(undefined);
@@ -43,16 +43,17 @@ const useAutoTableEffect = (baseUri: string, listUri: string | undefined) => {
         const eventListener = (event: CustomEvent<{ [key: string]: any }>) => {
             const { detail } = event
 
-            if (detail !== null)
+            if (detail.results || detail.message)
                 fetchData()
         };
 
-        window.addEventListener('emitAjaxPostDone', eventListener as EventListener);
+        subscribe('ajaxPostDone', eventListener as EventListener);
 
         // Cleanup the event listener when the component unmounts
         return () => {
-            window.removeEventListener('emitAjaxPostDone', eventListener as EventListener);
+            unsubscribe('ajaxPostDone', eventListener as EventListener);
         };
+
     }, []);
 
 

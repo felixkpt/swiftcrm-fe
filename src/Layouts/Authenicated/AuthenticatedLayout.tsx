@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Navbar from './Navbar/Index';
 import Footer from './Footer/Index';
@@ -29,7 +29,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
     // Initialize useAxios with the desired endpoint for fetching user data
     const { data, loading: loadingUser, get } = useAxios();
 
-    const { loadingRoutePermissions, fetchRolesAndDirectPermissions } = useRolePermissionsContext();
+    const { loadingRoutePermissions, fetchRolesAndDirectPermissions, fetchRoutePermissions, routePermissions } = useRolePermissionsContext();
 
     const { checkPermission } = usePermissions()
 
@@ -49,15 +49,13 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                 setIsAllowed(isAllowed);
             }
 
-            // console.log(testPermission,isAllowed)
-
             setTimeout(function () {
                 setChecked(true);
-            }, 500);
+            }, 700);
 
         }
 
-    }, [verified, loadingRoutePermissions, Component])
+    }, [verified, loadingRoutePermissions, Component, permission, routePermissions])
 
     useEffect(() => {
 
@@ -86,17 +84,22 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
         }
     }, [loadingUser, tried]);
 
-    const [previousUrl, setSpreviousUrl] = useState<string|null>(null)
+    const [previousUrl, setPreviousUrl] = useState<string | null>(null)
 
-  useEffect(() => {
-    
-    if (previousUrl !== location.pathname)
-    {
-        console.log('chng', previousUrl, location.pathname)
-        setSpreviousUrl(location.pathname)
-    }
+    useEffect(() => {
 
-  }, [location.pathname]);
+        if (previousUrl !== location.pathname) {
+            setPreviousUrl(location.pathname)
+        }
+
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if (reloadKey > 0) {
+            fetchRoutePermissions()
+        }
+
+    }, [reloadKey])
 
     return (
         <div key={reloadKey}>
@@ -138,7 +141,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                                 Please wait, logging you in...
                             </div>
                             :
-                            <div className='alert alert-danger'>Server error</div>
+                            <div className='alert alert-danger text-center'>Unknown server error occured.</div>
                     }
                 </div>
             }

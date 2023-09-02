@@ -29,7 +29,7 @@ const useRolePermissions = () => {
         }
     };
 
-    const fetchRoutePermissions = async (roleId = null) => {
+    const fetchRoutePermissions = async (roleId = null, source: string = 'none') => {
 
         if (!user || !currentRole) return false
 
@@ -52,9 +52,18 @@ const useRolePermissions = () => {
     };
 
     useEffect(() => {
-        if (roles) {
-            if (!currentRole) setCurrentRole(roles[0])
+        if (user && roles.length > 0) {
+            const defaultRole = user.default_role_id
+                ? roles.find((role) => role.id === user.default_role_id)
+                : null;
 
+            setCurrentRole(defaultRole || roles[0]);
+        }
+
+    }, [roles]);
+
+    useEffect(() => {
+        if (roles && currentRole) {
             fetchRoutePermissions()
         }
     }, [user, currentRole, roles])
@@ -65,6 +74,7 @@ const useRolePermissions = () => {
         directPermissions,
         routePermissions,
         fetchRolesAndDirectPermissions,
+        currentRole,
         setCurrentRole,
         fetchRoutePermissions,
         loadingRoutePermissions,

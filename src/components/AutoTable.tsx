@@ -6,7 +6,7 @@ import { convertToTitleCase } from '@/utils/helpers';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
-import { AutoTableInterface } from '@/interfaces/Uncategorized';
+import { AutoTableInterface } from '../interfaces/UncategorizedInterfaces';
 
 // Define the __dangerousHtml function
 function __dangerousHtml(html: HTMLElement) {

@@ -1,4 +1,4 @@
-import { subscribe, unsubscribe } from '@/utils/events';
+import { publish, subscribe, unsubscribe } from '@/utils/events';
 import { emitAjaxPost } from '@/utils/helpers'
 import React, { ReactNode, useEffect, useState } from 'react'
 
@@ -41,7 +41,7 @@ const GeneralModal: React.FC<GeneralModalProps> = ({ title, children, actionUrl,
     const handleAjaxPostDone = (resp: any) => {
         if (resp.detail) {
             const detail = resp.detail;
-            if (detail.modalId === id && detail.response && setKey) {
+            if (detail.elementId === id && detail.results && setKey) {
                 setTimeout(() => {
                     setKey((curr) => curr + 1);
                 }, 300);
@@ -59,7 +59,7 @@ const GeneralModal: React.FC<GeneralModalProps> = ({ title, children, actionUrl,
                     </div>
                     <div className="modal-body">
                         <div className="section">
-                            <form encType="" method="post" action-url={actionUrl} onSubmit={(e: any) => emitAjaxPost(e)} >
+                            <form encType="" method="post" action-url={actionUrl} onSubmit={(e: any) => publish('ajaxPost', e)} >
                                 {children}
                             </form>
                         </div>

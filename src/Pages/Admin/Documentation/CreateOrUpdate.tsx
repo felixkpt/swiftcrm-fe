@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import { emitAjaxPost } from '@/utils/helpers';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import useAxios from '@/hooks/useAxios';
-import { subscribe, unsubscribe } from '@/utils/events';
+import { publish, subscribe, unsubscribe } from '@/utils/events';
+import Dropzone from '@/components/Dropzone';
 
 const CreateOrUpdate = () => {
 
@@ -19,6 +19,8 @@ const CreateOrUpdate = () => {
   const [contentShort, setContentShort] = useState('')
   const [content, setContent] = useState('')
   const [status, setStatus] = useState('published')
+
+  const [files, setFiles] = useState([]);
 
   const editorRef = useRef(null);
 
@@ -43,7 +45,7 @@ const CreateOrUpdate = () => {
   }, [id])
 
   useEffect(() => {
-    if (!id) {      
+    if (!id) {
       setKey((curr) => curr + 1)
       setRecord(null);
       setTitle('');
@@ -67,7 +69,7 @@ const CreateOrUpdate = () => {
 
     subscribe('ajaxPostDone', handleAjaxPostDone)
 
-    return () => unsubscribe(handleAjaxPostDone)
+    return () => unsubscribe('ajaxPostDone', handleAjaxPostDone)
 
   }, [])
 
@@ -75,18 +77,21 @@ const CreateOrUpdate = () => {
     <div className='card'>
       <div className="card-body">
         <NavLink to={`/admin/documentation`} className='btn btn-outline-light shadow'>
-          <span className='d-flex align-items-center gap-1'>All docs 
-            <Icon className='font-large' icon={`humbleicons:arrow-go-back`}/>
+          <span className='d-flex align-items-center gap-1'>All docs
+            <Icon className='font-large' icon={`humbleicons:arrow-go-back`} />
           </span>
         </NavLink>
-        <form key={key} id={`docs-form`} onSubmit={emitAjaxPost}
+
+        <form key={key} id={`docs-form`} onSubmit={(e) => publish('ajaxPost', e, { files })}
           action-url={
             record
               ? `/admin/documentation/documentation/${record.id}`
               : 'admin/documentation'
           }
+          encType='multipart/form-data'
         >
           {record && <input type="hidden" value="put" name="_method" />}
+          <input type="hidden" name="files_folder" value="testingfolder" />
           <div className='d-flex justify-content-end'>
             <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
               <button type="submit" onClick={() => setStatus('published')} className="btn btn-primary">Publish</button>
@@ -142,9 +147,19 @@ const CreateOrUpdate = () => {
               <textarea defaultValue={content} name="content" className='d-none'></textarea>
             </div>
           </div>
+
+          <div className="form-group mb-3">
+            <Dropzone files={files} setFiles={setFiles} />
+          </div>
         </form>
       </div>
 
+      <div id='someuniqueid'>
+        <form action="">
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Perferendis, similique aperiam voluptatum error soluta officia aliquid excepturi dicta est quia hic suscipit? Earum eius aperiam ipsam deserunt, distinctio provident quis!
+          <Dropzone files={files} setFiles={setFiles} />
+        </form>
+      </div>
     </div>
   );
 }

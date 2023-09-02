@@ -1,4 +1,4 @@
-interface RoleData {
+interface RoleInterface {
   id: number;
   name: string;
   guard_name: string;
@@ -8,7 +8,7 @@ interface RoleData {
   status: number;
 }
 
-interface PermissionData {
+interface PermissionInterface {
   id: number;
   name: string;
   guard_name: string;
@@ -26,7 +26,7 @@ interface PermissionData {
   };
 }
 
-interface Route {
+interface RouteInterface {
   uri: string;
   methods: string;
   uri_methods: string;
@@ -35,15 +35,14 @@ interface Route {
   hidden: boolean;
   icon: string | null;
   checked: boolean;
-  children?: Route[];
 }
-interface RouteCollection {
+interface RouteCollectionInterface {
   folder: string;
-  routes: Route[];
+  routes: RouteInterface[];
   slug: string;
   title: string;
   hidden: boolean;
   icon: string | null;
 
-  children: RouteCollection[];
+  children: RouteCollectionInterface[];
 }

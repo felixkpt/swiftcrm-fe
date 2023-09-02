@@ -1,7 +1,7 @@
 import AutoTable from '@/components/AutoTable';
 import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
-import { ListSource } from '@/interfaces/Uncategorized';
+import { ListSource } from '../../../../../interfaces/UncategorizedInterfaces';
 
 const Permissions = () => {
 
