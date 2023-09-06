@@ -4,12 +4,13 @@ import Permissions from "./Tabs/Permissions";
 import Users from "./Tabs/Users";
 import useAxios from "@/hooks/useAxios";
 import { useParams } from "react-router-dom";
+import PageHeader from "@/components/PageHeader";
 
 export default function Index(): JSX.Element {
 
     const { id } = useParams<{ id: string }>();
 
-    const roleUri = `admin/settings/role-permissions/roles/role/${id}`;
+    const roleUri = `admin/settings/role-permissions/roles/detail/${id}`;
 
     const { data: role, loading, get } = useAxios();
 
@@ -21,7 +22,7 @@ export default function Index(): JSX.Element {
 
     const permissionsUri = `admin/settings/role-permissions/permissions/get-role-permissions/${id}`;
 
-    const { data: permissions, get: getPermissions, loading: loadingPermission } = useAxios<PermissionData[]>();
+    const { data: permissions, get: getPermissions, loading: loadingPermission } = useAxios<PermissionInterface[]>();
 
     useEffect(() => {
         doGetPermissions()
@@ -47,8 +48,9 @@ export default function Index(): JSX.Element {
     return (
         <div className="mb-3">
             {
-                !loading && role && <h2>{role.name}</h2>
+                !loading && role && <PageHeader title={role.name} listUrl="/admin/settings/role-permissions/roles" />
             }
+             
             <AutoTabs tabs={tabs} active="permissions" />
         </div>
     );

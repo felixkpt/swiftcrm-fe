@@ -1,25 +1,12 @@
 import AutoTable from '@/components/AutoTable';
-import AutoModal from '@/components/AutoModal';
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import usePermissions from '@/hooks/usePermissions';
+import PageHeader from '@/components/PageHeader';
 
 const Documentation = () => {
-  const [data, setData] = useState({})
-
-  const { checkPermission } = usePermissions()
 
   return (
     <div>
-      <h3>Docs List</h3>
+      <PageHeader title={'Docs List'} action="link" actionText="Create Doc" actionLink="/admin/documentation/create" permission='/admin/documentation' />
       <div>
-        {
-          checkPermission('documentation', 'post') &&
-          <div className='d-flex justify-content-end'>
-            <NavLink to={`/admin/documentation/create`} className="btn btn-info text-white">Create Doc</NavLink>
-          </div>
-        }
-        
         <AutoTable
           baseUri='/admin/documentation'
           columns={[
@@ -51,7 +38,6 @@ const Documentation = () => {
               key: 'action',
             },
           ]}
-          setData={setData}
           search={true}
         />
       </div>

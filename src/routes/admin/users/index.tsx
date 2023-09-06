@@ -1,6 +1,6 @@
 import CreateOrUpdateUser from "@/Pages/Admin/Settings/Users/CreateOrUpdateUser"
-import Index from "@/Pages/Admin/Settings/Users/User/Index"
 import Users from '@/Pages/Admin/Settings/Users/Index';
+import Detail from "@/Pages/Admin/Settings/Users/Detail/Index"
 import AuthenticatedLayout from "@/Layouts/Authenicated/AuthenticatedLayout";
 
 const relativeUri = 'users/'
@@ -17,12 +17,12 @@ const index = [
 
   },
   {
-    path: 'user/:id/edit',
-    element: <AuthenticatedLayout uri={relativeUri + 'user/:id/edit'} permission="" Component={CreateOrUpdateUser} />,
+    path: 'detail/:id/edit',
+    element: <AuthenticatedLayout uri={relativeUri + 'detail/:id/edit'} permission="" Component={CreateOrUpdateUser} />,
   },
   {
-    path: 'user/:id',
-    element: <AuthenticatedLayout uri={relativeUri + 'user/:id'} permission="" Component={Index} />,
+    path: 'detail/:id',
+    element: <AuthenticatedLayout uri={relativeUri + 'detail/:id'} permission="" Component={Detail} />,
   },
 
 ]

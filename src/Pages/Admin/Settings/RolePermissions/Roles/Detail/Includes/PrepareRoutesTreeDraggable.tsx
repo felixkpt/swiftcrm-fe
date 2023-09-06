@@ -6,9 +6,9 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 // Define the Props interface for the RoutesTree component
 interface Props {
-  routes: RouteCollection[];
-  permissions: PermissionData[];
-  allPermissions: PermissionData[];
+  routes: RouteCollectionInterface[];
+  permissions: PermissionInterface[];
+  allPermissions: PermissionInterface[];
   handleSubmit: ({ folders, permissions }: any) => void;
   saving: boolean;
   savedFolders: string[]
@@ -106,7 +106,7 @@ function constructMenu(topLevelFolders: HTMLElement[], isMenu = false) {
   return nestedRoutes;
 }
 
-function hasRouteInChildren(children: RouteCollection[]) {
+function hasRouteInChildren(children: RouteCollectionInterface[]) {
   for (const child of children) {
     if (child.routes.length > 0 || hasRouteInChildren(child.children)) {
       return true;

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
 import AutoTabs from "@/components/AutoTabs";
-import Roles from "./Roles/Roles";
-import Permissions from "./Permissions/Permissions";
-import Routes from "./Roles/Role/Routes";
+import Roles from "./Roles/Index";
+import Permissions from "./Permissions/Index";
+import Routes from "./Roles/Detail/Routes";
 
 export default function Index(): JSX.Element {
 

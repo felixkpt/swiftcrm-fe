@@ -6,7 +6,7 @@ function unsubscribe(eventName: string, listener: EventListener) {
   document.removeEventListener(eventName, listener);
 }
 
-function publish(eventName: string, data: any, moreData: any = []) {
+function publish(eventName: string, data: any, moreData: any = null) {
 
   if (data instanceof Event || (data && data.nativeEvent)) {
     data.preventDefault();
@@ -14,8 +14,8 @@ function publish(eventName: string, data: any, moreData: any = []) {
 
   let detail = data
 
-  if (moreData.length > 0) {
-    detail = { ...detail, ...moreData }
+  if (moreData) {
+    detail = { ...detail, moreData }
   }
 
   const event = new CustomEvent(eventName, { detail });

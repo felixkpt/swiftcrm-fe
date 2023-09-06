@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { convertToTitleCase, emitAjaxPost } from '@/utils/helpers';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import RenderAsyncSelect from './RenderAsyncSelect';
+import { CollectionItemsInterface } from '@/interfaces/UncategorizedInterfaces';
+import Str from '@/utils/Str';
 interface ModalProps {
     modelDetails?: any;
-    record?: string[] | null
+    record?: CollectionItemsInterface | null
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
     actionUrl: string;
@@ -152,7 +153,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                                                             <div key={current_key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
                                                                 <div className="form-group mb-2" id={`form-group-section-${current_key}`}>
                                                                     <div className="mb-2 block">
-                                                                        <label htmlFor="small">{convertToTitleCase(current_key)}</label>
+                                                                        <label htmlFor="small">{Str.title(current_key)}</label>
                                                                     </div>
                                                                     {input === 'input' && type !== 'file' && (
                                                                         <input

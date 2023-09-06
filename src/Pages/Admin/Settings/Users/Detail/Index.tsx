@@ -1,6 +1,7 @@
 import AutoModal from '@/components/AutoModal';
 import useAxios from '@/hooks/useAxios'
 import { UserInterface } from '@/interfaces/UserInterface';
+import { publish } from '@/utils/events';
 import { emitAjaxPost } from '@/utils/helpers';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { useEffect, useState } from 'react'
@@ -13,7 +14,6 @@ const Index = (props: Props) => {
   const { id } = useParams<{ id: string }>();
 
   const [user, setUser] = useState<UserInterface>()
-  const [data, setData] = useState(null)
 
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const Index = (props: Props) => {
   const [modelDetails, setModelDetails] = useState({})
 
   useEffect(() => {
-    get('admin/users/user/' + id)
+    get('admin/users/detail/' + id)
   }, [id])
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const Index = (props: Props) => {
   async function loginUser() {
 
     if (user) {
-      await postLogin(`admin/users/user/login/${user.id}`);
+      await postLogin(`admin/users/detail/login/${user.id}`);
 
     }
 
@@ -132,7 +132,7 @@ const Index = (props: Props) => {
 
                     <div className='d-flex gap-1'>
 
-                      <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">
+                      <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#UpdateUserInfo">
                         <Icon fontSize={26} icon="streamline:interface-user-edit-actions-close-edit-geometric-human-pencil-person-single-up-user-write" />
                         <span className='ms-2'>Edit User</span>
                       </button>
@@ -158,7 +158,7 @@ const Index = (props: Props) => {
 
                         <div className="modal-body">
                           <div className="section">
-                            <form encType="" method="post" action-url={'/admin/users/user/update-others-password'} onSubmit={(e: any) => emitAjaxPost(e)} >
+                            <form encType="" method="post" action-url={'/admin/users/user/update-others-password'} onSubmit={(e: any) => publish('ajaxPost', e)} >
                               <input type="hidden" name="user_id" value={id} />
                               <input type="hidden" name="_method" value="patch" />
                               <div className="form-group password">
@@ -185,7 +185,7 @@ const Index = (props: Props) => {
             }
 
             {
-              user && <><AutoModal modelDetails={modelDetails} record={user} actionUrl={`/admin/users/user/${data?.data?.id || 0}`} list_sources={list_sources} size='modal-lg' /></>
+              user && <><AutoModal modelDetails={modelDetails} record={user} actionUrl={`/admin/users/detail/${user.id || 0}`} list_sources={list_sources} size='modal-lg' id='UpdateUserInfo' /></>
             }
 
           </div>

@@ -25,7 +25,7 @@ const Permissions: React.FC = ({ role, permissions, loadingPermission, doGetPerm
     const { data: routes, get: getRoutes } = useAxios<RoleData>();
     const { data: allPermissions, get: getAllPermissions } = useAxios<PermissionData[]>();
 
-    const roleUri = `admin/settings/role-permissions/roles/role/${id}`;
+    const roleUri = `admin/settings/role-permissions/roles/detail/${id}`;
     const allPermissionsUri = `admin/settings/role-permissions/permissions/get-role-permissions/all`;
     const routesUri = 'admin/settings/role-permissions/permissions/routes';
 
@@ -90,6 +90,9 @@ const Permissions: React.FC = ({ role, permissions, loadingPermission, doGetPerm
 
         return (
             <div>
+                <div className='d-flex justify-content-between mt-2'>
+                    <h4>Role Description</h4>
+                </div>
                 <Header permissions={permissions} loadingPermission={loadingPermission} role={role} />
                 <div className="row">
                     <div className='col-sm-12'>

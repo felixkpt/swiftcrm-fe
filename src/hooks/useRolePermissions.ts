@@ -6,10 +6,10 @@ const useRolePermissions = () => {
     const { get } = useAxios();
     const { user } = useAuth()
 
-    const [roles, setRoles] = useState<RoleData[]>([]);
-    const [currentRole, setCurrentRole] = useState<RoleData>();
-    const [directPermissions, setDirectPermissions] = useState<PermissionData[]>([]);
-    const [routePermissions, setRoutePermissions] = useState<PermissionData[]>([]);
+    const [roles, setRoles] = useState<RoleInterface[]>([]);
+    const [currentRole, setCurrentRole] = useState<RoleInterface>();
+    const [directPermissions, setDirectPermissions] = useState<PermissionInterface[]>([]);
+    const [routePermissions, setRoutePermissions] = useState<PermissionInterface[]>([]);
 
     const [loadingRoutePermissions, setLoadingRoutePermissions] = useState(false)
 
@@ -39,7 +39,7 @@ const useRolePermissions = () => {
         setLoadingRoutePermissions(true)
 
         try {
-            const routePermissionsResponse = await get(`/admin/settings/role-permissions/roles/role/${currentRole.id}/get-user-route-permissions`);
+            const routePermissionsResponse = await get(`/admin/settings/role-permissions/roles/detail/${currentRole.id}/get-user-route-permissions`);
 
             if (routePermissionsResponse) {
                 setRoutePermissions(routePermissionsResponse || []);

@@ -2,42 +2,46 @@ import { subscribe, unsubscribe } from '@/utils/events';
 import React, { useEffect, useCallback } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 
+interface MsgProps {
+  title: string
+  content: string
+}
+const Msg = ({ title, content }: MsgProps) => (
+  <div>
+    <h6 className='fw-bold'>{title}</h6>
+    <div className="error-modal text-sm" dangerouslySetInnerHTML={{ __html: `${content}` }} />
+  </div>
+)
+
 const ToastNotification: React.FC = () => {
 
   // Function to handle the emitted error event
   const handleNotification = useCallback((message: string, type: string, status: number) => {
 
     // Define the CSS classes based on the type of the notification
-    let toastCls = 'toast m-2';
     let titleText = 'Toast title';
 
-    if (type == 'success') {
-      toastCls += ' bg-success-subtle'; // Add the appropriate class for an error notification
+    if (type === 'success') {
       titleText = `Success notification`;
       toast.success(<Msg title={titleText} content={message} />)
 
-    } else if (type == 'warning') {
-      toastCls += ' bg-warning-subtle'; // Add the appropriate class for an error notification
+    } else if (type === 'warning') {
       titleText = `Warning notification`;
       toast.warning(<Msg title={titleText} content={message} />)
 
-    } else if (type == 'error') {
-      toastCls += ' bg-danger-subtle'; // Add the appropriate class for an error notification
+    } else if (type === 'error') {
       titleText = `Error notification ${typeof status === 'number' ? ` (status ${status})` : ''}`;
       toast.error(<Msg title={titleText} content={message} />)
 
-    } else if (type == 'info') {
-      toastCls += ' bg-info-subtle'; // Add the appropriate class for an error notification
+    } else if (type === 'info') {
       titleText = `Info notification`;
       toast.info(<Msg title={titleText} content={message} />)
 
     } else {
-      toastCls += ' bg-light-subtle'; // Add the appropriate class for a connection error notification
       titleText = 'General Notification';
       toast(<Msg title={titleText} content={message} />)
 
     }
-
 
   }, []);
 
@@ -65,17 +69,5 @@ const ToastNotification: React.FC = () => {
     </>
   );
 };
-
-interface MsgProps {
-  title: string
-  content: string
-}
-const Msg = ({ title, content }: MsgProps) => (
-  <div>
-    <h6 className='fw-bold'>{title}</h6>
-    <div className="error-modal text-sm" dangerouslySetInnerHTML={{ __html: `${content}` }} />
-  </div>
-)
-
 
 export default ToastNotification;

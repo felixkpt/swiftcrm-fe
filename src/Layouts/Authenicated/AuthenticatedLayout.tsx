@@ -46,7 +46,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
             if (!allowedRoutes.includes(testPermission)) {
                 const isAllowed = checkPermission(testPermission, 'get');
-                setIsAllowed(isAllowed);
+                // setIsAllowed(isAllowed);
             }
 
             setTimeout(function () {

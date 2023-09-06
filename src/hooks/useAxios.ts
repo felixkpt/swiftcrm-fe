@@ -48,7 +48,7 @@ const useAxios = <T = any>() => {
             setErrors(null);
 
             if (response.data?.message) {
-                publish('notification', { message: response.data.message, type: 'success' })
+                publish('notification', { message: response.data.message, type: 'success', status: 200 })
 
                 if (!response.data?.results) {
                     setData(response.data.message);

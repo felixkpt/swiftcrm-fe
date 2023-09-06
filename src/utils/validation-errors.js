@@ -15,7 +15,7 @@ const showErrors = data => {
             if (!element) {
                 element = document.getElementById(input) || document.getElementById(key)
             }
-
+            
             if (!element) continue
 
             if (element.getAttribute('type') == 'hidden' || element.classList.contains('hidden') || element.classList.contains('d-none')) {

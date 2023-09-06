@@ -601,4 +601,31 @@ a:focus {
   outline: none;
   transition: border .24s ease-in-out;
 }
+
 // Dropzone 
+
+.view-list {
+  transform: scale(1);
+  transition: transform 500ms ease-in-out;
+}
+
+.view-list:hover {
+  animation: pulse 0.9s ease-in-out alternate infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.95);
+  }
+}
+
+.featured-image {
+  float: left;
+  width: 25%;
+}
+p {
+  margin: 0;
+}

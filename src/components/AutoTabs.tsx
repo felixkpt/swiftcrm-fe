@@ -67,22 +67,23 @@ const AutoTabs: React.FC<Props> = ({ tabs, currentTab, active }) => {
 
   // Render the AutoTabs component
   return (
-    <div className="flex flex-col w-full">
-      <ul className="nav nav-tabs">
+    <div>
+      <ul className="nav nav-tabs" role="tablist">
 
         {tabs.map((tab) => (
           <li key={tab.name} className="nav-item" role="presentation">
             <NavLink
               to={`?tab=${tab.link}`} // Set the URL parameter for the tab link
               onClick={(e) => handleTab(e, tab.link)} 
-              className={`nav-link ${openTab === tab.link ? "active bg-body-secondary mx-1" : ""}`}
+              className={`nav-link ${openTab === tab.link ? "active bg-body-secondary" : "border-bottom"}`}
+              data-toggle="tab"
             >
               {tab.name}
             </NavLink>
           </li>
         ))}
       </ul>
-      <div className="w-full pt-2 mt-2">
+      <div className="tab-content">
         <div className="transition-opacity duration-500">{currentTabContent}</div>
       </div>
     </div>

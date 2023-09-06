@@ -11,18 +11,26 @@ const AjaxPost = () => {
 
     const handleEvent = async (event: CustomEvent<{ [key: string]: any }>) => {
 
-        const files = event.detail?.files ?? []
-
         const rawForm = event.detail.target
         setForm(rawForm);
 
         const formElement = event.detail.nativeEvent.target; // Get the form element
         const formData = new FormData(formElement); // Create a FormData object from the form
 
-        // Append files to the FormData as an array
-        files.forEach((file) => {
-            formData.append('files_array[]', file);
-        });
+        const moreData = event.detail?.moreData || []
+        for (const key in moreData) {
+
+            if (Array.isArray(moreData[key])) {
+                const files = moreData[key];
+
+                files.forEach((file) => {
+                    formData.append(`${key}[]`, file || null);
+                });
+
+            } else {
+                formData.append(`${key}`, moreData[key] || null);
+            }
+        }
 
         // Specify the URL where the post request will be sent
         let url = rawForm?.getAttribute('action-url') || ''; // Get the baseUri from the event detail

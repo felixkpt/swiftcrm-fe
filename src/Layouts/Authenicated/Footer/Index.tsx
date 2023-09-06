@@ -1,5 +1,4 @@
 import AjaxPost from '@/components/AjaxPost';
-import ToastError from '@/components/Modals/ToastError';
 import ToastNotification from '@/components/Modals/ToastNotification';
 import PrepareEditModal from '@/components/PrepareEditModal';
 import PrepareStatusUpdateModal from '@/components/PrepareStatusUpdateModal';
@@ -23,7 +22,6 @@ export default function Footer() {
             </footer>
             <div>
                 <ToastNotification />
-                <ToastError />
                 <PrepareViewModal />
                 <PrepareEditModal />
                 <PrepareStatusUpdateModal />

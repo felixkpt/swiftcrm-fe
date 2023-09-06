@@ -24,7 +24,8 @@ const Users = ({ role }: Props) => {
             {
                 role && role.id ?
                     <>
-                        <div className='d-flex justify-content-end'>
+                        <div className='d-flex justify-content-between mt-2'>
+                            <h4>Users list</h4>
                             <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#addUserToRole">Add User to Role</button>
                         </div>
                         <AutoTable

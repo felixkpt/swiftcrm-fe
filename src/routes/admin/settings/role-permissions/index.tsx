@@ -1,32 +1,17 @@
-import Roles from '@/Pages/Admin/Settings/RolePermissions/Roles/Roles';
-import Permissions from '@/Pages/Admin/Settings/RolePermissions/Permissions/Permissions';
-import CreateOrUpdatePermission from '@/Pages/Admin/Settings/RolePermissions/Permissions/CreateOrUpdatePermission';
-import Role from '@/Pages/Admin/Settings/RolePermissions/Roles/Role/Index';
-import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
 
-const relativeUri = 'settings/role-permissions/';
+import roles from '@/routes/admin/settings/role-permissions/roles/index'
+import permissions from '@/routes/admin/settings/role-permissions/permissions/index'
 
 const index = [
+
     {
         path: 'roles',
-        element: <AuthenticatedLayout uri={relativeUri + 'roles'} permission="" Component={Roles} />,
-    },
-    {
-        path: 'roles/role/:id',
-        element: <AuthenticatedLayout uri={relativeUri + 'roles/role/:id'} permission="" Component={Role} />,
+        children: roles,
     },
     {
         path: 'permissions',
-        element: <AuthenticatedLayout uri={relativeUri + 'permissions'} permission="" Component={Permissions} />,
+        children: permissions,
     },
-    {
-        path: 'permissions/create',
-        element: <AuthenticatedLayout uri={relativeUri + 'permissions/create'} permission="" Component={CreateOrUpdatePermission} />,
-    },
-    {
-        path: 'permissions/permission/:id/edit',
-        element: <AuthenticatedLayout uri={relativeUri + 'permissions/permission/:id/edit'} permission="" Component={CreateOrUpdatePermission} />,
-    },
-];
+]
 
-export default index;
+export default index

@@ -11,7 +11,6 @@ const Header = ({ permissions, loadingPermission, role }: Props) => {
         <div>
             {role && (
                 <div className="mb-3">
-                    <h3>Role Description</h3>
                     <table className="table table-bordered">
                         <tbody>
                             <tr>

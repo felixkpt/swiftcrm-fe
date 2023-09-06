@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/Authenicated/AuthenticatedLayout";
-import Documentation from "@/Pages/Admin/Documentation/Documentation"
+import Documentation from "@/Pages/Admin/Documentation/Index"
 import CreateOrUpdate from "@/Pages/Admin/Documentation/CreateOrUpdate"
-import DocumentationView from "@/Pages/Admin/Documentation/Documentation/DocumentationView";
+import DocumentationDetail from "@/Pages/Admin/Documentation/Detail/Index";
 
 const relativeUri = 'documentation/';
 
@@ -16,12 +16,12 @@ const index = [
         element: <AuthenticatedLayout uri={relativeUri + 'create'} permission="" Component={CreateOrUpdate} />,
     },
     {
-        path: 'documentation/:id',
-        element: <AuthenticatedLayout uri={relativeUri + 'documentation/:id'} permission="" Component={DocumentationView} />,
+        path: 'detail/:id',
+        element: <AuthenticatedLayout uri={relativeUri + 'detail/:id'} permission="" Component={DocumentationDetail} />,
     },
     {
-        path: 'documentation/:id/edit',
-        element: <AuthenticatedLayout uri={relativeUri + 'documentation/:id/edit'} permission="" Component={CreateOrUpdate} />,
+        path: 'detail/:id/edit',
+        element: <AuthenticatedLayout uri={relativeUri + 'detail/:id/edit'} permission="" Component={CreateOrUpdate} />,
     },
 
 ]
