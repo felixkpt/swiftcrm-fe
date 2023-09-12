@@ -9,8 +9,43 @@ import PageHeader from '@/components/PageHeader';
 import { baseURL } from '@/utils/helpers';
 import '@/assets/prismjs/prism'
 import '@/assets/prismjs/prism.css'
+import Select from "react-select";
 
 const CreateOrUpdate = () => {
+
+  const [customers, setCustomers] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+
+  const { get } = useAxios();
+
+  useEffect(() => {
+    fetchSelectData('admin/docs/categories?all=1', setCustomers);
+  }, []);
+
+  const fetchSelectData = (url: string, setDataFunction: (data: []) => any) => {
+    get(url).then((results) => {
+      if (results)
+        setDataFunction(results.data);
+    });
+  };
+
+  const handleSelectChange = async (job: { uri: string, fn: (data: []) => any }, dependencies: object[]) => {
+    let updatedUri = job.uri;
+
+    dependencies.forEach((dependency: any) => {
+
+      const [name, selectedValue] = dependency
+
+      updatedUri += `&${name}=${selectedValue?.id || 0}`;
+
+    });
+
+    fetchSelectData(updatedUri, job.fn);
+
+  };
+
 
   const navigate = useNavigate()
 
@@ -30,13 +65,13 @@ const CreateOrUpdate = () => {
 
   const editorRef = useRef(null);
 
-  const { get } = useAxios()
+  const { get: getDoc } = useAxios()
   const { post, errors } = useAxios()
 
   useEffect(() => {
 
     if (id) {
-      get(`admin/docs/detail/${id}`).then(res => {
+      getDoc(`admin/docs/detail/${id}`).then(res => {
 
         if (res) {
           const { data, statuses } = res
@@ -58,7 +93,7 @@ const CreateOrUpdate = () => {
   useEffect(() => {
     if (!id) {
 
-      get('/admin/settings/picklists/statuses/post?all=1').then((res) => {
+      getDoc('/admin/settings/picklists/statuses/post?all=1').then((res) => {
 
         if (res) {
           setStatuses(res)
@@ -94,6 +129,7 @@ const CreateOrUpdate = () => {
 
   }, [])
 
+
   return (
     <div>
       <PageHeader title={`${id ? 'Edit Doc #' + id : 'Create Doc'}`} listUrl='/admin/docs' />
@@ -108,7 +144,7 @@ const CreateOrUpdate = () => {
             encType='multipart/form-data'
           >
             {record && statuses && <input type="hidden" value="put" name="_method" />}
-            <div className='d-flex justify-content-end'>
+            <div className='d-flex justify-content-end mb-3'>
               <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
                 <button type="submit" className="btn btn-primary">Publish</button>
                 <div className="btn-group" role="group">
@@ -124,6 +160,47 @@ const CreateOrUpdate = () => {
               </div>
               <input type="hidden" name='status_id' defaultValue={status_id} />
             </div>
+
+            <div className='form-group mb-3'>
+              <label htmlFor="category_id">Category</label>
+              <div className='form-control' id='category_id'>
+                <Select
+                  value={selectedCategory}
+                  onChange={(newValue) => {
+                    setSelectedCategory(newValue)
+                    handleSelectChange(
+                      { uri: 'admin/docs/categories/topics?all=1', fn: setTopics },
+                      [
+                        ['category_id', newValue, setTopics],
+                      ],
+                    )
+                  }
+                  }
+                  options={customers}
+                  getOptionValue={(option: any) => option && `${option?.id}`}
+                  getOptionLabel={(option: any) => option && `${option?.name}`}
+                  name='category_id'
+                />
+              </div>
+            </div>
+
+            <div className='form-group mb-3'>
+              <label htmlFor="topic_id">Topic</label>
+              <div className='form-control' id='topic_id'>
+                <Select
+                  value={selectedTopic}
+                  onChange={(newValue) => {
+                    setSelectedTopic(newValue)
+                  }
+                  }
+                  options={topics}
+                  getOptionValue={(option: any) => option && `${option?.id}`}
+                  getOptionLabel={(option: any) => option && `${option?.name}`}
+                  name='topic_id'
+                />
+              </div>
+            </div>
+
             <div className="form-group mb-3">
               <label htmlFor="title">Title</label>
               <input type="text" id="title" name="title" defaultValue={title} className='form-control' />

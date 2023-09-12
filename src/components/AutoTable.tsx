@@ -34,8 +34,12 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
     const [modelDetails, setModelDetails] = useState({})
 
     useEffect(() => {
-        if (tableData?.data?.length >= 0) {
-            setModelDataLength(tableData.data.length);
+        if (tableData) {
+            
+            if (tableData?.data?.length >= 0) {
+                setModelDataLength(tableData.data.length);
+            }
+
             const { data, ...others } = tableData
             if (setModelDetails) {
 

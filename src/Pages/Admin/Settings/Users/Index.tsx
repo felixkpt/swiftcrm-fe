@@ -1,7 +1,6 @@
 import AutoTable from '@/components/AutoTable'
 import { useState } from 'react'
 import AutoModal from '@/components/AutoModal'
-import usePermissions from '@/hooks/usePermissions'
 import PageHeader from '@/components/PageHeader'
 
 type Props = {}
@@ -38,7 +37,7 @@ const Index = (props: Props) => {
                         key: 'action',
                     },
                 ]}
-                setData={setData}
+                getModelDetails={setData}
                 search={true}
             />
 

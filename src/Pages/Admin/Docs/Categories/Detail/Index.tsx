@@ -1,6 +1,5 @@
 import PageHeader from '@/components/PageHeader'
 import useAxios from '@/hooks/useAxios'
-import useLoadAssets from '@/hooks/useLoadAssets'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -25,21 +24,24 @@ const Index = (props: Props) => {
   const { slug } = useParams()
 
   const { data, loading, get } = useAxios()
-  const { get:getCats } = useAxios()
+  const { get: getCats } = useAxios()
 
-  const [doc, setDoc] = useState<Docs>()
+  const [category, setCategory] = useState<Docs>()
 
   useEffect(() => {
 
     if (slug && !data)
       get(`/admin/docs/categories/${slug}`)
     else {
-      setDoc(data?.data)
+      const { data: data2, ...others } = data
+      setCategory(data2)
+      setModelDetails2(others)
     }
 
   }, [slug, data])
 
   const [modelDetails, setModelDetails] = useState({})
+  const [modelDetails2, setModelDetails2] = useState({})
 
   const list_sources = {
     async categoryId() {
@@ -51,12 +53,12 @@ const Index = (props: Props) => {
   return (
     <div className=''>
       {
-        !loading && doc &&
+        !loading && category &&
 
         <div>
-          <PageHeader title={doc.title} action="button" actionText="Edit Category" actionTargetId="AutoModal" permission='/admin/docs/categories' />
+          <PageHeader title={category.title} action="button" actionText="Edit Category" actionTargetId="EditCat" permission='/admin/docs/categories' />
 
-          <PageHeader title={'Topics List'} action="button" actionText="Create Topic" actionTargetId="AutoModal" permission='/admin/docs/categories/topics' />
+          <PageHeader title={'Topics List'} action="button" actionText="Create Topic" actionTargetId="CreateTopicModal" permission='/admin/docs/categories/topics' />
 
           <AutoTable
             baseUri={`/admin/docs/categories/${slug}/topics`}
@@ -83,7 +85,11 @@ const Index = (props: Props) => {
             search={true}
           />
           {
-            modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories/topics`} list_sources={list_sources} /></>
+            Object.keys(modelDetails).length > 0 && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories/topics`} list_sources={list_sources} id='CreateTopicModal' /></>
+          }
+
+          {
+            Object.keys(modelDetails2).length > 0 && <><AutoModal record={category} modelDetails={modelDetails2} actionUrl={`/admin/docs/categories/${category.id}`} id='EditCat' /></>
           }
         </div>
 
