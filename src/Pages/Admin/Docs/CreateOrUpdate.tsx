@@ -36,7 +36,7 @@ const CreateOrUpdate = () => {
   useEffect(() => {
 
     if (id) {
-      get(`admin/documentation/detail/${id}`).then(res => {
+      get(`admin/docs/detail/${id}`).then(res => {
 
         if (res) {
           const { data, statuses } = res
@@ -58,7 +58,7 @@ const CreateOrUpdate = () => {
   useEffect(() => {
     if (!id) {
 
-      get('/admin/settings/picklists/statuses/post-statuses?all=1').then((res) => {
+      get('/admin/settings/picklists/statuses/post?all=1').then((res) => {
 
         if (res) {
           setStatuses(res)
@@ -83,7 +83,7 @@ const CreateOrUpdate = () => {
         const { elementId, results } = event.detail;
 
         if (elementId === 'docs-form' && results) {
-          navigate('/admin/documentation/detail/' + results.id + '/edit');
+          navigate('/admin/docs/detail/' + results.id + '/edit');
         }
       }
     };
@@ -96,14 +96,14 @@ const CreateOrUpdate = () => {
 
   return (
     <div>
-      <PageHeader title={`${id ? 'Edit Doc #' + id : 'Create Doc'}`} listUrl='/admin/documentation' />
+      <PageHeader title={`${id ? 'Edit Doc #' + id : 'Create Doc'}`} listUrl='/admin/docs' />
       <div className='card'>
         <div className="card-body">
           <form key={key} id={`docs-form`} onSubmit={(e) => publish('ajaxPost', e, { image: files[0] })}
             action-url={
               record
-                ? `/admin/documentation/detail/${record.id}`
-                : 'admin/documentation'
+                ? `/admin/docs/detail/${record.id}`
+                : 'admin/docs'
             }
             encType='multipart/form-data'
           >

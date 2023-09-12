@@ -4,18 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Select from 'react-select';
 
-type Role = {
-    id: number;
-    name: string;
-};
-
-type User = {
-    id: number;
-    name: string;
-    email: string;
-    roles: Role[];
-};
-
 type Props = {};
 
 

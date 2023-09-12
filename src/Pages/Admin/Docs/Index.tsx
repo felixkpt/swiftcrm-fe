@@ -5,10 +5,10 @@ const Documentation = () => {
 
   return (
     <div>
-      <PageHeader title={'Docs List'} action="link" actionText="Create Doc" actionLink="/admin/documentation/create" permission='/admin/documentation' />
+      <PageHeader title={'Docs List'} action="link" actionText="Create Doc" actionLink="/admin/docs/create" permission='/admin/docs' />
       <div>
         <AutoTable
-          baseUri='/admin/documentation'
+          baseUri='/admin/docs'
           columns={[
             {
               label: 'ID',

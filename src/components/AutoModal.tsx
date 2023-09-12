@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import RenderAsyncSelect from './RenderAsyncSelect';
-import { CollectionItemsInterface } from '@/interfaces/UncategorizedInterfaces';
+import { CollectionItemsInterface, ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
 import Str from '@/utils/Str';
 interface ModalProps {
     modelDetails?: any;
@@ -9,7 +9,7 @@ interface ModalProps {
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
     actionUrl: string;
-    list_sources?: any;
+    list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> };
     id?: string
     setKey?: React.Dispatch<React.SetStateAction<number>>; // Use React.Dispatch type for setKey
     size?: 'modal-sm' | 'modal-lg' | 'modal-xl'
@@ -111,9 +111,9 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
 
     }, [])
 
-    
+
     const handleAjaxPostDone = (event: CustomEvent<{ [key: string]: any }>) => {
-   
+
         if (event.detail) {
             const detail = event.detail;
 

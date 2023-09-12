@@ -5,29 +5,34 @@ import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
 
 interface RenderAsyncSelectProps {
     current_key: string;
-    currentData: { };
+    currentData: {};
     isMulti?: boolean;
-    list_sources: ListSourceInterface[];
+    list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> };
 }
 
 const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = false }: RenderAsyncSelectProps) => {
 
-    console.log('loaded')
+    console.log('loaded RenderAsyncSelect')
     async function getOptions(current_key: string, rawSelected: PropsValue<object> | undefined) {
-        try {
-            const fn = Str.camel(current_key);
-            const options = await list_sources[fn]();
 
-            let selected = rawSelected
+        if (!list_sources) return {}
+
+        const fn = Str.camel(current_key);
+
+        // Type assertion to specify that list_sources[fn] is a function returning Promise<any>
+        const listSourceFn = list_sources[fn] as (() => Promise<any>);
+
+        if (typeof listSourceFn === 'function') {
+            const options = await listSourceFn();
+
+            let selected = rawSelected;
             if (typeof rawSelected === 'string') {
-                selected = options.find((option: any) => String(option.id) === rawSelected)
+                selected = options.find((option: any) => String(option.id) === rawSelected);
             }
-
             return { options, selected };
-        } catch (e) {
-            console.log(e);
+        } else {
+            throw new Error(`Function '${fn}' not found in list_sources.`);
         }
-        return {};
 
     }
 
