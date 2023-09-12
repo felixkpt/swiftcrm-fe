@@ -37,7 +37,7 @@ const Index = (props: Props) => {
             setDoc(data?.data)
 
             if (data?.data?.image) {
-                loadImage(data.data.image).then(blob => setImageUrl(blob))                
+                loadImage(data.data.image).then(blob => setImageUrl(blob))
             }
         }
 
@@ -51,11 +51,9 @@ const Index = (props: Props) => {
                 <div>
                     <PageHeader title={doc.title} action="link" actionText="Edit Doc" actionLink={`/admin/documentation/detail/${doc.id}/edit`} permission='/admin/documentation/detail/{id}' method='put' listUrl='/admin/documentation' />
                     <div className='row mb-4'>
-                        <div className='col-12 gap-2 d-inline float-left'>
-                            <img style={{ width: '320px', height: 240 }} src={imageUrl} alt="Doc image" className='border featured-image p-2 me-3 mb-2 rounded' />
-                            <div className='d-block float-left'>
-                                <p dangerouslySetInnerHTML={{ __html: String(doc.content) }}></p>
-                            </div>
+                        <div className='col-12 gap-2 row d-md-inline'>
+                            <img style={{ maxWidth: '320px', height: 240 }} src={imageUrl} alt={`${doc.title} featured image`} className='border featured-image p-2 me-md-5 col-12 col-md-4 mb-2 rounded mx-auto' />
+                            <div className='post-content col-12' dangerouslySetInnerHTML={{ __html: String(doc.content) }}></div>
                         </div>
                     </div>
                 </div>

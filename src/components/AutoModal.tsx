@@ -25,6 +25,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
     const [method, setMethod] = useState("POST");
 
     const [computedSize, setComputedSize] = useState<string>('')
+    const modalId = id || 'AutoModal'
 
     useEffect(() => {
         if (modelDetails) {
@@ -124,13 +125,18 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                 } else {
                     publish('reloadAutoTable', { tableId: modelDetails.tableId });
                 }
+
+                // close modal
+                if (rootRef.current) {
+                    rootRef.current.querySelector('button[data-bs-toggle="modal"]')?.click()
+                }
             }
         }
     };
 
     return (
         <div ref={rootRef || null}>
-            <div className={`modal fade`} id={`${id || 'AutoModal'}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+            <div className={`modal fade`} id={modalId} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
                 <div className={`modal-dialog ${computedSize}`}>
                     <div className="modal-content">
                         {modelDetails && isModalOpen ?
@@ -181,9 +187,9 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                                                                         />
                                                                     )}
 
-                                                                    {input === 'select' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} inputData={inputData} isMulti={false} />}
+                                                                    {input === 'select' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={false} />}
 
-                                                                    {input === 'multiselect' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} inputData={inputData} isMulti={true} />}
+                                                                    {input === 'multiselect' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={true} />}
 
                                                                     {input === 'textarea' && (
                                                                         <textarea
@@ -216,7 +222,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                         }
                     </div>
                 </div>
-                <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target="#AutoModal"></button>
+                <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target={modalId}></button>
             </div>
         </div>
     );

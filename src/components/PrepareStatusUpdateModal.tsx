@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { subscribe, unsubscribe } from '@/utils/events'
-import AutoModal from './AutoModal'
-import { emitAjaxPost } from '@/utils/helpers'
+import { publish, subscribe, unsubscribe } from '@/utils/events'
+import Select, { PropsValue } from 'react-select';
+import Str from '@/utils/Str';
 
 const PrepareStatusUpdateModal = () => {
 
-    const [modelDetails, setModelDetails] = useState({})
+    const [statuses, setStatuses] = useState([])
     const [record, setRecord] = useState<any>(false)
+    const [selected, setSelected] = useState<PropsValue<object> | undefined>();
 
     const [actionUrl, setActionUrl] = useState<string>('')
 
@@ -14,7 +15,8 @@ const PrepareStatusUpdateModal = () => {
 
         const detail = event?.detail
         if (detail) {
-            setModelDetails(detail.modelDetails)
+            console.log(detail)
+            setStatuses(detail.modelDetails.statuses)
             setRecord(detail.record)
             setActionUrl(detail.action)
         }
@@ -22,6 +24,15 @@ const PrepareStatusUpdateModal = () => {
         document.getElementById("showStatusUpdate")?.click()
 
     }
+
+    useEffect(() => {
+
+        if (record) {
+            const status = statuses.find((status) => status.id === record.status_id)
+            if (status) setSelected(status)
+        }
+
+    }, [record])
 
     useEffect(() => {
 
@@ -54,14 +65,30 @@ const PrepareStatusUpdateModal = () => {
                         </div>
                         <div className="modal-body">
                             <div className="section">
-                                <form encType="" method="post" action-url={actionUrl} onSubmit={(e: any) => emitAjaxPost(e)} >
+                                <form method="post" action-url={actionUrl} onSubmit={(e: any) => publish('ajaxPost', e)} >
                                     <input type="hidden" name="_method" value="patch" />
-
                                     <div>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique non reprehenderit doloremque ducimus corporis! Assumenda laudantium recusandae exercitationem possimus sed magni harum eveniet ut earum omnis eos, aperiam soluta odit.
+                                        {
+                                            (record && selected) ?
+                                                <Select
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    defaultValue={selected}
+                                                    isDisabled={false}
+                                                    isLoading={false}
+                                                    isClearable={false}
+                                                    isSearchable={true}
+                                                    name="status_id"
+                                                    options={statuses}
+                                                    onChange={(val) => setSelected(val)}
+                                                    getOptionValue={(option) => `${option['id']}`}
+                                                    getOptionLabel={(option) => Str.title(`${option['name']}`)}
+                                                />
+                                                : 'Loading record...'
+                                        }
                                     </div>
-                                    <div className="form-group mt-2">
-                                        <button type="submit" className="btn  btn-primary submit-btn ">Save Information</button>
+                                    <div className="form-group mt-2 text-end">
+                                        <button type="submit" className="btn  btn-primary submit-btn ">Save</button>
                                     </div>
                                 </form>
                             </div>

@@ -2,7 +2,6 @@ import AutoModal from '@/components/AutoModal';
 import useAxios from '@/hooks/useAxios'
 import { UserInterface } from '@/interfaces/UserInterface';
 import { publish } from '@/utils/events';
-import { emitAjaxPost } from '@/utils/helpers';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,6 +12,7 @@ const Index = (props: Props) => {
 
   const { id } = useParams<{ id: string }>();
 
+  const [key, setKey] = useState<number>(0)
   const [user, setUser] = useState<UserInterface>()
 
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ const Index = (props: Props) => {
   const [modelDetails, setModelDetails] = useState({})
 
   useEffect(() => {
-    get('admin/users/detail/' + id)
-  }, [id])
+    get('admin/settings/users/detail/' + id)
+  }, [id, key])
 
   useEffect(() => {
     if (!loading && userData) {
@@ -39,7 +39,7 @@ const Index = (props: Props) => {
   async function loginUser() {
 
     if (user) {
-      await postLogin(`admin/users/detail/login/${user.id}`);
+      await postLogin(`admin/settings/users/detail/login/${user.id}`);
 
     }
 
@@ -158,7 +158,7 @@ const Index = (props: Props) => {
 
                         <div className="modal-body">
                           <div className="section">
-                            <form encType="" method="post" action-url={'/admin/users/user/update-others-password'} onSubmit={(e: any) => publish('ajaxPost', e)} >
+                            <form encType="" method="post" action-url={'/admin/settings/users/user/update-others-password'} onSubmit={(e: any) => publish('ajaxPost', e)} >
                               <input type="hidden" name="user_id" value={id} />
                               <input type="hidden" name="_method" value="patch" />
                               <div className="form-group password">
@@ -185,7 +185,7 @@ const Index = (props: Props) => {
             }
 
             {
-              user && <><AutoModal modelDetails={modelDetails} record={user} actionUrl={`/admin/users/detail/${user.id || 0}`} list_sources={list_sources} size='modal-lg' id='UpdateUserInfo' /></>
+              user && <><AutoModal setKey={setKey} modelDetails={modelDetails} record={user} actionUrl={`/admin/settings/users/detail/${user.id || 0}`} list_sources={list_sources} size='modal-lg' id='UpdateUserInfo' /></>
             }
 
           </div>

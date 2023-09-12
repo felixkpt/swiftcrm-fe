@@ -1,16 +1,16 @@
 import Select, { PropsValue } from 'react-select';
 import Str from '@/utils/Str';
 import { useEffect, useState } from "react";
-import { ListSource } from '../interfaces/UncategorizedInterfaces';
+import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
 
 interface RenderAsyncSelectProps {
     current_key: string;
-    inputData: { [current_key: string]: string };
+    currentData: { };
     isMulti?: boolean;
-    list_sources: ListSource[];
+    list_sources: ListSourceInterface[];
 }
 
-const RenderAsyncSelect = ({ list_sources, current_key, inputData, isMulti = false }: RenderAsyncSelectProps) => {
+const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = false }: RenderAsyncSelectProps) => {
 
     console.log('loaded')
     async function getOptions(current_key: string, rawSelected: PropsValue<object> | undefined) {
@@ -39,7 +39,7 @@ const RenderAsyncSelect = ({ list_sources, current_key, inputData, isMulti = fal
         if (current_key) {
 
             async function fetchData() {
-                const currentValue = inputData[current_key.replace(/_list/, '')] || (isMulti ? [] : '');
+                const currentValue = currentData || (isMulti ? [] : '');
                 const { options: fetchedOptions, selected: fetchedSelected } = await getOptions(current_key, currentValue);
 
                 setOptions(fetchedOptions);
@@ -49,7 +49,7 @@ const RenderAsyncSelect = ({ list_sources, current_key, inputData, isMulti = fal
             fetchData();
         }
 
-    }, [current_key, inputData, isMulti]);
+    }, [current_key, currentData, isMulti]);
 
     return (
         <Select

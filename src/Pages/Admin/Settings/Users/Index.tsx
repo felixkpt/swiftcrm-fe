@@ -2,6 +2,7 @@ import AutoTable from '@/components/AutoTable'
 import { useState } from 'react'
 import AutoModal from '@/components/AutoModal'
 import usePermissions from '@/hooks/usePermissions'
+import PageHeader from '@/components/PageHeader'
 
 type Props = {}
 
@@ -9,20 +10,12 @@ const Index = (props: Props) => {
 
     const [data, setData] = useState([])
 
-    const { checkPermission } = usePermissions()
-
     return (
 
-        <div className="container mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Users</h1>
-            {
-                checkPermission('users', 'post') &&
-                <div className='d-flex justify-content-end'>
-                    <button type="button" className="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#AutoModal">Create User</button>
-                </div>
-            }
+        <div>
+            <PageHeader title={'Users List'} action="button" actionText="Create User" actionTargetId="AutoModal" permission='admin.settings.users' />
             <AutoTable
-                baseUri='/admin/users'
+                baseUri='/admin/settings/users'
                 columns={[
                     {
                         label: 'ID',

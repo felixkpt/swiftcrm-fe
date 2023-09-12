@@ -22,7 +22,9 @@ const CreateOrUpdate = () => {
   const [title, setTitle] = useState('')
   const [contentShort, setContentShort] = useState('')
   const [content, setContent] = useState('')
-  const [status, setStatus] = useState('published')
+  const [status_id, setStatusId] = useState('published')
+  const [statuses, setStatuses] = useState([])
+
 
   const [files, setFiles] = useState([]);
 
@@ -34,30 +36,44 @@ const CreateOrUpdate = () => {
   useEffect(() => {
 
     if (id) {
-      get(`admin/documentation/documentation/${id}`).then(res => {
+      get(`admin/documentation/detail/${id}`).then(res => {
 
         if (res) {
-          const { data } = res
+          const { data, statuses } = res
           setRecord(data)
           setTitle(data.title)
           setContentShort(data.content_short)
           setContent(data.content)
-          setStatus(data.status)
+          setStatusId(data.status_id)
+
+          setStatuses(statuses)
+
         }
       })
 
     }
+
   }, [id])
 
   useEffect(() => {
     if (!id) {
-      setKey((curr) => curr + 1)
-      setRecord(null);
-      setTitle('');
-      setContentShort('');
-      setContent('');
-      setStatus('published');
+
+      get('/admin/settings/picklists/statuses/post-statuses?all=1').then((res) => {
+
+        if (res) {
+          setStatuses(res)
+
+          setKey((curr) => curr + 1)
+          setRecord(null);
+          setTitle('');
+          setContentShort('');
+          setContent('');
+          setStatusId(res.find((status: any) => status.name === 'published').id || 0);
+
+        }
+      })
     }
+
   }, [id]);
 
   useEffect(() => {
@@ -67,7 +83,7 @@ const CreateOrUpdate = () => {
         const { elementId, results } = event.detail;
 
         if (elementId === 'docs-form' && results) {
-          navigate('/admin/documentation/documentation/' + results.id + '/edit');
+          navigate('/admin/documentation/detail/' + results.id + '/edit');
         }
       }
     };
@@ -78,23 +94,6 @@ const CreateOrUpdate = () => {
 
   }, [])
 
-  function file_picker_callback(callback, value, meta) {
-    // Provide file and text for the link dialog
-    if (meta.filetype == 'file') {
-      callback('mypage.html', { text: 'My text' });
-    }
-
-    // Provide image and alt text for the image dialog
-    if (meta.filetype == 'image') {
-      callback('myimage.jpg', { alt: 'My alt text' });
-    }
-
-    // Provide alternative source and posted for the media dialog
-    if (meta.filetype == 'media') {
-      callback('movie.mp4', { source2: 'alt.ogg', poster: 'image.jpg' });
-    }
-  }
-
   return (
     <div>
       <PageHeader title={`${id ? 'Edit Doc #' + id : 'Create Doc'}`} listUrl='/admin/documentation' />
@@ -103,26 +102,27 @@ const CreateOrUpdate = () => {
           <form key={key} id={`docs-form`} onSubmit={(e) => publish('ajaxPost', e, { image: files[0] })}
             action-url={
               record
-                ? `/admin/documentation/documentation/${record.id}`
+                ? `/admin/documentation/detail/${record.id}`
                 : 'admin/documentation'
             }
             encType='multipart/form-data'
           >
-            {record && <input type="hidden" value="put" name="_method" />}
+            {record && statuses && <input type="hidden" value="put" name="_method" />}
             <div className='d-flex justify-content-end'>
               <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
-                <button type="submit" onClick={() => setStatus('published')} className="btn btn-primary">Publish</button>
+                <button type="submit" className="btn btn-primary">Publish</button>
                 <div className="btn-group" role="group">
                   <button id="btnGroupDrop1" type="button" className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     More
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                    <li><button type="submit" onClick={() => setStatus('draft')} className="dropdown-item btn btn-warning d-flex align-items-center gap-1"><Icon icon={`bi:bookmark`} />Save as Draft</button></li>
-                    <li><button type="submit" onClick={() => setStatus('trash')} className="dropdown-item btn btn-warning d-flex align-items-center gap-1"><Icon icon={`bi:bookmark`} />Move to Trash</button></li>
+                    {statuses.map(status => (
+                      <li key={status.id}><button type="submit" onClick={() => setStatusId(status.id)} className="dropdown-item btn btn-warning d-flex align-items-center gap-1"><Icon icon={`bi:bookmark`} />Save as {status.name}</button></li>
+                    ))}
                   </ul>
                 </div>
               </div>
-              <input type="hidden" name='status' defaultValue={status} />
+              <input type="hidden" name='status_id' defaultValue={status_id} />
             </div>
             <div className="form-group mb-3">
               <label htmlFor="title">Title</label>
@@ -186,7 +186,7 @@ const CreateOrUpdate = () => {
                           if (results) {
                             const { data, token } = results
 
-                            cb(baseURL('/admin/file-repo/' + data.path + '?token=' + token), { title: data.caption, class:'asas' });
+                            cb(baseURL('/admin/file-repo/' + data.path + '?token=' + token), { title: data.caption, class: 'asas' });
                           }
 
                         })
@@ -196,8 +196,8 @@ const CreateOrUpdate = () => {
                       input.click();
                     },
                     image_class_list: [
-                      {title: 'Autofetch Image', value: 'autofetch-image'},
-                      ]
+                      { title: 'Autofetch Image', value: 'autofetch-image' },
+                    ]
                   }}
                   onChange={(e) => setContent(e.target.getContent())}
                 />

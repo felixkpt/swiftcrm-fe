@@ -1,14 +1,12 @@
-import AuthenticatedLayout from "@/Layouts/Authenicated/AuthenticatedLayout";
-import Statuses from "@/Pages/Admin/Settings/Picklists/Statuses/Statuses";
 
-
-const relativeUri = 'settings/picklists/';
+import statuses from '@/routes/admin/settings/picklists/statuses'
 
 const index = [
+
     {
         path: 'statuses',
-        element: <AuthenticatedLayout uri={relativeUri + 'statuses'} permission="" Component={Statuses} />,
-    },
-];
+        children: statuses,
+    }
+]
 
-export default index;
+export default index
