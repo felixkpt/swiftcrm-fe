@@ -112,7 +112,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                             <SideNav />
                         </div>
                         <div id="layoutSidenav_content">
-                            <main className='container-fluid p-3 min-h-100vh position-relative'>
+                            <main className='container-fluid p-4 min-h-100vh position-relative'>
                                 {
                                     isAllowed === true && checked === true ?
                                         <Component />

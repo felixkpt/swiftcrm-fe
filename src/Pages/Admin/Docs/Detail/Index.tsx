@@ -32,7 +32,7 @@ const Index = (props: Props) => {
     useEffect(() => {
 
         if (id && !data)
-            get(`admin/documentation/detail/${id}`)
+            get(`admin/docs/detail/${id}`)
         else {
             setDoc(data?.data)
 
@@ -49,7 +49,7 @@ const Index = (props: Props) => {
                 !loading && doc &&
 
                 <div>
-                    <PageHeader title={doc.title} action="link" actionText="Edit Doc" actionLink={`/admin/documentation/detail/${doc.id}/edit`} permission='/admin/documentation/detail/{id}' method='put' listUrl='/admin/documentation' />
+                    <PageHeader title={doc.title} action="link" actionText="Edit Doc" actionLink={`/admin/docs/detail/${doc.id}/edit`} permission='/admin/docs/detail/{id}' method='put' listUrl='/admin/documentation' />
                     <div className='row mb-4'>
                         <div className='col-12 gap-2 row d-md-inline'>
                             <img style={{ maxWidth: '320px', height: 240 }} src={imageUrl} alt={`${doc.title} featured image`} className='border featured-image p-2 me-md-5 col-12 col-md-4 mb-2 rounded mx-auto' />
