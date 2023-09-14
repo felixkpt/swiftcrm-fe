@@ -44,10 +44,10 @@ const PageHeader = ({ title, action, actionText, actionLink, permission, method 
   };
 
   return (
-    <div className='header-title shadow-sm p-2 rounded mb-3 row justify-content-between'>
+    <div className='header-title shadow-sm p-2 rounded mb-3 row justify-content-betwee'>
       {
         listUrl && isAllowed() &&
-        <div className={`col-6 ${isAllowed() ? 'col-md-1 col-lg-2 col-xl-1' : 'col-md-2 col-lg-2 col-xl-1'} d-flex justify-content-start gap-2`}>
+        <div className={`col-6 col-md-2 d-flex justify-content-start mb-2 mb-md-2`}>
           <div>
             <NavLink to={listUrl} className=' btn btn-outline-light shadow view-list'>
               <span className='d-flex align-items-center gap-1 text-dark'>View list
@@ -57,12 +57,14 @@ const PageHeader = ({ title, action, actionText, actionLink, permission, method 
           </div>
         </div>
       }
-      <h3 className={`col-12 col-md-10 ${isAllowed() ? 'col-lg-8 col-xl-10' : 'col-lg-10 col-xl-11'} order-3 order-md-2 mt-3 mt-md-0`}>{title}</h3>
-      {isAllowed() && (
-        <div className='col-6 col-md-1 col-lg-2 col-xl-2 order-2 text-end'>
-          {renderAction()}
-        </div>
-      )}
+      <div className={`col-12 ${listUrl && isAllowed() ? 'col-md-10' : ''} d-flex justify-content-between align-items-center`}>
+        <h3>{title}</h3>
+        {isAllowed() && (
+          <div className='text-end'>
+            {renderAction()}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

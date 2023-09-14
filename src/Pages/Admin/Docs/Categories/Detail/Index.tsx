@@ -19,15 +19,23 @@ export default function Index(): JSX.Element {
 
   useEffect(() => {
 
-    if (slug && !data)
+    if (slug) {
       get(`/admin/docs/categories/${slug}`)
-    else {
+    }
+
+  }, [slug])
+
+  useEffect(() => {
+
+    if (!loading && data) {
+
       const { data: data2, ...others } = data
       setCategory(data2)
       setModelDetails2(others)
+      
     }
 
-  }, [slug, data])
+  }, [data])
 
   const [modelDetails2, setModelDetails2] = useState({})
 

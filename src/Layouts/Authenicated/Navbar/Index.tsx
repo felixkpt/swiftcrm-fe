@@ -1,13 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import useAxios from "@/hooks/useAxios";
 import React, { useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-import defaultAvatar from '@/images/defaultavatar.png'
+import { NavLink } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 const NavBar = () => {
-    const [open, setOpen] = React.useState(false);
-    const [flyer, setFlyer] = React.useState(false);
-    const [flyerTwo, setFlyerTwo] = React.useState(false);
     const { user } = useAuth();
     const { post, loading } = useAxios();
 
@@ -69,8 +65,8 @@ const NavBar = () => {
 
 
     return (
-        <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <NavLink className="navbar-brand ps-3" to="/">SwiftCRM</NavLink>
+        <nav className="sb-topnav navbar navbar-expand navbar-dark sb-navbar-dark shadow">
+            <NavLink className="navbar-brand ps-3" to="/">CIHDocs</NavLink>
             <button className="btn btn-link btn-sm me-4 me-lg-0" id="sidebarToggle"><Icon icon={`fa6-solid:bars`} /></button>
             <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
                 <div className="input-group">

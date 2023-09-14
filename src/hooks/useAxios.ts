@@ -39,13 +39,19 @@ const useAxios = <T = any>() => {
     );
 
     const fetchData = async (config) => {
-        clearErrors()
+
+        let elementId: string | null = null
+        if (config?.elementId) {
+            elementId = config.elementId
+        }
+
+        clearErrors(elementId)
 
         try {
             setLoading(true);
             const response = await axiosInstance(config);
 
-            setErrors(null);
+            setErrors(null, elementId);
 
             if (response.data?.message) {
                 publish('notification', { message: response.data.message, type: 'success', status: 200 })
@@ -68,7 +74,7 @@ const useAxios = <T = any>() => {
                     const status = axiosError.response.status;
 
                     const msg = axiosError.response?.data?.message || 'An error occurred.'
-                    setErrors(msg);
+                    setErrors(msg, elementId);
 
                     if (status && status !== 200 && status !== 201 && status !== 401) {
                         publish('notification', { message: msg, type: 'error', status })
@@ -81,19 +87,19 @@ const useAxios = <T = any>() => {
 
                     // Handle validation errors in the response data
                     if (axiosError.response?.data.errors) {
-                        showErrors(axiosError.response.data);
+                        showErrors(axiosError.response.data, elementId);
                     }
 
 
                 } else {
                     const msg = 'We are experiencing server connection issues.'
-                    setErrors(msg);
+                    setErrors(msg, elementId);
                     publish('notification', { message: msg, type: 'error', status: 0 })
 
                 }
             } else {
                 const msg = error?.message || 'An unexpected error occurred.'
-                setErrors(msg);
+                setErrors(msg, elementId);
                 publish('notification', { message: msg, type: 'error', status: 0 })
 
             }
@@ -107,7 +113,7 @@ const useAxios = <T = any>() => {
     const post = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config });
     const put = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
     const patch = (url, data = {}, config = {}) => fetchData({ method: 'POST', url, data, ...config, _method: 'patch' });
-    const destroy = (url, config = {}) => fetchData({ method: 'DELETE', url, ...config });
+    const destroy = (url, data = {}, config = {}) => fetchData({ method: 'DELETE', url, ...config });
     const getFile = async (url, config = {}) => {
 
         try {

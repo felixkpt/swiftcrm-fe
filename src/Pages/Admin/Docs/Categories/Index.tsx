@@ -42,7 +42,7 @@ const Index = ({ category }: Props) => {
         modalSize='modal-lg'
       />
       {
-        // modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories?parent_category_id=${category ? category.id : '0'}`} list_sources={list_sources} /></>
+        modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories?parent_category_id=${category ? category.id : '0'}`} list_sources={list_sources} modalSize='modal-lg' /></>
       }
     </div>
   );

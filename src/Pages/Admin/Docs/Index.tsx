@@ -7,7 +7,7 @@ interface Props {
 
 const Documentation = ({ category }: Props) => {
 
-  return (
+    return (
     <div>
       <PageHeader title={'Docs List'} action="link" actionText="Create Doc" actionLink={`/admin/docs/create?category_id=${category ? category.id : '0'}`} permission='/admin/docs' />
       <div>

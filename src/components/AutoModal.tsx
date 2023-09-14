@@ -45,7 +45,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
 
             const tObj: { [key: string]: string } = {};
             keys.forEach((key: string) => {
-                tObj[key] = 'a';
+                tObj[key] = '';
             });
 
             setHasFillable(true);

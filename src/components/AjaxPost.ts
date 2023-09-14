@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 const AjaxPost = () => {
 
-    const { data, post, put, destroy, patch } = useAxios();
+    const { data, post, put, destroy, patch, setValidationElementId } = useAxios();
 
     const [form, setForm] = useState();
 
@@ -32,6 +32,8 @@ const AjaxPost = () => {
             }
         }
 
+        const elementId = rawForm.id || rawForm?.closest('.modal')?.id || null
+
         // Specify the URL where the post request will be sent
         let url = rawForm?.getAttribute('action-url') || ''; // Get the baseUri from the event detail
         url = baseURL(url);
@@ -48,16 +50,16 @@ const AjaxPost = () => {
 
         // Make the request
         if (method == 'post') {
-            results = await post(url, formData);
+            results = await post(url, formData, { elementId });
         } else if (method == 'put') {
-            results = await put(url, formData);
+            results = await put(url, formData, { elementId });
         } else if (method == 'patch') {
-            results = await patch(url, formData);
+            results = await patch(url, formData, { elementId });
         } else if (method == 'delete') {
-            results = await destroy(url, formData);
+            results = await destroy(url, formData, { elementId });
         }
 
-        publish('ajaxPostDone', { elementId: rawForm.id || rawForm?.closest('.modal')?.id || null, results })
+        publish('ajaxPostDone', { elementId, results })
 
         if (button) {
             button.disabled = false
