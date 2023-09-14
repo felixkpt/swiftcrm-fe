@@ -82,9 +82,9 @@ export interface AutoTableInterface {
     reload?: number;
     hideCreate?: boolean
     getModelDetails?: (props: Partial<CollectionItemsInterface>) => void
-    list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> };
-    id?: string
-
+    list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> }
+    tableId?: string
+    modalSize?: ModalSizeType
 }
 
 export interface ListSourceInterface {
@@ -92,3 +92,13 @@ export interface ListSourceInterface {
     name: string;
     // You can add more properties here if needed
 }
+
+export interface DocsInterface {
+    id: string
+    title: string
+    content: string
+    content_short: string
+    image: string
+}
+
+export type ModalSizeType = 'modal-sm' | 'modal-lg' | 'modal-xl';

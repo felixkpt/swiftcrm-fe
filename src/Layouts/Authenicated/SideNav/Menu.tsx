@@ -42,54 +42,52 @@ const Menu = () => {
     return <>
       {
         user && userMenu !== null ?
-          <div className='shadow'>
-            <ul className="metismenu list-unstyled nested-routes main" id="menu">
+          <ul className="metismenu list-unstyled nested-routes main" id="menu">
 
-              {
-                userMenu.map((child: RouteCollection, i) => {
+            {
+              userMenu.map((child: RouteCollection, i) => {
 
-                  const { routes, children, icon, folder } = child
+                const { routes, children, icon, folder } = child
 
-                  const shouldShowFirstLevelRoutes = true
+                const shouldShowFirstLevelRoutes = true
 
-                  const shouldShowFolder = routes.length > 0 || children.length > 0
+                const shouldShowFolder = routes.length > 0 || children.length > 0
 
-                  const currentId = Str.slug((folder).replace(/^\//, ''));
+                const currentId = Str.slug((folder).replace(/^\//, ''));
 
-                  const indent = 2
+                const indent = 2
 
-                  if (shouldShowFolder)
+                if (shouldShowFolder)
 
-                    return (
-                      <div key={currentId}>
-                        <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target={`#${currentId}`} aria-expanded="false" aria-controls="collapsePages">
-                          <span className='d-flex align-items-center gap-1'>
-                            <Icon icon={`${icon || 'prime:bookmark'}`} />
-                            <span>{Str.title(Str.afterLast(folder, '/'))}</span>
-                          </span>
-                          <div className="sb-sidenav-collapse-arrow"><Icon className='arrow-section' icon={`bi-chevron-down`} /></div>
-                        </a>
-                        <div className="collapse" id={`${currentId}`} aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                          <nav className="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                            <RoutesList routes={routes} />
-                            {
-                              children.length > 0 &&
-                              <>
-                                {
-                                  children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} prevId={currentId} />)
-                                }
-                              </>
-                            }
-                          </nav>
-                        </div>
+                  return (
+                    <div key={currentId}>
+                      <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target={`#${currentId}`} aria-expanded="false" aria-controls="collapsePages">
+                        <span className='d-flex align-items-center gap-1'>
+                          <Icon icon={`${icon || 'prime:bookmark'}`} />
+                          <span>{Str.title(Str.afterLast(folder, '/'))}</span>
+                        </span>
+                        <div className="sb-sidenav-collapse-arrow"><Icon className='arrow-section' icon={`bi-chevron-down`} /></div>
+                      </a>
+                      <div className="collapse" id={`${currentId}`} aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <nav className="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                          <RoutesList routes={routes} />
+                          {
+                            children.length > 0 &&
+                            <>
+                              {
+                                children.map((child) => <MenuTree key={child.folder} indent={indent} child={child} prevId={currentId} />)
+                              }
+                            </>
+                          }
+                        </nav>
                       </div>
-                    )
+                    </div>
+                  )
 
-                  else return null
-                })
-              }
-            </ul>
-          </div>
+                else return null
+              })
+            }
+          </ul>
           :
           <div className='ps-2 pt-3'>
             {!currentRole || loading ?

@@ -26,8 +26,8 @@ const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = f
             const options = await listSourceFn();
 
             let selected = rawSelected;
-            if (typeof rawSelected === 'string') {
-                selected = options.find((option: any) => String(option.id) === rawSelected);
+            if (typeof rawSelected === 'number' || typeof rawSelected === 'string') {
+                selected = options.find((option: any) => String(option.id) === String(rawSelected));
             }
             return { options, selected };
         } else {

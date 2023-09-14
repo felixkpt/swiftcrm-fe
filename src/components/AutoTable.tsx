@@ -14,7 +14,7 @@ function __dangerousHtml(html: HTMLElement) {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetails, list_sources, id }: AutoTableInterface) => {
+const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetails, list_sources, tableId, modalSize }: AutoTableInterface) => {
     const {
         tableData,
         loading,
@@ -25,7 +25,7 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
         setReload,
     } = useAutoTableEffect(baseUri, listUri);
 
-    id = id ? id : 'AutoTable'
+    const id = tableId ? tableId : 'AutoTable'
 
     const [checkedItems, setCheckedItems] = useState<(string | number)[]>([]);
     const [checkedAllItems, setCheckedAllItems] = useState<boolean>(false);
@@ -35,7 +35,7 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
 
     useEffect(() => {
         if (tableData) {
-            
+
             if (tableData?.data?.length >= 0) {
                 setModelDataLength(tableData.data.length);
             }
@@ -203,7 +203,7 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
 
         const record = tableData.data.find((item: any) => item.id == id)
 
-        publish('prepareView', { modelDetails, record, action })
+        publish('prepareView', { modelDetails, record, action, modalSize })
 
     };
 
@@ -214,22 +214,19 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
         const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
 
         const id = target.getAttribute('data-id');
-        const action = target.getAttribute('href');
+        const action = target.getAttribute('data-action') || target.getAttribute('href');
 
         if (!id || !action) return;
 
         const record = tableData.data.find((item: any) => item.id == id)
 
-        console.log(modelDetails)
-        publish('prepareEdit', { modelDetails, record, action, list_sources })
+        publish('prepareEdit', { modelDetails, record, action, list_sources, modalSize })
 
     };
 
     const handleStatusUpdate = (event: Event) => {
 
         event.preventDefault()
-        console.log('okkssass    '
-        )
 
         const target = event.target as HTMLElement; // Narrow down the type to HTMLElement
 
@@ -240,7 +237,7 @@ const AutoTable = ({ baseUri, listUri, search, columns: initCols, getModelDetail
 
         const record = tableData.data.find((item: any) => item.id == id)
 
-        publish('prepareStatusUpdate', { modelDetails, record, action, type: 'status-update' })
+        publish('prepareStatusUpdate', { modelDetails, record, action, modalSize })
 
     };
 

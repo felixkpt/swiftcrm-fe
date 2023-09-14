@@ -1,32 +1,21 @@
-import PageHeader from '@/components/PageHeader'
-import useAxios from '@/hooks/useAxios'
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import AutoTabs from "@/components/AutoTabs";
+import Topics from "./Tabs/Topics";
+import Categories from "./Tabs/Categories";
+import PageHeader from "@/components/PageHeader";
+import { useEffect, useState } from "react";
+import { DocsInterface } from "@/interfaces/UncategorizedInterfaces";
+import { useParams } from "react-router-dom";
+import useAxios from "@/hooks/useAxios";
+import AutoModal from "@/components/AutoModal";
+import Docs from "./Tabs/Docs";
 
-import '@/assets/prismjs/prism'
-import '@/assets/prismjs/prism.css'
-import AutoTable from '@/components/AutoTable'
-import AutoModal from '@/components/AutoModal'
-import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces'
+export default function Index(): JSX.Element {
 
-type Props = {}
-
-interface Docs {
-  id: string
-  title: string
-  content: string
-  content_short: string
-  image: string
-}
-
-const Index = (props: Props) => {
+  const [category, setCategory] = useState<DocsInterface>()
 
   const { slug } = useParams()
 
   const { data, loading, get } = useAxios()
-  const { get: getCats } = useAxios()
-
-  const [category, setCategory] = useState<Docs>()
 
   useEffect(() => {
 
@@ -40,62 +29,43 @@ const Index = (props: Props) => {
 
   }, [slug, data])
 
-  const [modelDetails, setModelDetails] = useState({})
   const [modelDetails2, setModelDetails2] = useState({})
 
-  const list_sources = {
-    async categoryId() {
-      const res = await getCats('/admin/docs/categories?all=1').then((res) => res)
-      return res.data || [] as ListSourceInterface[];
-    }
-  };
+  const tabs = [
+    {
+      name: "Docs",
+      link: "docs",
+      content: <Docs category={category} />,
+    },
+    {
+      name: "Categories",
+      link: "categories",
+      content: <Categories category={category} />,
+    },
+    {
+      name: "Topics",
+      link: "topics",
+      content: <Topics category={category} />,
+    },
+  ];
 
   return (
-    <div className=''>
-      {
-        !loading && category &&
+    <div className="mb-3">
+      {category ?
+        (
+          <>
+            <PageHeader title={category.title} action="button" actionText="Edit Category" actionTargetId="EditCat" permission='/admin/docs/categories' />
 
-        <div>
-          <PageHeader title={category.title} action="button" actionText="Edit Category" actionTargetId="EditCat" permission='/admin/docs/categories' />
-
-          <PageHeader title={'Topics List'} action="button" actionText="Create Topic" actionTargetId="CreateTopicModal" permission='/admin/docs/categories/topics' />
-
-          <AutoTable
-            baseUri={`/admin/docs/categories/${slug}/topics`}
-            columns={[
-              {
-                label: 'ID',
-                key: 'id',
-              },
-              {
-                label: 'Topic Title',
-                key: 'title',
-              },
-              {
-                label: 'Topic Slug',
-                key: 'slug',
-              },
-              {
-                label: 'Action',
-                key: 'action',
-              }
-
-            ]}
-            getModelDetails={setModelDetails}
-            search={true}
-          />
-          {
-            Object.keys(modelDetails).length > 0 && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories/topics`} list_sources={list_sources} id='CreateTopicModal' /></>
-          }
-
-          {
-            Object.keys(modelDetails2).length > 0 && <><AutoModal record={category} modelDetails={modelDetails2} actionUrl={`/admin/docs/categories/${category.id}`} id='EditCat' /></>
-          }
-        </div>
-
+            <AutoTabs key={slug} tabs={tabs} active="docs" />
+            {
+              Object.keys(modelDetails2).length > 0 && <><AutoModal record={category} modelDetails={modelDetails2} actionUrl={`/admin/docs/categories/${category.id}`} id='EditCat' /></>
+            }
+          </>
+        )
+        :
+        <div>Loading...</div>
       }
-    </div>
-  )
-}
 
-export default Index
+    </div>
+  );
+}

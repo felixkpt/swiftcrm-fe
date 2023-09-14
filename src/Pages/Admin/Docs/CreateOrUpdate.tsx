@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useAxios from '@/hooks/useAxios';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import Dropzone from '@/components/Dropzone';
@@ -10,8 +10,12 @@ import { baseURL } from '@/utils/helpers';
 import '@/assets/prismjs/prism'
 import '@/assets/prismjs/prism.css'
 import Select from "react-select";
+import useQueryParams from '@/hooks/useQueryParams';
 
 const CreateOrUpdate = () => {
+
+  const { id } = useParams()
+  const queryParams = useQueryParams();
 
   const [customers, setCustomers] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -21,7 +25,7 @@ const CreateOrUpdate = () => {
   const { get } = useAxios();
 
   useEffect(() => {
-    fetchSelectData('admin/docs/categories?all=1', setCustomers);
+    fetchSelectData(`admin/docs/categories?all=1&id=${queryParams.get('category_id') || '0'}`, setCustomers);
   }, []);
 
   const fetchSelectData = (url: string, setDataFunction: (data: []) => any) => {
@@ -46,10 +50,7 @@ const CreateOrUpdate = () => {
 
   };
 
-
   const navigate = useNavigate()
-
-  const { id } = useParams()
 
   const [key, setKey] = useState(0)
   const [record, setRecord] = useState(null)
@@ -169,7 +170,7 @@ const CreateOrUpdate = () => {
                   onChange={(newValue) => {
                     setSelectedCategory(newValue)
                     handleSelectChange(
-                      { uri: 'admin/docs/categories/topics?all=1', fn: setTopics },
+                      { uri: `admin/docs/categories/topics?all=1`, fn: setTopics },
                       [
                         ['category_id', newValue, setTopics],
                       ],

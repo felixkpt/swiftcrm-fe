@@ -10,7 +10,7 @@ const Index = () => {
     const { get } = useAxios()
 
     const list_sources = {
-        async sectionId() {
+        async categoryId() {
             const res = await get('/admin/docs/categories?all=1').then((res) => res)
             return res.data || [] as ListSourceInterface[];
         }
@@ -42,6 +42,7 @@ const Index = () => {
                 ]}
                 getModelDetails={setModelDetails}
                 search={true}
+                list_sources={list_sources}
             />
             {
                 modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl='/admin/docs/categories/topics' list_sources={list_sources} /></>

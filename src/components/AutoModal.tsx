@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import RenderAsyncSelect from './RenderAsyncSelect';
-import { CollectionItemsInterface, ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
+import { CollectionItemsInterface, ListSourceInterface, ModalSizeType } from '@/interfaces/UncategorizedInterfaces';
 import Str from '@/utils/Str';
 interface ModalProps {
     modelDetails?: any;
@@ -12,10 +12,10 @@ interface ModalProps {
     list_sources?: { [key: string]: () => Promise<ListSourceInterface[]> };
     id?: string
     setKey?: React.Dispatch<React.SetStateAction<number>>; // Use React.Dispatch type for setKey
-    size?: 'modal-sm' | 'modal-lg' | 'modal-xl'
+    modalSize?: ModalSizeType
 }
 
-const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size, id, setKey, list_sources }) => {
+const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, modalSize, id, setKey, list_sources }) => {
 
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -28,26 +28,43 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
     const modalId = id || 'AutoModal'
 
     useEffect(() => {
-        if (modelDetails) {
-            setFillable(modelDetails?.fillable || []);
+        if (Object.keys(modelDetails).length > 0) {
+            if (modelDetails?.fillable) {
+                setFillable(modelDetails.fillable);
+            }
+
             setModelName(modelDetails?.model_name || null);
         }
     }, [modelDetails]);
 
+
     useEffect(() => {
-        const transformedObject: { [key: string]: string } = {};
+
         const keys = Object.keys(fillable);
-        keys.forEach((key: string) => {
-            transformedObject[key] = '';
-        });
+        if (keys.length > 0) {
 
-        let length = keys.length
-        if (length > 0) {
+            const tObj: { [key: string]: string } = {};
+            keys.forEach((key: string) => {
+                tObj[key] = 'a';
+            });
+
             setHasFillable(true);
-            setInputData(transformedObject);
 
-            if (size)
-                setComputedSize(size)
+            if (Object.keys(record || {}).length > 0) {
+
+                setMethod('put')
+
+                for (const key in record) {
+                    tObj[key] = record[key];
+                }
+
+                setInputData(tObj);
+            } else {
+                setInputData(tObj);
+            }
+
+            if (modalSize)
+                setComputedSize(modalSize)
             else if (length < 8)
                 setComputedSize('modal-sm')
             else if (length < 16)
@@ -56,17 +73,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
                 setComputedSize('modal-xl')
         }
 
-        if (fillable && record) {
-
-            for (const key in record) {
-                transformedObject[key] = record[key];
-                setMethod('put')
-            }
-
-            setInputData(transformedObject);
-        }
-
-    }, [fillable, record]);
+    }, [fillable, record])
 
     const errors = {};
 
@@ -111,7 +118,6 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
 
     }, [])
 
-
     const handleAjaxPostDone = (event: CustomEvent<{ [key: string]: any }>) => {
 
         if (event.detail) {
@@ -135,95 +141,97 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, size
     };
 
     return (
-        <div ref={rootRef || null}>
-            <div className={`modal fade`} id={modalId} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
-                <div className={`modal-dialog ${computedSize}`}>
-                    <div className="modal-content">
-                        {modelDetails && isModalOpen ?
-                            <div>
-                                <div className="modal-header">
-                                    <h5 className="modal-title" id="staticBackdropLabel">{`${record && record.id ? 'Edit' : 'Create'} ${modelName}`}</h5>
-                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div className="modal-body">
-                                    <form ref={formRef} method='post' action-url={actionUrl} onSubmit={(e: any) => publish('ajaxPost', e)} className="flex justify-center">
-                                        <div className="container-fluid">
-                                            <input type="hidden" name="_method" value={method} />
-                                            <div className="row">
-                                                {hasFillable ? (
-                                                    Object.keys(fillable).map((key) => {
-                                                        const { input, type } = fillable[key];
-                                                        const current_key = key.replace(/_multilist$/, '_list')
-
-                                                        return (
-                                                            <div key={current_key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
-                                                                <div className="form-group mb-2" id={`form-group-section-${current_key}`}>
-                                                                    <div className="mb-2 block">
-                                                                        <label htmlFor="small">{Str.title(current_key)}</label>
-                                                                    </div>
-                                                                    {input === 'input' && type !== 'file' && (
-                                                                        <input
-                                                                            className="form-control"
-                                                                            id={current_key}
-                                                                            type={guessType(current_key)}
-                                                                            name={current_key}
-                                                                            value={inputData[current_key] || ''}
-                                                                            onChange={(e) => handleInputChange(current_key, e.target.value)}
-                                                                            key={current_key}
-                                                                        />
-                                                                    )}
-                                                                    {input === 'input' && type === 'file' && (
-                                                                        <input
-                                                                            className="form-control"
-                                                                            id={current_key}
-                                                                            type="file"
-                                                                            name={current_key}
-                                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                                const files = e.target.files;
-                                                                                const fileNames = files ? Array.from(files).map((file) => file.name).join(', ') : '';
-                                                                                handleInputChange(current_key, fileNames);
-                                                                            }}
-                                                                            key={current_key}
-                                                                        />
-                                                                    )}
-
-                                                                    {input === 'select' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={false} />}
-
-                                                                    {input === 'multiselect' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={true} />}
-
-                                                                    {input === 'textarea' && (
-                                                                        <textarea
-                                                                            id={current_key}
-                                                                            className="form-control"
-                                                                            name={current_key}
-                                                                            value={inputData[current_key] || ''}
-                                                                            onChange={(e) => handleInputChange(current_key, e.target.value)}
-                                                                            key={current_key}
-                                                                            rows={7}
-                                                                        ></textarea>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <p>Model has no fillable fields.</p>
-                                                )}
-                                            </div>
-                                            <div className="modal-footer">
-                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" className="btn btn-primary">Submit</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
+        <div className={`modal fade`} id={modalId} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden={`${isModalOpen ? 'true' : 'false'}`}>
+            <div className={`modal-dialog ${computedSize}`}>
+                <div className="modal-content">
+                    {modelDetails && isModalOpen ?
+                        <div>
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="staticBackdropLabel">{`${record && record.id ? 'Edit' : 'Create'} ${modelName}`}</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            : 'Model data incomplete'
-                        }
-                    </div>
+                            <div className="modal-body">
+                                <form ref={formRef} method='post' action-url={actionUrl} onSubmit={(e: any) => publish('ajaxPost', e)} className="flex justify-center">
+                                    <div className="container-fluid">
+                                        <input type="hidden" name="_method" value={method} />
+
+                                        <div className="row">
+                                            {hasFillable ? (
+                                                Object.keys(fillable).map((key) => {
+                                                    const obj = fillable[key]
+                                                    const { input, type } = obj;
+                                                    const accept = obj.accept || '*'
+
+                                                    const current_key = key.replace(/_multilist$/, '_list')
+
+                                                    return (
+                                                        <div key={current_key} className={`col-12 ${computedSize !== 'modal-sm' ? 'col-md-6 col-xl-6' : ''}`}>
+                                                            <div className="form-group mb-2" id={`form-group-section-${current_key}`}>
+                                                                <div className="mb-2 block">
+                                                                    <label htmlFor="small">{Str.title(current_key)}</label>
+                                                                </div>
+                                                                {input === 'input' && type !== 'file' && (
+                                                                    <input
+                                                                        className="form-control"
+                                                                        id={current_key}
+                                                                        type={guessType(current_key)}
+                                                                        name={current_key}
+                                                                        value={inputData[current_key] || ''}
+                                                                        onChange={(e) => handleInputChange(current_key, e.target.value)}
+                                                                    />
+                                                                )}
+                                                                {input === 'input' && type === 'file' && (
+                                                                    <input
+                                                                        className="form-control"
+                                                                        id={current_key}
+                                                                        type="file"
+                                                                        name={current_key}
+                                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                            const files = e.target.files;
+                                                                            const fileNames = files ? Array.from(files).map((file) => file.name).join(', ') : '';
+                                                                            handleInputChange(current_key, fileNames);
+                                                                        }}
+                                                                        key={current_key}
+                                                                        accept={accept}
+                                                                    />
+                                                                )}
+
+                                                                {input === 'select' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={false} />}
+
+                                                                {input === 'multiselect' && <RenderAsyncSelect list_sources={list_sources} current_key={current_key} currentData={inputData[current_key.replace(/_list/, '')]} isMulti={true} />}
+
+                                                                {input === 'textarea' && (
+                                                                    <textarea
+                                                                        id={current_key}
+                                                                        className="form-control"
+                                                                        name={current_key}
+                                                                        value={inputData[current_key] || ''}
+                                                                        onChange={(e) => handleInputChange(current_key, e.target.value)}
+                                                                        key={current_key}
+                                                                        rows={7}
+                                                                    ></textarea>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <p>Model has no fillable fields.</p>
+                                            )}
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" className="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        : 'Model data incomplete'
+                    }
                 </div>
-                <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target={modalId}></button>
             </div>
+            <button type="button" className="d-none" data-bs-toggle="modal" data-bs-target={modalId}></button>
         </div>
     );
 };

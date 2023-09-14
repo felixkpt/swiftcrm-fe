@@ -1,10 +1,13 @@
 import AutoTable from '@/components/AutoTable';
 import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
-import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
 import PageHeader from '@/components/PageHeader';
 
-const Index = () => {
+type Props = {
+  category?: any
+}
+
+const Index = ({ category }: Props) => {
   const [modelDetails, setModelDetails] = useState({})
 
   const list_sources = {
@@ -14,7 +17,7 @@ const Index = () => {
     <div>
       <PageHeader title={'Categories List'} action="button" actionText="Create Category" actionTargetId="AutoModal" permission='/admin/docs/categories' />
       <AutoTable
-        baseUri='/admin/docs/categories'
+        baseUri={`/admin/docs/categories?parent_category_id=${category ? category.id : '0'}`}
         columns={[
           {
             label: 'ID',
@@ -36,9 +39,10 @@ const Index = () => {
         ]}
         getModelDetails={setModelDetails}
         search={true}
+        modalSize='modal-lg'
       />
       {
-        modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl='/admin/docs/categories' list_sources={list_sources} /></>
+        // modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl={`/admin/docs/categories?parent_category_id=${category ? category.id : '0'}`} list_sources={list_sources} /></>
       }
     </div>
   );

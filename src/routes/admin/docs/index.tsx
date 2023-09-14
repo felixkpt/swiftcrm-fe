@@ -1,5 +1,4 @@
 import AuthenticatedLayout from "@/Layouts/Authenicated/AuthenticatedLayout";
-import Docs from "@/Pages/Admin/Docs/Index"
 import CreateOrUpdate from "@/Pages/Admin/Docs/CreateOrUpdate"
 import DocDetail from "@/Pages/Admin/Docs/Detail/Index";
 import categories from "./categories";
@@ -9,12 +8,8 @@ const relativeUri = 'docs/';
 const index = [
 
     {
-        path: 'categories',
-        children: categories,
-    },
-    {
         path: '',
-        element: <AuthenticatedLayout uri={relativeUri + ''} permission="" Component={Docs} />,
+        children: categories,
     },
     {
         path: 'create',

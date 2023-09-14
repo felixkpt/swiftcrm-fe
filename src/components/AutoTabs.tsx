@@ -83,7 +83,7 @@ const AutoTabs: React.FC<Props> = ({ tabs, currentTab, active }) => {
           </li>
         ))}
       </ul>
-      <div className="tab-content">
+      <div className="tab-content mt-2">
         <div className="transition-opacity duration-500">{currentTabContent}</div>
       </div>
     </div>
