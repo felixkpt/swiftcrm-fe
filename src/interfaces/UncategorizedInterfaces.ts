@@ -9,10 +9,11 @@ export interface UserInterface {
 }
 
 
-interface DataInterface {
+export interface DataInterface {
     id: string | number
     name?: string
     status: boolean | number | string
+    [key: string]: any
 }
 export interface CollectionItemsInterface {
     current_page: number
@@ -27,11 +28,11 @@ export interface CollectionItemsInterface {
     per_page: number
     prev_page_url: any
     to: number
-    total: number,
-    model_name: string,
-    model_name_plural: string,
-    fillable: {},
-    sortable: [],
+    total: number
+    model_name: string
+    model_name_plural: string
+    fillable: { [key: string]: any }
+    sortable: []
 }
 
 export interface Link {
@@ -42,10 +43,10 @@ export interface Link {
 
 export interface GetItemInterface {
     data: DataInterface
-    model_name: string,
-    model_name_plural: string,
-    fillable: {},
-    sortable: [],
+    model_name: string
+    model_name_plural: string
+    fillable: {}
+    sortable: []
 }
 
 export interface GetItemsInterface {
@@ -59,9 +60,9 @@ export interface ResponseDataInterface {
 }
 
 interface ColumnInterface {
-    label: string,
-    key: string,
-    column?: string,
+    label: string
+    key: string
+    column?: string
 }
 
 interface ActionInterface {

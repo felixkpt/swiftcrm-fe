@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import RenderAsyncSelect from './RenderAsyncSelect';
-import { CollectionItemsInterface, ListSourceInterface, ModalSizeType } from '@/interfaces/UncategorizedInterfaces';
+import { CollectionItemsInterface, DataInterface, ListSourceInterface, ModalSizeType } from '@/interfaces/UncategorizedInterfaces';
 import Str from '@/utils/Str';
 interface ModalProps {
     modelDetails?: any;
-    record?: CollectionItemsInterface | null
+    record?: DataInterface | null
     modelName?: string;
     fillable?: { [key: string]: { input: string; type: string } };
     actionUrl: string;
@@ -20,7 +20,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
     const [inputData, setInputData] = useState<{ [key: string]: string }>({});
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [hasFillable, setHasFillable] = useState(false);
-    const [fillable, setFillable] = useState([]);
+    const [fillable, setFillable] = useState<{ [key: string]: any }[]>([]);
     const [modelName, setModelName] = useState([]);
     const [method, setMethod] = useState("POST");
 
@@ -41,7 +41,8 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
     useEffect(() => {
 
         const keys = Object.keys(fillable);
-        if (keys.length > 0) {
+        const length = keys.length
+        if (length > 0) {
 
             const tObj: { [key: string]: string } = {};
             keys.forEach((key: string) => {
@@ -62,7 +63,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
             } else {
                 setInputData(tObj);
             }
-
+            
             if (modalSize)
                 setComputedSize(modalSize)
             else if (length < 8)
@@ -103,7 +104,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
         }
     }, [errors]);
 
-    const guessType = (name: string) => {
+    const guessType = (name: any) => {
         if (fillable && fillable[name] && fillable[name].type) {
             return fillable[name].type;
         }
@@ -157,7 +158,7 @@ const AutoModal: React.FC<ModalProps> = ({ modelDetails, record, actionUrl, moda
 
                                         <div className="row">
                                             {hasFillable ? (
-                                                Object.keys(fillable).map((key) => {
+                                                Object.keys(fillable).map((key:any) => {
                                                     const obj = fillable[key]
                                                     const { input, type } = obj;
                                                     const accept = obj.accept || '*'
