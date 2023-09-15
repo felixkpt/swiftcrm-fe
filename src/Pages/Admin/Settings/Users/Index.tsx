@@ -7,7 +7,7 @@ type Props = {}
 
 const Index = (props: Props) => {
 
-    const [data, setData] = useState([])
+    const [modelDetails, setModelDetails] = useState({})
 
     return (
 
@@ -37,12 +37,12 @@ const Index = (props: Props) => {
                         key: 'action',
                     },
                 ]}
-                getModelDetails={setData}
+                getModelDetails={setModelDetails}
                 search={true}
             />
 
             {
-                data && <><AutoModal data={data} actionUrl='/admin/users' /></>
+                modelDetails && <><AutoModal id={`CreatePermission`} modelDetails={modelDetails} actionUrl='/admin/users' /></>
             }
 
         </div>
