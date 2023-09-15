@@ -1,10 +1,6 @@
 import PageHeader from '@/components/PageHeader'
 import useAxios from '@/hooks/useAxios'
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-
-import '@/assets/prismjs/prism'
-import '@/assets/prismjs/prism.css'
+import { useState } from 'react'
 import AutoTable from '@/components/AutoTable'
 import AutoModal from '@/components/AutoModal'
 import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces'

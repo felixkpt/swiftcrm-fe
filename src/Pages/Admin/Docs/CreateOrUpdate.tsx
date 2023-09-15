@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useAxios from '@/hooks/useAxios';
 import { publish, subscribe, unsubscribe } from '@/utils/events';
 import Dropzone from '@/components/Dropzone';
 import PageHeader from '@/components/PageHeader';
 import { baseURL } from '@/utils/helpers';
-import '@/assets/prismjs/prism'
-import '@/assets/prismjs/prism.css'
 import Select from "react-select";
 import useQueryParams from '@/hooks/useQueryParams';
 

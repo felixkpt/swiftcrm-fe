@@ -20,7 +20,7 @@
   },
   "include": [
     "src"
-  ],
+, "src/assets/prismjs"  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

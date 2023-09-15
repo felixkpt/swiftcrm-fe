@@ -6,7 +6,7 @@ import router from "@/routes/router.js";
 import ErrorBoundary from "./components/Notifications/ErrorBoundary";
 import './scss/customized-boostrap.scss';
 import 'react-toastify/dist/ReactToastify.css';
-  
+
 import { RolePermissionsProvider } from "./contexts/RolePermissionsContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

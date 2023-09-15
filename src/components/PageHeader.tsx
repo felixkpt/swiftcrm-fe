@@ -47,7 +47,7 @@ const PageHeader = ({ title, action, actionText, actionLink, permission, method 
     <div className='header-title shadow-sm p-2 rounded mb-3 row justify-content-betwee'>
       {
         listUrl && isAllowed() &&
-        <div className={`col-6 col-md-2 d-flex justify-content-start mb-2 mb-md-2`}>
+        <div className={`col-6 col-md-1 col-lg-2 d-flex justify-content-start mb-2 mb-md-2`}>
           <div>
             <NavLink to={listUrl} className=' btn btn-outline-light shadow view-list'>
               <span className='d-flex align-items-center gap-1 text-dark'>View list
@@ -57,11 +57,13 @@ const PageHeader = ({ title, action, actionText, actionLink, permission, method 
           </div>
         </div>
       }
-      <div className={`col-12 ${listUrl && isAllowed() ? 'col-md-10' : ''} d-flex justify-content-between align-items-center`}>
+      <div className={`col-12 ${listUrl && isAllowed() ? 'col-md-11 col-lg-10' : ''} d-flex justify-content-between align-items-center`}>
         <h3>{title}</h3>
         {isAllowed() && (
-          <div className='text-end'>
+          <div className='ms-1 text-end text-nowrap'>
+            <div>
             {renderAction()}
+            </div>
           </div>
         )}
       </div>

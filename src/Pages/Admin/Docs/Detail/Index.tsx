@@ -1,11 +1,12 @@
 import PageHeader from '@/components/PageHeader'
 import useAxios from '@/hooks/useAxios'
 import useLoadAssets from '@/hooks/useLoadAssets'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import '@/assets/prismjs/prism'
-import '@/assets/prismjs/prism.css'
+import Prism from "prismjs";
+import '@/assets/prismjs/prism.css';
+import '@/assets/prismjs/prism';
 
 type Props = {}
 
@@ -18,6 +19,18 @@ interface Docs {
 }
 
 const Index = (props: Props) => {
+
+
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (ref.current) {
+
+            useEffect(() => {
+                Prism.highlightAll();
+            }, []);
+
+        }
+    }, []);
 
     const { id } = useParams()
 
@@ -45,6 +58,7 @@ const Index = (props: Props) => {
 
     return (
         <div className=''>
+
             {
                 !loading && doc &&
 
