@@ -1,28 +1,13 @@
 import AutoTable from '@/components/AutoTable';
 import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
-import usePermissions from '@/hooks/usePermissions';
-import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
 import PageHeader from '@/components/PageHeader';
+import useListSources from '@/hooks/apis/useListSources';
 
 const Index = () => {
   const [modelDetails, setModelDetails] = useState({})
-  const { checkPermission } = usePermissions()
 
-  const list_sources = {
-    guardName: async () => {
-      return [
-        {
-          id: 'web',
-          name: 'web',
-        },
-        {
-          id: 'api',
-          name: 'api',
-        }
-      ] as ListSourceInterface[];
-    },
-  };
+  const { rolePermissions: list_sources } = useListSources()
 
   return (
     <div>
@@ -53,6 +38,7 @@ const Index = () => {
         ]}
         getModelDetails={setModelDetails}
         search={true}
+        list_sources={list_sources}
       />
       {
         modelDetails && <><AutoModal modelDetails={modelDetails} actionUrl='/admin/settings/role-permissions/roles' list_sources={list_sources} /></>

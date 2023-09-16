@@ -10,7 +10,7 @@ const Index = (props: Props) => {
 
     const [modelDetails, setModelDetails] = useState({})
 
-    const {permissions: list_sources } = useListSources()
+    const {rolePermissions: list_sources } = useListSources()
 
     return (
 

@@ -1,7 +1,7 @@
 import useAutoTableEffect from '@/hooks/useAutoTableEffect';
 import { debounce } from 'lodash';
 import Pagination from './Pagination';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { convertToTitleCase } from '@/utils/helpers';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';

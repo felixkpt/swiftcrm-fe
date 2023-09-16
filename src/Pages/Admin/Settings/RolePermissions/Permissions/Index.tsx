@@ -2,26 +2,13 @@ import AutoTable from '@/components/AutoTable';
 import AutoModal from '@/components/AutoModal';
 import { useState } from 'react';
 import PageHeader from '@/components/PageHeader';
-import { ListSourceInterface } from '@/interfaces/UncategorizedInterfaces';
+import useListSources from '@/hooks/apis/useListSources';
 
 const Index = () => {
 
   const [modelDetails, setModelDetails] = useState({})
 
-  const list_sources = {
-    guardName: async () => {
-      return [
-        {
-          id: 'web',
-          name: 'web',
-        },
-        {
-          id: 'api',
-          name: 'api',
-        }
-      ] as ListSourceInterface[];
-    },
-  };
+  const {rolePermissions: list_sources} = useListSources();
 
   return (
     <div>
