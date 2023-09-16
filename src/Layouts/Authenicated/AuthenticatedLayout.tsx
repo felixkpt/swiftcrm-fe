@@ -24,7 +24,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
     const [reloadKey, setReloadKey] = useState<number>(0);
 
-    const { user, updateUser, deleteUser, verified } = useAuth();
+    const { user, updateUser, deleteUser, verified, setRedirectTo } = useAuth();
     const navigate = useNavigate();
 
     // Initialize useAxios with the desired endpoint for fetching user data
@@ -88,6 +88,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                 updateUser(user);
             } else {
                 deleteUser()
+                setRedirectTo(location.pathname)
                 navigate('/login');
             }
         }

@@ -4,14 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import useAxios from '@/hooks/useAxios';
 
 export default function Login() {
-const { setUser, csrfToken } = useAuth();
+    const { setUser, csrfToken, redirectTo } = useAuth();
     const navigate = useNavigate();
 
     // Initialize useAxios with the desired endpoint for login
     const { data, loading, post } = useAxios();
 
     // login user
-    const handleSubmit = async (e:any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
 
         const { email, password } = e.target.elements;
@@ -35,8 +35,8 @@ const { setUser, csrfToken } = useAuth();
 
             if (user) {
                 setUser(user);
-                // Redirect the user to the home page
-                navigate('/admin');
+                // Redirect the user
+                navigate(redirectTo);
 
             }
         }

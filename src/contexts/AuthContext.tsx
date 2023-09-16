@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import CryptoJS from 'crypto-js';
 import { UserInterface } from '@/interfaces/UserInterface';
+import App from '@/utils/App';
 
 // Secret key for encryption/decryption
 const secretKey = import.meta.env.VITE_APP_CRYPO_SECRET_KEY;
@@ -19,7 +20,8 @@ interface AuthenticatedUser {
   deleteUser: () => void;
   // recenty verified user credentials
   verified: boolean
-  setVerified: (val: boolean) => void;
+  redirectTo: string
+  setRedirectTo: (location: string) => void;
 }
 
 // Function to decrypt the user object
@@ -51,7 +53,9 @@ const AuthContent = createContext<AuthenticatedUser>({
   setUser: () => { },
   deleteUser: () => { },
   verified: false,
-  setVerified: () => { },
+  redirectTo: '/',
+  setRedirectTo: () => { },
+
 });
 
 // Function to encrypt the user object
@@ -81,7 +85,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   });
 
-  const [verified, setVerified] = useState(false)
+  const [verified, setVerified] = useState<boolean>(false)
+  const [redirectTo, setRedirectTo] = useState<string>(App.home())
 
   // Set encrypted user data to local storage and update roles state
   const setUser = (newUser: UserInterface) => {
@@ -126,7 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Provide the authentication data and functions to the children components
   return (
-    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, verified, setVerified }}>
+    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, verified, redirectTo, setRedirectTo }}>
       {children}
     </AuthContent.Provider>
   );
