@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { NavLink } from 'react-router-dom';
 import Str from '@/utils/Str';
+import { toggleSidebar } from './Index';
 
 function cleanUri(uri: string): string {
     uri = `/${uri.startsWith('admin') ? '' : 'admin/'}${uri}`;
@@ -10,7 +11,7 @@ function cleanUri(uri: string): string {
 }
 
 interface RoutesListProps {
-    routes: Route[];
+    routes: RouteInterface[];
 }
 
 const RoutesList: React.FC<RoutesListProps> = ({ routes }) => {
@@ -20,6 +21,7 @@ const RoutesList: React.FC<RoutesListProps> = ({ routes }) => {
                 <>
                     {routes.map((route, i) => (
                         <NavLink
+                            onClick={(e:any) => toggleSidebar(e, 'hide')}
                             key={`${i}_${route.uri}`}
                             to={cleanUri(route.uri)}
                             className="nav-link overflow-hidden text-decoration-none px-3 cursor-pointer d-flex align-items-center gap-1"

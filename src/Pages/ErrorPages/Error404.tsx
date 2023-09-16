@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom'
 
 interface Props {
-  previousUrl: string | null
-  currentUrl: string
-  setReloadKey: React.Dispatch<React.SetStateAction<number>>
+  previousUrl?: string | null
+  currentUrl?: string
+  setReloadKey?: React.Dispatch<React.SetStateAction<number>>
 }
 
 const Error404 = ({ previousUrl, currentUrl, setReloadKey }: Props) => {

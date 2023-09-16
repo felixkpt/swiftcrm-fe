@@ -19,6 +19,7 @@ interface AuthenticatedUser {
   deleteUser: () => void;
   // recenty verified user credentials
   verified: boolean
+  setVerified: (val: boolean) => void;
 }
 
 // Function to decrypt the user object
@@ -49,7 +50,8 @@ const AuthContent = createContext<AuthenticatedUser>({
   csrfToken: async () => false,
   setUser: () => { },
   deleteUser: () => { },
-  verified: false
+  verified: false,
+  setVerified: () => { },
 });
 
 // Function to encrypt the user object
@@ -124,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Provide the authentication data and functions to the children components
   return (
-    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, verified }}>
+    <AuthContent.Provider value={{ user, updateUser, csrfToken, setUser, deleteUser, verified, setVerified }}>
       {children}
     </AuthContent.Provider>
   );

@@ -1,5 +1,9 @@
 import AutoModal from '@/components/AutoModal';
+import SimpleTable from '@/components/SimpleTable';
+import { useAuth } from '@/contexts/AuthContext';
+import useListSources from '@/hooks/apis/useListSources';
 import useAxios from '@/hooks/useAxios'
+import useRolePermissions from '@/hooks/useRolePermissions';
 import { UserInterface } from '@/interfaces/UserInterface';
 import { publish } from '@/utils/events';
 import { Icon } from '@iconify/react/dist/iconify.js';
@@ -11,6 +15,7 @@ type Props = {}
 const Index = (props: Props) => {
 
   const { id } = useParams<{ id: string }>();
+  const { setUser: setLoggedInUser, setVerified } = useAuth();
 
   const [key, setKey] = useState<number>(0)
   const [user, setUser] = useState<UserInterface>()
@@ -18,7 +23,6 @@ const Index = (props: Props) => {
   const navigate = useNavigate();
 
   const { data: userData, loading, errors, get } = useAxios()
-  const { data: roles, loading: loadingRoles, errors: errorsRoles, get: getRoles } = useAxios()
   const { data: dataLoggedIn, loading: loggingIn, errors: errorsLoggingIn, post: postLogin } = useAxios()
 
   const [modelDetails, setModelDetails] = useState({})
@@ -52,7 +56,9 @@ const Index = (props: Props) => {
 
       if (user) {
 
-        setUser(user);
+        setLoggedInUser(user);
+        setVerified(false)
+        
         // Redirect the user to the home page
         navigate('/admin');
 
@@ -61,20 +67,8 @@ const Index = (props: Props) => {
 
   }, [dataLoggedIn, loggingIn]);
 
-  const list_sources = {
 
-    async rolesList() {
-      const res = await getRoles('admin/settings/role-permissions/roles?all=1').then((res) => res)
-      return res || []
-
-    },
-
-    async directPermissionsList() {
-      const res = await getRoles('admin/settings/role-permissions/permissions?all=1').then((res) => res)
-      return res || []
-
-    }
-  }
+  const {permissions: list_sources} = useListSources()
 
   return (
     <div className="row">
@@ -86,45 +80,10 @@ const Index = (props: Props) => {
                 <div className="row">
                   <div className="col-md-6">
                     <div className="model-view">
-                      <table className="table">
-                        <tbody><tr>
-                          <th>NAME</th>
-                          <td>
-                            {user.name}
-                          </td>
-                        </tr>
-                          <tr>
-                            <th>EMAIL</th>
-                            <td>
-                              {user.email}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>PHONE</th>
-                            <td>
-                              {user.phone || 'N/A'}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>Roles</th>
-                            <td>
-                              {user.roles.reduce((prev, item) => (prev ? prev + ', ' : prev) + item.name, '')}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>Direct permissions</th>
-                            <td>
-                              {user.direct_permissions.reduce((prev, item) => (prev ? prev + ', ' : prev) + item.name, '')}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>CREATED AT</th>
-                            <td>
-                              {user.created_at}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      {
+                        modelDetails &&
+                        <SimpleTable record={user} />
+                      }
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -158,7 +117,7 @@ const Index = (props: Props) => {
 
                         <div className="modal-body">
                           <div className="section">
-                            <form encType="" method="post" action-url={'/admin/settings/users/user/update-others-password'} onSubmit={(e: any) => publish('ajaxPost', e)} >
+                            <form encType="" method="post" action-url={'/admin/settings/users/detail/update-others-password'} onSubmit={(e: any) => publish('ajaxPost', e)} >
                               <input type="hidden" name="user_id" value={id} />
                               <input type="hidden" name="_method" value="patch" />
                               <div className="form-group password">

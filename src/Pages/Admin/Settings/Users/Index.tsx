@@ -2,6 +2,7 @@ import AutoTable from '@/components/AutoTable'
 import { useState } from 'react'
 import AutoModal from '@/components/AutoModal'
 import PageHeader from '@/components/PageHeader'
+import useListSources from '@/hooks/apis/useListSources'
 
 type Props = {}
 
@@ -9,10 +10,12 @@ const Index = (props: Props) => {
 
     const [modelDetails, setModelDetails] = useState({})
 
+    const {permissions: list_sources } = useListSources()
+
     return (
 
         <div>
-            <PageHeader title={'Users List'} action="button" actionText="Create User" actionTargetId="AutoModal" permission='admin.settings.users' />
+            <PageHeader title={'Users List'} action="button" actionText="Create User" actionTargetId="CreateUserModal" permission='admin.settings.users' />
             <AutoTable
                 baseUri='/admin/settings/users'
                 columns={[
@@ -42,7 +45,7 @@ const Index = (props: Props) => {
             />
 
             {
-                modelDetails && <><AutoModal id={`CreatePermission`} modelDetails={modelDetails} actionUrl='/admin/users' /></>
+                modelDetails && <><AutoModal id={`CreateUserModal`} modelDetails={modelDetails} actionUrl='/admin/settings/users' list_sources={list_sources} /></>
             }
 
         </div>

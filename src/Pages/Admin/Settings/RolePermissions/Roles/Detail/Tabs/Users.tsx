@@ -30,7 +30,7 @@ const Users = ({ role }: Props) => {
                         </div>
                         <AutoTable
                             key={key}
-                            baseUri={`/admin/users?role_id=${role.id}`}
+                            baseUri={`/admin/settings/users?role_id=${role.id}`}
                             columns={[
                                 {
                                     label: 'ID',
@@ -55,7 +55,7 @@ const Users = ({ role }: Props) => {
                             ]}
                             search={true}
                         />
-                        <GeneralModal setKey={setKey} title='Add User to Role' actionUrl={`admin/settings/role-permissions/roles/role/${role.id}/add-user`} id={`addUserToRole`}>
+                        <GeneralModal setKey={setKey} title='Add User to Role' actionUrl={`admin/settings/role-permissions/roles/detail/${role.id}/add-user`} id={`addUserToRole`}>
                             <AddUser key={key} role={role} />
                         </GeneralModal>
                     </>
@@ -77,7 +77,7 @@ const AddUser = ({ role }: Pick<Props, 'role'>) => {
 
     const debouncedLoadOptions = (roleId: number) =>
         debounce(async (q: string, callback: (data: any[]) => void) => {
-            const { data } = await get(`/admin/users?role_id=${roleId}&negate=1&all=1&q=${q}`);
+            const { data } = await get(`/admin/settings/users?role_id=${roleId}&negate=1&all=1&q=${q}`);
             callback(data || []);
         }, 1000);
 

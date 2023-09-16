@@ -76,7 +76,7 @@ const useAxios = <T = any>() => {
                     const msg = axiosError.response?.data?.message || 'An error occurred.'
                     setErrors(msg, elementId);
 
-                    if (status && status !== 200 && status !== 201 && status !== 401) {
+                    if (status && status !== 200 && status !== 201 && status !== 401 && status !== 422) {
                         publish('notification', { message: msg, type: 'error', status })
 
                     }

@@ -2,14 +2,20 @@ import useRolePermissions from '@/hooks/useRolePermissions';
 import React, { createContext, useContext } from 'react';
 
 interface RolePermissionsContextType {
-    roles: RoleData[];
-    directPermissions: PermissionData[];
-    routePermissions: PermissionData[];
-    fetchRolesAndDirectPermissions: () => void;
+    roles: RoleInterface[];
+    directPermissions: PermissionInterface;
+    routePermissions: PermissionInterface[];
+    refreshCurrentRole: () => void;
     fetchRoutePermissions: (roleId?: string, source?: string) => void;
     loadingRoutePermissions: boolean
     currentRole: string
-    setCurrentRole: (role: RoleData) => void
+    setCurrentRole: (role: RoleInterface | undefined) => void
+    roleWasChanged: boolean
+    setRoleWasChanged: (val: boolean) => void
+    userMenu:RouteCollectionInterface[]
+    setUserMenu: (role: RouteCollectionInterface[] | undefined) => void
+    loadingMenu: boolean,
+    errorsLoadingMenu: any,
 }
 
 const RolePermissionsContext = createContext<RolePermissionsContextType | undefined>(undefined);

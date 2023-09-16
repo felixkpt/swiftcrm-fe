@@ -30,7 +30,7 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
         // Fetch the user data if the 'id' parameter is present
 
         if (id) {
-            getUser(`admin/users/user/${id}/edit`);
+            getUser(`admin/setting/users/detail/${id}/edit`);
         }
 
     }, [id]);
@@ -80,8 +80,8 @@ const CreateOrUpdateUser: React.FC<Props> = () => {
                             method="post"
                             action-url={
                                 user
-                                    ? `/admin/users/user/${user.id}`
-                                    : '/admin/users'
+                                    ? `/admin/setting/users/detail/${user.id}`
+                                    : '/admin/setting/users'
                             }
                             onSubmit={(e: any) => emitAjaxPost(e)}
                             className="flex justify-center"

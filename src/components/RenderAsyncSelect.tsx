@@ -12,10 +12,9 @@ interface RenderAsyncSelectProps {
 
 const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = false }: RenderAsyncSelectProps) => {
 
-    console.log('loaded RenderAsyncSelect')
-    async function getOptions(current_key: string, rawSelected: PropsValue<object> | undefined) {
+    async function getOptions(current_key: string, rawSelected: PropsValue<object> | PropsValue<object[]> | undefined) {
 
-        if (!list_sources) return {}
+        if (!list_sources) return {};
 
         const fn = Str.camel(current_key);
 
@@ -26,14 +25,17 @@ const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = f
             const options = await listSourceFn();
 
             let selected = rawSelected;
-            if (typeof rawSelected === 'number' || typeof rawSelected === 'string') {
+
+            if (Array.isArray(rawSelected)) {
+                selected = options.filter((option: any) => rawSelected.some((selectedItem: any) => String(selectedItem.id) === String(option.id)));
+            } else if (typeof rawSelected === 'number' || typeof rawSelected === 'string') {
                 selected = options.find((option: any) => String(option.id) === String(rawSelected));
             }
+
             return { options, selected };
         } else {
             throw new Error(`Function '${fn}' not found in list_sources.`);
         }
-
     }
 
     const [options, setOptions] = useState([]);
@@ -60,7 +62,11 @@ const RenderAsyncSelect = ({ list_sources, current_key, currentData, isMulti = f
         <Select
             id={current_key}
             className="form-control"
-            name={isMulti ? `${current_key}[]` : current_key}
+            name={
+                isMulti && Array.isArray(selected) && selected.length > 0
+                    ? `${current_key}[]`
+                    : current_key
+            }
             key={current_key}
             defaultValue={selected}
             value={selected}

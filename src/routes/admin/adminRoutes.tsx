@@ -1,10 +1,8 @@
 import Admin from '@/Pages/Admin/Index';
 import settings from './settings';
 import docs from './docs';
-import tickets from './tickets/tickets';
 import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
 import Error404 from '@/Pages/ErrorPages/Error404';
-
 
 const adminRoutes = [
   {
@@ -14,10 +12,6 @@ const adminRoutes = [
   {
     path: 'settings',
     children: settings,
-  },
-  {
-    path: 'tickets',
-    children: tickets,
   },
   {
     path: 'docs',

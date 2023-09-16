@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar/Index';
 import Footer from './Footer/Index';
 import useAxios from '@/hooks/useAxios';
-import SideNav from './SideNav/Index';
 import ScrollToTop from '@/components/ScrollToTop';
 import Error403 from '@/Pages/ErrorPages/Error403';
 import usePermissions from '@/hooks/usePermissions';
@@ -13,13 +12,17 @@ import Loader from '@/components/Loader';
 import { useRolePermissionsContext } from '@/contexts/RolePermissionsContext';
 import Error404 from '@/Pages/ErrorPages/Error404';
 import { environment } from '@/utils/helpers';
+import SideNav, { toggleSidebar } from '@/Layouts/Authenicated/SideNav/Index';
 
 interface Props {
     uri: string
     permission?: string | null
     Component: React.ComponentType
 }
+
 const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
+
+    console.log('Loaded:', uri)
 
     const [reloadKey, setReloadKey] = useState<number>(0);
 
@@ -29,7 +32,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
     // Initialize useAxios with the desired endpoint for fetching user data
     const { data, loading: loadingUser, get } = useAxios();
 
-    const { loadingRoutePermissions, fetchRolesAndDirectPermissions, fetchRoutePermissions, routePermissions } = useRolePermissionsContext();
+    const { loadingRoutePermissions, currentRole, refreshCurrentRole, setCurrentRole, fetchRoutePermissions, routePermissions } = useRolePermissionsContext();
 
     const { checkPermission } = usePermissions()
 
@@ -46,7 +49,7 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
             if (!allowedRoutes.includes(testPermission)) {
                 const isAllowed = checkPermission(testPermission, 'get');
-                // setIsAllowed(isAllowed);
+                setIsAllowed(isAllowed);
             }
 
             setTimeout(function () {
@@ -60,13 +63,21 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
     useEffect(() => {
 
         const fetchData = () => {
-            get('/user?verify=1').then((res) => res && fetchRolesAndDirectPermissions());
+            get('/user?verify=1');
         }
 
-        if (verified === false)
+        if (verified === false) {
+            setCurrentRole(undefined)
             fetchData();
+        }
 
     }, [verified]);
+
+    useEffect(() => {
+        if (currentRole === undefined) {
+            refreshCurrentRole()
+        }
+    }, [currentRole])
 
     const [tried, setTried] = useState(false);
 
@@ -101,6 +112,23 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
     }, [reloadKey])
 
+
+
+    useEffect(() => {
+        const sidebarToggle = document.body.querySelector('#sidebarToggle');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+
+        return () => {
+            if (sidebarToggle) {
+                sidebarToggle.removeEventListener('click', toggleSidebar);
+            }
+        };
+    }, []);
+
+
     return (
         <div key={reloadKey}>
             <ScrollToTop />
@@ -111,7 +139,15 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
                         <div id="layoutSidenav_nav">
                             <SideNav />
                         </div>
-                        <div id="layoutSidenav_content">
+                        <div id="layoutSidenav_content"
+                            onClick={(e: any) => {
+
+                                if (window.innerWidth < 992) {
+                                    toggleSidebar(e, 'hide')
+                                }
+                            }
+                            }
+                        >
                             <main className='container-fluid mt-4 px-4 min-h-100vh position-relative'>
                                 {
                                     isAllowed === true && checked === true ?

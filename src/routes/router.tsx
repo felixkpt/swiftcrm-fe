@@ -1,6 +1,4 @@
 import { createBrowserRouter } from 'react-router-dom';
-import GuestLayout from '@/Layouts/Guest/GuestLayout';
-import AuthenticatedLayout from '@/Layouts/Authenicated/AuthenticatedLayout';
 import guestRoutes from '@/routes/guest/guestRoutes';
 import adminRoutes from '@/routes/admin/adminRoutes';
 import userRoutes from '@/routes/user/index';
@@ -19,6 +17,5 @@ const router = createBrowserRouter([
     children: adminRoutes,
   },
 ]);
-
 
 export default router;

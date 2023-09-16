@@ -39,7 +39,7 @@ class Str {
         if (!subject) return subject
 
         let strVal = '';
-        let str = subject.replace(/_/, ' ').split(' ');
+        let str = subject.replaceAll(/_/g, ' ').split(' ');
         for (var chr = 0; chr < str.length; chr++) {
             let sub = str[chr]
             if (sub === 'id') sub = 'ID'

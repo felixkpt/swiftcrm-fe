@@ -3,6 +3,9 @@ import useAxios from "@/hooks/useAxios";
 import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { toggleSidebar } from "../SideNav/Index";
+import App from "@/utils/App";
+
 const NavBar = () => {
     const { user } = useAuth();
     const { post, loading } = useAxios();
@@ -20,37 +23,7 @@ const NavBar = () => {
     };
 
     useEffect(() => {
-        // Add event listener to all elements with the class 'dropdown-toggle'
-        document.querySelectorAll('.dropdown-toggle').forEach(item => {
-            item.addEventListener('click', event => {
-                if (event.target.classList.contains('dropdown-toggle')) {
-                    event.target.classList.toggle('toggle-change');
-                } else if (event.target.parentElement.classList.contains('dropdown-toggle')) {
-                    event.target.parentElement.classList.toggle('toggle-change');
-                }
-            });
-        });
-
-        // Clean up the event listener on component unmount
-        return () => {
-            document.querySelectorAll('.dropdown-toggle').forEach(item => {
-                item.removeEventListener('click', event => {
-                    // Your event listener logic here if needed
-                });
-            });
-        };
-    }, []);
-
-    useEffect(() => {
         const sidebarToggle = document.body.querySelector('#sidebarToggle');
-
-        const toggleSidebar = (event: Event) => {
-            event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-
-            const isToggled = document.body.classList.contains('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', isToggled.toString());
-        };
 
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', toggleSidebar);
@@ -60,14 +33,17 @@ const NavBar = () => {
             if (sidebarToggle) {
                 sidebarToggle.removeEventListener('click', toggleSidebar);
             }
-        };
+        }
     }, []);
-
 
     return (
         <nav className="sb-topnav navbar navbar-expand navbar-dark sb-navbar-dark shadow">
-            <NavLink className="navbar-brand ps-3" to="/">CIHDocs</NavLink>
-            <button className="btn btn-link btn-sm me-4 me-lg-0" id="sidebarToggle"><Icon icon={`fa6-solid:bars`} /></button>
+            <div className="navbar-brand ps-3 d-flex align-items-center justify-content-md-between">
+                <span className="order-2 order-md-1">
+                    <NavLink to="/" className='navbar-brand ps-3'>{App.name()}</NavLink>
+                </span>
+                <button className="btn btn-link btn-sm me-4 me-lg-0 order-1 order-md-2" id="sidebarToggle"><Icon icon={`fa6-solid:bars`} /></button>
+            </div>
             <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
                 <div className="input-group">
                     <input className="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
@@ -78,6 +54,7 @@ const NavBar = () => {
                 <li className="nav-item dropdown">
                     <a className="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><Icon icon={`uiw:user`} /></a>
                     <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><span className="dropdown-item disabled">{user?.name || 'Guest'}</span></li>
                         <li><NavLink className="dropdown-item" to="/user/profile">Profile</NavLink></li>
                         <li><a className="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr className="dropdown-divider" /></li>

@@ -4,14 +4,16 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const useRolePermissions = () => {
     const { get } = useAxios();
-    const { user } = useAuth()
+    const { user, verified } = useAuth()
 
     const [roles, setRoles] = useState<RoleInterface[]>([]);
-    const [currentRole, setCurrentRole] = useState<RoleInterface>();
+    const [currentRole, setCurrentRole] = useState<RoleInterface | undefined>();
     const [directPermissions, setDirectPermissions] = useState<PermissionInterface[]>([]);
     const [routePermissions, setRoutePermissions] = useState<PermissionInterface[]>([]);
 
     const [loadingRoutePermissions, setLoadingRoutePermissions] = useState(false)
+
+    const [userMenu, setUserMenu] = useState<RouteCollectionInterface[]>([])
 
     const fetchRolesAndDirectPermissions = async () => {
 
@@ -29,9 +31,9 @@ const useRolePermissions = () => {
         }
     };
 
-    const fetchRoutePermissions = async (roleId = null, source: string = 'none') => {
+    const fetchRoutePermissions = async (roleId = null) => {
 
-        if (!user || !currentRole) return false
+        if (!verified || !currentRole) return false
 
         // When roleId is give, let us NOT do refetching routePermissions if following condition fails
         if (roleId && String(currentRole.id) !== roleId) return false
@@ -44,15 +46,29 @@ const useRolePermissions = () => {
             if (routePermissionsResponse) {
                 setRoutePermissions(routePermissionsResponse || []);
             }
-        } catch (error) {
-            // Handle error
-        }
+        } catch (error) { }
 
         setLoadingRoutePermissions(false)
     };
 
+    function refreshCurrentRole() {
+
+        if (user) {
+
+            // console.log('Resetting current role && fetchRolesAndDirectPermissions...')
+            setCurrentRole(() => {
+                fetchRolesAndDirectPermissions()
+                return undefined
+            });
+
+        }
+    }
+
     useEffect(() => {
-        if (user && roles.length > 0) {
+
+        if (user && currentRole === undefined && verified && roles.length > 0) {
+
+            // console.log('Setting current role...')
             const defaultRole = user.default_role_id
                 ? roles.find((role) => role.id === user.default_role_id)
                 : null;
@@ -60,24 +76,53 @@ const useRolePermissions = () => {
             setCurrentRole(defaultRole || roles[0]);
         }
 
-    }, [roles]);
+    }, [roles, verified])
 
     useEffect(() => {
-        if (roles && currentRole) {
-            fetchRoutePermissions()
+        if (user && currentRole && verified && roles.length > 0) {
+            // console.log('FetchRoutePermissions...')
+            fetchRoutePermissions();
         }
-    }, [user, currentRole, roles])
+
+    }, [roles, currentRole])
+
+
+    const { data, get: getMenu, loading, errors } = useAxios()
+    useEffect(() => {
+
+        if (user && currentRole) {
+            getMenu('/admin/settings/role-permissions/roles/detail/' + currentRole.id + '/get-role-menu/?get-menu=1').then((resp) => {
+                if (resp === undefined) {
+                    setUserMenu([])
+                }
+            })
+
+        }
+
+    }, [currentRole])
+
+    useEffect(() => {
+
+        if (!loading && !errors && data) {
+            setUserMenu(data?.menu)
+        }
+
+    }, [loading])
 
     return {
         user,
         roles,
         directPermissions,
         routePermissions,
-        fetchRolesAndDirectPermissions,
+        refreshCurrentRole,
         currentRole,
         setCurrentRole,
         fetchRoutePermissions,
         loadingRoutePermissions,
+        userMenu,
+        setUserMenu,
+        loadingMenu: loading,
+        errorsLoadingMenu: errors,
     };
 };
 
