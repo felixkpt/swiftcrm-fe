@@ -22,8 +22,6 @@ interface Props {
 
 const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
-    console.log('Loaded:', uri)
-
     const [reloadKey, setReloadKey] = useState<number>(0);
 
     const { user, updateUser, deleteUser, verified } = useAuth();
@@ -112,8 +110,6 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
 
     }, [reloadKey])
 
-
-
     useEffect(() => {
         const sidebarToggle = document.body.querySelector('#sidebarToggle');
 
@@ -127,7 +123,6 @@ const AuthenticatedLayout = ({ uri, permission, Component }: Props) => {
             }
         };
     }, []);
-
 
     return (
         <div key={reloadKey}>
